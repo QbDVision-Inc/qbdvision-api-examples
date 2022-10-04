@@ -1,0 +1,394 @@
+process_name: Make Cookies
+step_order:
+    '1': Mix Wet Ingredients
+    '2': Mix Dry Ingredients
+    '3': Mix Dough
+    '4': Bake Cookies
+    '5': Test Cookies
+steps:
+    Bake Cookies:
+        connected_from: Mix Dough
+        connected_to: Test Cookies
+        inputs:
+            dough:
+                connects:
+                - Mix Dough
+                properties:
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 30
+                            upper_limit: null
+                        unit: g
+            oven:
+                connects: []
+                properties:
+                    ID:
+                        specs:
+                            valid_options:
+                            - oven0123
+                        unit: string
+                    temperature:
+                        specs:
+                            lower_limit: null
+                            target_value: 180
+                            upper_limit: null
+                        unit: "\xB0C"
+            scale:
+                connects: []
+                properties:
+                    ID:
+                        specs:
+                            valid_options:
+                            - scale 0123
+                        unit: string
+        outputs:
+            cookie:
+                connects:
+                - Test Cookies
+                properties:
+                    creator:
+                        specs:
+                            valid_options:
+                            - your initials here
+                        unit: string
+                    well:
+                        specs:
+                            valid_options:
+                            - position on baking tray e.g. A1
+                        unit: string
+            oven:
+                connects: []
+                properties:
+                    time (duration):
+                        specs:
+                            lower_limit: null
+                            target_value: 12
+                            upper_limit: null
+                        unit: min
+        step_name: Bake Cookies
+        step_number: 4
+    Mix Dough:
+        connected_from: Mix Wet Ingredients
+        connected_to: Bake Cookies
+        inputs:
+            chocolate:
+                connects: []
+                properties:
+                    batch ID:
+                        specs:
+                            valid_options:
+                            - choc0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 60
+                            upper_limit: null
+                        unit: g
+                    type:
+                        specs:
+                            valid_options:
+                            - chips
+                            - wafer
+                            - powder
+                        unit: string
+            dry material:
+                connects:
+                - Mix Dry Ingredients
+                properties:
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: null
+                            upper_limit: null
+                        unit: g
+            wet material:
+                connects: []
+                properties:
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: null
+                            upper_limit: null
+                        unit: g
+        outputs:
+            dough:
+                connects:
+                - Bake Cookies
+                properties:
+                    creator:
+                        specs:
+                            valid_options:
+                            - your initials here
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: null
+                            upper_limit: null
+                        unit: g
+        step_name: Mix Dough
+        step_number: 3
+    Mix Dry Ingredients:
+        connected_from: null
+        connected_to: Mix Dough
+        inputs:
+            scale:
+                connects: []
+                properties:
+                    ID:
+                        specs:
+                            valid_options:
+                            - scale0123
+                        unit: string
+            sodium bicarbonate:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - bicarb0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 5
+                            upper_limit: null
+                        unit: g
+            sodium chloride:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - salt0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 1
+                            upper_limit: null
+                        unit: g
+            wheat flour:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - flour0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 200
+                            upper_limit: null
+                        unit: g
+                    protein:
+                        concentration:
+                            specs:
+                                lower_limit: null
+                                target_value: null
+                                upper_limit: null
+                            unit: g/kg
+        outputs:
+            dry material:
+                connects:
+                - Mix Dough
+                properties:
+                    creator:
+                        specs:
+                            valid_options:
+                            - your initials here
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: null
+                            upper_limit: null
+                        unit: g
+        step_name: Mix Dry Ingredients
+        step_number: 2
+    Mix Wet Ingredients:
+        connected_from: null
+        connected_to: Mix Dough
+        inputs:
+            brown sugar:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - brown0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 85
+                            upper_limit: null
+                        unit: g
+            butter:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - butter0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 110
+                            upper_limit: null
+                        unit: g
+            egg:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - egg0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 60
+                            upper_limit: null
+                        unit: g
+            scale:
+                connects: []
+                properties:
+                    ID:
+                        specs:
+                            valid_options:
+                            - scale0123
+                        unit: string
+            vanilla extract:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - vanilla0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 1
+                            upper_limit: null
+                        unit: g
+            white sugar:
+                connects: []
+                properties:
+                    lot number:
+                        specs:
+                            valid_options:
+                            - white0123
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: 75
+                            upper_limit: null
+                        unit: g
+        outputs:
+            wet material:
+                connects:
+                - Mix Dough
+                properties:
+                    creator:
+                        specs:
+                            valid_options:
+                            - your initials here
+                        unit: string
+                    date:
+                        specs:
+                            valid_options: null
+                        unit: string
+                    mass:
+                        specs:
+                            lower_limit: null
+                            target_value: null
+                            upper_limit: null
+                        unit: g
+                    replicate:
+                        specs:
+                            lower_limit: null
+                            target_value: null
+                            upper_limit: null
+                        unit: count
+        step_name: Mix Wet Ingredients
+        step_number: 1
+    Test Cookies:
+        connected_from: Bake Cookies
+        connected_to: null
+        inputs:
+            cookie:
+                connects:
+                - Bake Cookies
+                properties:
+                    well:
+                        specs:
+                            valid_options: null
+                        unit: string
+            testing chamber:
+                connects: []
+                properties:
+                    ID:
+                        specs:
+                            valid_options:
+                            - test0123
+                        unit: string
+                    method:
+                        specs:
+                            valid_options:
+                            - cookie
+                            - brownie
+                            - bar
+                        unit: string
+        outputs:
+            cookie:
+                connects: []
+                properties:
+                    creator:
+                        specs:
+                            valid_options: null
+                        unit: string
+                    crunch:
+                        specs:
+                            lower_limit: 90
+                            target_value: 95
+                            upper_limit: 100
+                        unit: dB
+                    energy:
+                        specs:
+                            lower_limit: 175
+                            target_value: 200
+                            upper_limit: 225
+                        unit: Kcal
+                    glucose:
+                        concentration:
+                            specs:
+                                lower_limit: 8
+                                target_value: 10
+                                upper_limit: null
+                            unit: g/kg
+                    protein:
+                        concentration:
+                            specs:
+                                lower_limit: 8
+                                target_value: 10
+                                upper_limit: null
+                            unit: g/kg
+                    water activity:
+                        specs:
+                            lower_limit: 0.4
+                            target_value: 0.5
+                            upper_limit: 0.6
+                        unit: Aw
+                    well:
+                        specs:
+                            valid_options: null
+                        unit: string
+        step_name: Test Cookies
+        step_number: 5
