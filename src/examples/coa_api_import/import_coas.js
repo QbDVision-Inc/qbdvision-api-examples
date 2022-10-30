@@ -41,7 +41,7 @@ async function main() {
 async function getUploadUrl(fileName) {
 let response;
   try {
-    response = await openAPIProxy.get(encodeURI(`import/getCoAUploadUrl?fileName=${fileName}`));
+    response = await openAPIProxy.get(encodeURI(`import/getSmartImportUploadUrl?fileName=${fileName}`));
   } catch(error) {
     console.log(error);
   }
