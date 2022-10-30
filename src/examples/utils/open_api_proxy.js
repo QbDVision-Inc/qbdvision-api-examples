@@ -25,7 +25,7 @@ module.exports.OpenAPIProxy = class OpenAPIProxy {
     });
   }
 
-  // Delegate all of the API calls to Axios. Read more here: https://axios-http.com/docs/api_intro
+  // Delegate all the API calls to Axios. Read more here: https://axios-http.com/docs/api_intro
   get(url, config) {
     return this.axios.get(url, config);
   }
