@@ -1,6 +1,6 @@
 "use strict";
 
-const {OpenAPIProxy} = require("../utils/open_api_proxy");
+const {OpenAPIProxy} = require("./utils/open_api_proxy");
 const fs = require("fs");
 
 /**

@@ -103,7 +103,10 @@ export default class ProcessExplorerAPIProxy extends OpenAPIProxy {
         }
       } else {
         for (let recordKey in treeData[map]) {
-          const record = treeData[map][recordKey]
+          const record = treeData[map][recordKey];
+          if(record.deletedAt) {
+            continue;
+          }
           this.nodesDataSet.add({
             id: counter,
             label: record.name,

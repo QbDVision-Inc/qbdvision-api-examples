@@ -5,8 +5,8 @@ const coaDocsToMaterialIds = require("./coaDocsToMaterialIds.json");
 const fs = require("fs");
 
 const COA_DOCUMENTS_PATH = './coaDocs/';
-const API_KEY = "95b9db61cf654c20aa3d97b14f780171";
-const BASE_URL = "https://api.cicdkons.dev.qbdvision.com/cicdkons/"
+const API_KEY = "b43e671d58d64d389407530f1ff3f06b";
+const BASE_URL = "http://localhost:3000/"
 const openAPIProxy = new CoAOpenAPIProxy(API_KEY, BASE_URL);
 
 (async () => {
@@ -16,11 +16,11 @@ const openAPIProxy = new CoAOpenAPIProxy(API_KEY, BASE_URL);
 async function main() {
   const coaDocs = fs.readdirSync(COA_DOCUMENTS_PATH);
 
-  for(let coaDoc of coaDocs) {
+  for (let coaDoc of coaDocs) {
     try {
       const materialId = coaDocsToMaterialIds[coaDoc];
 
-      if(materialId) {
+      if (materialId && materialId !== -1) {
         console.log(`Processing CoA ${coaDoc}`);
 
         const uploadUrl = await getUploadUrl(coaDoc);
@@ -32,17 +32,17 @@ async function main() {
 
         console.log("CoA imported successfully");
       }
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
   }
 }
 
 async function getUploadUrl(fileName) {
-let response;
+  let response;
   try {
-    response = await openAPIProxy.get(encodeURI(`import/getSmartImportUploadUrl?fileName=${fileName}`));
-  } catch(error) {
+    response = await openAPIProxy.get(encodeURI(`import/getCoAUploadUrl?fileName=${fileName}`));
+  } catch (error) {
     console.log(error);
   }
 
@@ -55,7 +55,7 @@ async function uploadToS3(uploadUrl, coaDoc) {
 
   try {
     response = await openAPIProxy.uploadToS3(uploadUrl, `${COA_DOCUMENTS_PATH}${coaDoc}`);
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 
@@ -79,7 +79,7 @@ async function startCoAJob(coaAPIInfo, materialId) {
 
   try {
     result = await openAPIProxy.post(`import/processCoA`, data);
-  } catch(error) {
+  } catch (error) {
     console.log(error);
   }
 
@@ -98,7 +98,8 @@ async function waitForJobToFinish(jobId) {
           jobId: jobId,
         }
       });
-    } catch(ignore) {}
+    } catch (ignore) {
+    }
 
     await sleep(2000);
   }
