@@ -47,13 +47,16 @@ export class OpenAPIProxy {
     if (result.data?.data) {
       const input = result.data.data;
       // This is required in order to make fflate decompress.
-      let fflateCompressedLatinEncodedStr = fflate.strToU8(input, true);
+      const fflateCompressedLatinEncodedStr = fflate.strToU8(input, true);
 
       // Decompress the compressed data
-      let decompressedDataStream = fflate.decompressSync(fflateCompressedLatinEncodedStr);
+      const decompressedDataStream = fflate.decompressSync(fflateCompressedLatinEncodedStr);
 
       // Convert the decompressed data stream to string
-      result.data = fflate.strFromU8(decompressedDataStream);
+      const decompressedString = fflate.strFromU8(decompressedDataStream);
+
+      // Parse the string to JSON
+      result.data = JSON.parse(decompressedString);
     }
 
     return result;

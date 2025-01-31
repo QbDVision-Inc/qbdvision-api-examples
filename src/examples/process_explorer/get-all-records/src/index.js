@@ -28,7 +28,7 @@ async function main() {
   console.log("Sending request to get record data...");
   const dataResult = await openAPIProxy.put(`/editables/multiple/list/${PROJECT_ID}?onlyLoadDetails=true&includeHistory=true&includeClonedFrom=true&shouldCompress=true&includeFromLibrary=true&includeRecordOrder=true&returnLatestApprovedOrDraftVersionsOnly=true`, {requirementIds: allRecordKeys});
 
-  const instances = JSON.parse(dataResult.data).instances;
+  const instances = dataResult.data.instances;
   console.log(`Received ${instances.length} records:`);
   for (const instance of instances) {
     console.log(`  ${instance.typeCode}-${instance.id}: ${instance.name}`);
