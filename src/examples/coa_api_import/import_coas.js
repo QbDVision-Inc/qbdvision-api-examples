@@ -5,8 +5,8 @@ const coaDocsToMaterialIds = require("./coaDocsToMaterialIds.json");
 const fs = require("fs");
 
 const COA_DOCUMENTS_PATH = './coaDocs/';
-const API_KEY = "b43e671d58d64d389407530f1ff3f06b";
-const BASE_URL = "http://localhost:3000/"
+const API_KEY = "YOUR_API_KEY";
+const BASE_URL = "https://api.sandbox.qbdvision.com/sandbox/";
 const openAPIProxy = new CoAOpenAPIProxy(API_KEY, BASE_URL);
 
 (async () => {

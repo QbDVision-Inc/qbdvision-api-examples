@@ -1,7 +1,7 @@
 import { OpenAPIProxy } from "./utils/open_api_proxy.js";
 import fs from "fs";
 
-const API_KEY = "<YOUR_API_KEY>";
+const API_KEY = "YOUR_API_KEY";
 const BASE_URL = "http://api.sandbox.qbdvision.com/sandbox"
 const PROJECT_ID = 146;
 const PROCESS_ID = 425;

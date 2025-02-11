@@ -7,7 +7,7 @@ This example demonstrates how to import batch records using the QbDVision REST A
 - Node.js 20.x or higher
 - A QbDVision API key
 
-## Installation
+## Getting Started
 
 1. Install the dependencies
 ```bash
@@ -31,11 +31,7 @@ cp /path/to/your/batch/record/files/* ./batchRecordDocs
 ```bash
 node import_batch_records.js
 ```
-# Best Practices for Production usage
+# Best Practices for Production
  - Use environment variables for API keys
  - Implement proper error handling and retries
- - Add logging
-
-
-
-
+- Add logging/reporting according to your company's standards

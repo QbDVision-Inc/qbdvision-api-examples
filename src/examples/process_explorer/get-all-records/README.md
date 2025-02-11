@@ -1,11 +1,28 @@
-Get started:
-1. Get this repository
+# Get all Process Explorer Records Example (Node.js)
+
+This example demonstrates how to load all of the records in a process using the QbDVision REST API with Node.js.
+
+## Prerequisites
+
+- Node.js 20.x or higher
+- A QbDVision API key
+
+## Getting Started
+
+1. Install the dependencies
+```bash
+npm install
+```
+2. Edit `src/index.js` and replace `YOUR_API_KEY` with your QbDVision API key.
+3. Modify `BASE_URL` to point to your QbDVision environment if you're not using Sandbox.
+4. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to export.
 2. Run `npm install`
 3. Run `npm run start`
 
-The output will look like this, with the full results written to a file named `all-records.json`:
+## Output
+The output will look something like this, with the full results written to a file named `all-records.json`:
 
-```bazaar
+```
 Ryans-MacBook-Pro:get-all-records ryanshillington$ npm run start
 
 > get-all-records@0.1.0 start
@@ -67,3 +84,9 @@ Received 36 records:
 Writing the data to all-records.json...
 Done!
 ```
+
+# Best Practices for Production
+- Use environment variables for API keys
+- Implement proper error handling and retries
+- Add logging/reporting according to your company's standards
+

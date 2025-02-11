@@ -3,8 +3,11 @@ import urllib.parse
 import urllib.request
 import sys
 
-QBDVISION_API_KEY = 'xxxYourAPIKeyGoesHerexxx'
-QBDVISION_URL = 'https://api.dev-staging-circleci.qbdvision.com/dev-staging-circleci'
+QBDVISION_API_KEY = 'YOUR_API_KEY'
+BASE_URL = 'https://api.sandbox.qbdvision.com/sandbox/'
+PROJECT_ID = 100  # Update this with your project Id that you want to import the data into
+UNIT_OPERATION_ID = 506  # Update this with the Unit Operation Id that you want to update
+
 HEADERS = {
   "qbdvision-api-key": QBDVISION_API_KEY,
   "Content-Type": "application/json"
@@ -19,8 +22,6 @@ with open('Make Cookies.json') as input_file:
   unitOperation = {};
   # Load the existing data from QbDVision
   try:
-    PROJECT_ID = 100  # Update this with your project Id that you want to import the data into
-    UNIT_OPERATION_ID = 506  # Update this with the Unit Operation Id that you want to update
     req = urllib.request.Request(f"{QBDVISION_URL}/editables/UnitOperation/{UNIT_OPERATION_ID}/{PROJECT_ID}", None,
                                  HEADERS, None, False, "GET")
     with urllib.request.urlopen(req) as response:
