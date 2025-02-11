@@ -25,8 +25,10 @@ Each directory in this repository focuses on a specific aspect of the API:
   Certificate of Analysis (CoA) documents/records using the API
 - [`/import_data_from_json`](/src/examples/import_data_from_json) - Importing
   basic record data from a JSON file
-- [`/process_explorer`](/src/examples/process_explorer) - How to use the Process
-  Explorer API to access multiple records
+- [`/process_explorer/get-all-records`](/src/examples/process_explorer/get-all-records) - How to use the Process
+  Explorer API to download multiple records
+- [`/process_explorer/process-graph`](/src/examples/process_explorer/process-graph) - Use the Process
+  Explorer API to download all records and then displays them as a graph
 
 ## Usage
 
