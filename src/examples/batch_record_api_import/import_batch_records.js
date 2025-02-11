@@ -6,11 +6,10 @@ const batchRecordDocsToProcessIds = require("./batchRecordDocsToProcessIds.json"
 const {S3Facade} = require("./facades/s3_facade");
 
 const BATCH_RECORD_DOCUMENTS_PATH = './batchRecordDocs/';
-const API_KEY = "cd17daf15e6c46e7ae2f84cae62d3cea";
-const BASE_URL = "https://api.cicdkons.dev.qbdvision.com/cicdkons/";
-const LOCAL_BASE_URL = "http://localhost:3000/";
-const openAPIProxy = new OpenAPIProxy(API_KEY, LOCAL_BASE_URL);
-const s3Facade = new S3Facade(API_KEY, LOCAL_BASE_URL);
+const API_KEY = "YOUR_API_KEY";
+const BASE_URL = "https://api.sandbox.qbdvision.com/sandbox/";
+const openAPIProxy = new OpenAPIProxy(API_KEY, BASE_URL);
+const s3Facade = new S3Facade(API_KEY, BASE_URL);
 
 (async () => {
   await main();

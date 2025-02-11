@@ -35,7 +35,6 @@ Each example includes:
 - Source code with detailed comments
 - A README explaining the specific use case
 - Requirements and setup instructions
-- Expected output
 
 To run an example:
 
