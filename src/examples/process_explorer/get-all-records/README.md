@@ -16,8 +16,10 @@ npm install
 2. Edit `src/index.js` and replace `YOUR_API_KEY` with your QbDVision API key.
 3. Modify `BASE_URL` to point to your QbDVision environment if you're not using Sandbox.
 4. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to export.
-2. Run `npm install`
-3. Run `npm run start`
+5. Run the example:
+```bash
+npm run start`
+````
 
 ## Output
 The output will look something like this, with the full results written to a file named `all-records.json`:
