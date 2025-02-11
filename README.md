@@ -16,10 +16,10 @@ To use these examples, you'll need:
 
 Each directory in this repository focuses on a specific aspect of the API:
 
-- [`/batch_record_api_import`](/batch_record_api_import) - How to import batch records using the API
-- [`/coa_api_import`](/coa_api_import) - How to import a Certificate of Analysis (CoA) documents/records using the API
-- [`/import_data_from_json`](/import_data_from_json) - Importing basic record data from a JSON file
-- [`/process_explorer`](/process_explorer) - How to use the Process Explorer API to access multiple records
+- [`/batch_record_api_import`](/src/examples/batch_record_api_import) - How to import batch records using the API
+- [`/coa_api_import`](/src/examples/coa_api_import) - How to import a Certificate of Analysis (CoA) documents/records using the API
+- [`/import_data_from_json`](/src/examples/import_data_from_json) - Importing basic record data from a JSON file
+- [`/process_explorer`](/src/examples/process_explorer) - How to use the Process Explorer API to access multiple records
 
 ## Usage
 
