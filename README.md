@@ -10,7 +10,7 @@ To use these examples, you'll need:
 
 - A QbDVision account with your organization (or a [sandbox account](https://sandbox.qbdvision.com/))
 - An API key ([Get one from your API Keys page](https://sandbox.qbdvision.com/users/list.html?showAPIKeys=true))
-- The interpreter for the example you're workign with (either in Python 3.13+ or Node.js 20.18+)
+- The interpreter for the example you're working with (either in Python 3.13+ or Node.js 20.18+)
 
 ## Examples
 
