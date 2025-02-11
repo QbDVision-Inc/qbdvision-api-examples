@@ -34,4 +34,5 @@ node import_batch_records.js
 # Best Practices for Production
  - Use environment variables for API keys
  - Implement proper error handling and retries
-- Add logging/reporting according to your company's standards
+ - Add logging/reporting according to your company's standards
+ - Use the latest versions of all libraries

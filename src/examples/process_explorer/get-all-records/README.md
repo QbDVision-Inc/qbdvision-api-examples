@@ -18,7 +18,7 @@ npm install
 4. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to export.
 5. Run the example:
 ```bash
-npm run start`
+npm run start
 ````
 
 ## Output
@@ -91,4 +91,4 @@ Done!
 - Use environment variables for API keys
 - Implement proper error handling and retries
 - Add logging/reporting according to your company's standards
-
+- Use the latest versions of all libraries

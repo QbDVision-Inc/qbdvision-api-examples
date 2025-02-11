@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# The file downloaded from the REST API
+!/src/apiLib/process-explorer-data.json
