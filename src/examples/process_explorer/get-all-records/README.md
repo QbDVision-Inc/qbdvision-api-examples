@@ -89,7 +89,7 @@ Done!
 ```
 
 # Best Practices for Production
-- Use environment variables for API keys
+- Use a key store for API keys
 - Implement proper error handling and retries
 - Add logging/reporting according to your company's standards
 - Use the latest versions of all libraries
