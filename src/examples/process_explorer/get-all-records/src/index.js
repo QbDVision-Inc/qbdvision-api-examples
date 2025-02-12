@@ -1,10 +1,11 @@
 import { OpenAPIProxy } from "./utils/open_api_proxy.js";
 import fs from "fs";
+import 'dotenv/config';
 
-const API_KEY = "YOUR_API_KEY";
-const BASE_URL = "http://api.sandbox.qbdvision.com/sandbox"
-const PROJECT_ID = 146;
-const PROCESS_ID = 425;
+const API_KEY = process.env.API_KEY;
+const BASE_URL = process.env.BASE_URL;
+const PROJECT_ID = process.env.PROJECT_ID;
+const PROCESS_ID = process.env.PROCESS_ID;
 
 main()
 

@@ -20,15 +20,15 @@ To use these examples, you'll need:
 Each directory in this repository focuses on a specific aspect of the API:
 
 - [`/batch_record_api_import`](/src/examples/batch_record_api_import) - How to
-  import batch records using the API
+  import batch records using the API **(Node.js)**
 - [`/coa_api_import`](/src/examples/coa_api_import) - How to import a
-  Certificate of Analysis (CoA) documents/records using the API
+  Certificate of Analysis (CoA) documents/records using the API **(Node.js)**
 - [`/import_data_from_json`](/src/examples/import_data_from_json) - Importing
-  basic record data from a JSON file
+  basic record data from a JSON file **(Python)**
 - [`/process_explorer/get-all-records`](/src/examples/process_explorer/get-all-records) - How to use the Process
-  Explorer API to download multiple records
+  Explorer API to download multiple records **(Node.js)**
 - [`/process_explorer/process-graph`](/src/examples/process_explorer/process-graph) - Use the Process
-  Explorer API to download all records and then displays them as a graph
+  Explorer API to download all records and then displays them as a graph **(Node.js)**
 
 ## Usage
 

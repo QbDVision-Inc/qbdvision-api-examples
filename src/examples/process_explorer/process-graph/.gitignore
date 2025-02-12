@@ -24,3 +24,6 @@ yarn-error.log*
 
 # The file downloaded from the REST API
 process-explorer-data.json
+
+# Secrets such as API keys
+.env

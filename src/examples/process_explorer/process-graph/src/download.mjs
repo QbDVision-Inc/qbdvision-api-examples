@@ -2,11 +2,12 @@
 
 import {OpenAPIProxy} from "./utils/open_api_proxy.mjs";
 import fs from "fs";
+import 'dotenv/config';
 
-const API_KEY = "YOUR_API_KEY";
-const BASE_URL = "http://api.sandbox.qbdvision.com/sandbox"
-const PROJECT_ID = 1;
-const PROCESS_ID = 258;
+const API_KEY = process.env.API_KEY;
+const BASE_URL = process.env.BASE_URL;
+const PROJECT_ID = process.env.PROJECT_ID;
+const PROCESS_ID = process.env.PROCESS_ID;
 
 async function main() {
     let data = await getProcessExplorerData(PROJECT_ID, PROCESS_ID);
@@ -24,6 +25,7 @@ async function getProcessExplorerData(projectId, processId) {
         result = await openAPIProxy.get(url);
     } catch (e) {
         console.log(`Failed to get the process explorer data: ${e.message}`);
+        throw e;
     }
     return result?.data;
 }

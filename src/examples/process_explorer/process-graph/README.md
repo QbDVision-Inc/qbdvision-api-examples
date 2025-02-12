@@ -14,16 +14,15 @@ the QbDVision REST API with Node.js and then display them in a diagram.
 ```bash
 npm install
 ```
-2. Edit `src/download.js` and replace `YOUR_API_KEY` with your QbDVision API key.
-3. Modify `BASE_URL` to point to your QbDVision environment if you're not using
-   Sandbox.
-4. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that
-   you want to see.
-5. Build the example:
+2. Copy `.env.example` to `.env` and fill in:
+    1. Modify `API_Key` to be your QbDVision API key.
+    2. Modify `BASE_URL` to point to your QbDVision environment if you're not using Sandbox.
+    3. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to see.
+3. Build the example:
 ```bash
 npm run build
 ```
-5. Download the process data:
+4. Download the process data:
 ```bash
 npm run download
 ```

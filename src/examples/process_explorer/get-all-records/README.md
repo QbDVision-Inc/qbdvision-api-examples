@@ -13,10 +13,11 @@ This example demonstrates how to load all of the records in a process using the 
 ```bash
 npm install
 ```
-2. Edit `src/index.js` and replace `YOUR_API_KEY` with your QbDVision API key.
-3. Modify `BASE_URL` to point to your QbDVision environment if you're not using Sandbox.
-4. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to export.
-5. Run the example:
+2. Copy `.env.example` to `.env` and fill in:
+    1. Modify `API_Key` to be your QbDVision API key.
+    2. Modify `BASE_URL` to point to your QbDVision environment if you're not using Sandbox.
+    3. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to see.
+3. Run the example:
 ```bash
 npm run start
 ````
