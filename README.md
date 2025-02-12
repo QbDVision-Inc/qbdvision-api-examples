@@ -57,8 +57,8 @@ cd qbdvision-api-examples/process_explorer
 * REST API Reference
   * This differs by environment, since different environments are different releases (with different features).
     * [Sandbox API Reference](https://sandbox.qbdvision.com/restAPI/index.html)
-    * [Professional API Reference](https://login.qbdvision.com/restAPI/index.html)
-    * [Professional XR API Reference](https://validated.qbdvision.com/restAPI/index.html)
+    * [Standard API Reference](https://login.qbdvision.com/restAPI/index.html)
+    * [Extended Release (XR) API Reference](https://validated.qbdvision.com/restAPI/index.html)
   
 * [API Objects Reference](https://cherrycircle.atlassian.net/wiki/spaces/QK/pages/2412478489/QbDVision+API+Objects) - 
 This page provides the list of objects and their attributes that can be used with the API.
