@@ -3,8 +3,7 @@
 import {OpenAPIProxy} from "./utils/open_api_proxy.mjs";
 import fs from "fs";
 
-//const API_KEY = "YOUR_API_KEY";
-const API_KEY = "dd657c69bbfe40a79b347e8bf48485a5";
+const API_KEY = "YOUR_API_KEY";
 const BASE_URL = "http://api.sandbox.qbdvision.com/sandbox"
 const PROJECT_ID = 1;
 const PROCESS_ID = 258;

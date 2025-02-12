@@ -11,11 +11,9 @@ the QbDVision REST API with Node.js and then display them in a diagram.
 ## Getting Started
 
 1. Install the dependencies
-
 ```bash
 npm install
 ```
-
 2. Edit `src/download.js` and replace `YOUR_API_KEY` with your QbDVision API key.
 3. Modify `BASE_URL` to point to your QbDVision environment if you're not using
    Sandbox.
