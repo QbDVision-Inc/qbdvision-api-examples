@@ -8,6 +8,8 @@ const PROJECT_ID = process.env.PROJECT_ID;
 const NEW_PROCESS_NAME = process.env.NEW_PROCESS_NAME;
 const EXCEL_FILE_PATH = process.env.EXCEL_FILE_PATH;
 
+const TIME_TOKEN = "Time to load data from Excel";
+console.time(TIME_TOKEN);
 const openAPIProxy = new OpenAPIProxy(API_KEY, BASE_URL);
 
 main();
@@ -117,7 +119,7 @@ async function main() {
         }
     }
 
-    // Find a unique process name
+    console.timeEnd(TIME_TOKEN);
     console.log("Done!");
 }
 
