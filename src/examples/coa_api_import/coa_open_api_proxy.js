@@ -10,23 +10,20 @@ const fs = require("fs");
  * @type {exports.OpenAPIProxy}
  */
 module.exports.CoAOpenAPIProxy = class CoAOpenAPIProxy extends OpenAPIProxy {
-  constructor(apiKey, baseUrl) {
-    super(apiKey, baseUrl);
-  }
-
-  async uploadToS3(url, filePath) {
-    const fileData = fs.readFileSync(filePath);
-
-    let result;
-    try {
-      result = await this.axios.put(url, fileData, {
-        headers: {
-          "x-amz-server-side-encryption": "AES256"
-        }
-      });
-    } catch (e) {
-      console.log(`S3 file upload operation failed: ${e.message}`);
+    constructor(apiKey, baseUrl) {
+        super(apiKey, baseUrl);
     }
-    return result;
-  }
+
+    async uploadToS3(url, filePath) {
+        const fileData = fs.readFileSync(filePath);
+
+        let result;
+        result = await this.axios.put(url, fileData, {
+            headers: {
+                "x-amz-server-side-encryption": "aws:kms:dsse",
+                "x-amz-server-side-encryption-aws-kms-key-id": "alias/S3KMSMultiRegionKey",
+            },
+        });
+        return result;
+    }
 };
