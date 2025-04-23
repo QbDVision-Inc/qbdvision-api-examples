@@ -1,6 +1,6 @@
-# Importing Certificate of Analysis (CoA) Records Example (Node.js)
+# Importing Certificate of Analysis (CoA) Record (from JSON) Example (Node.js)
 
-This example demonstrates how to import a CoA using the QbDVision REST API with Node.js.
+This example demonstrates how to import a CoA (from JSON) using the QbDVision REST API with Node.js.
 
 ## Prerequisites
 
@@ -20,20 +20,9 @@ npm install
 ```bash
 cp /path/to/your/coa/files/* ./coaDocs
 ```
-5. Update coaDocsToMaterialIds.json with the mapping of CoA documents to Library 
- Material IDs. The JSON file should look like this:
-```json
-{
-  "CoADocument1.pdf": 1,
-  "CoADocument2.pdf": 14
-}
-```
-Where 1 and 14 are the ids of the Materials in QbDVision (ex. MT-1 and 
-MT-14). Make the Material ID -1 if you want that file to be ignored.
-
-6. Run the script
+6. Run the script, passing in the material ID and the path to the JSON and PDF files:
 ```bash
-node import_coas.js
+node import_coas.js --materialId <MATERIAL_ID> --jsonFile <PATH_TO_JSON_FILE> --pdfFile <PATH_TO_PDF_FILE>
 ```
 
 # Best Practices for Production
