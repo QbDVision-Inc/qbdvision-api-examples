@@ -14,7 +14,7 @@ const openAPIProxy = new CoAOpenAPIProxy(API_KEY, BASE_URL);
 })();
 
 /**
- * Ryan's best guess at what's going on in the JSON file.
+ * A mapping of the array of values in the JSON file to what they represent.
  * @type {{}}
  */
 const JSON_ARRAY_STRUCTURE = {
@@ -190,7 +190,7 @@ function createCoAResults(libraryMaterial, coaAPIInfo, coaArray, pdfFilename, js
              * create multiple measurements[] and then compute & set the min,
              * max, average and standard deviation (sd) values.
              */
-            const value = convertToNumber(coaArrayElement[JSON_ARRAY_STRUCTURE.VALUE]);
+            const value = String(removeNonNumericText(coaArrayElement[JSON_ARRAY_STRUCTURE.VALUE]));
             if (!value) {
                 console.warn(`Value not found for ${qbdSpecName}. Value: ${coaArrayElement[JSON_ARRAY_STRUCTURE.VALUE]}`);
                 continue;
@@ -243,7 +243,7 @@ function getQbDVisionSpecName(coaArrayElement) {
  * @param someString The string that (hopefully) contains a number.
  * @return {string} A string that is just the number.
  */
-function convertToNumber(someString) {
+function removeNonNumericText(someString) {
     // This regex looks for numbers with optional decimal points
     // It handles numbers preceded by characters like "<" or other text
     const regex = /[-+]?\d*\.?\d+/g;
