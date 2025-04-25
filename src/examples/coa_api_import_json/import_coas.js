@@ -7,6 +7,9 @@ const {program} = require("commander");
 
 const API_KEY = process.env.API_KEY;
 const BASE_URL = process.env.BASE_URL;
+if (!API_KEY || !BASE_URL) {
+    throw new Error("Missing API_KEY or BASE_URL in .env file.");
+}
 const openAPIProxy = new CoAOpenAPIProxy(API_KEY, BASE_URL);
 
 (async () => {
@@ -80,6 +83,7 @@ async function main() {
         console.log("CoA imported successfully!");
     } catch (error) {
         console.error("Error caught:", error);
+        process.exit(1);
     }
 }
 
@@ -167,7 +171,7 @@ function createCoAResults(libraryMaterial, coaAPIInfo, coaArray, pdfFilename, js
         const specification = specNameToObjectMap.get(qbdSpecName);
         const objToImport = {
             attributeID: `MTLS-${specification.id}`,
-            attributeName: "Infrared absorption spectrum / Id A",
+            attributeName: specification.name,
             batchId: lotId || coaArrayElement[JSON_ARRAY_STRUCTURE.BATCH_ID],
             scale: coaArrayElement[JSON_ARRAY_STRUCTURE.AMOUNT],
             startDate: "",
