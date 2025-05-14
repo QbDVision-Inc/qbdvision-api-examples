@@ -22,13 +22,19 @@ Each directory in this repository focuses on a specific aspect of the API:
 - [`/batch_record_api_import`](/src/examples/batch_record_api_import) - How to
   import batch records using the API **(Node.js)**
 - [`/coa_api_import`](/src/examples/coa_api_import) - How to import a
-  Certificate of Analysis (CoA) documents/records using the API **(Node.js)**
+  Certificate of Analysis (CoA) documents/records using the API (from a PDF from the manufacturer) **(Node.js)**
+- [`/coa_api_import_json`](/src/examples/coa_api_import_json) - How to import a
+  Certificate of Analysis (CoA) documents/records using the API (from a JSON file with the values) **(Node.js)**
 - [`/import_data_from_json`](/src/examples/import_data_from_json) - Importing
   basic record data from a JSON file **(Python)**
 - [`/import_records_from_xlsx`](/src/examples/import_records_from_xlsx) - Importing
   basic record data from an Excel file **(Node.js)**
 - [`/process_explorer/get-all-records`](/src/examples/process_explorer/get-all-records) - How to use the Process
   Explorer API to download multiple records **(Node.js)**
+- [`/process_explorer/oauth-get-all-records`](/src/examples/process_explorer/oauth-get-all-records) - How to use OAuth keys to authenticate and then use the Process
+  Explorer API to download multiple records **(Node.js)**
+- [`/process_explorer/oauth-get-all-records_py`](/src/examples/process_explorer/oauth-get-all-records-py) - How to use OAuth keys to authenticate and then use the Process
+  Explorer API to download multiple records **(Python)**
 - [`/process_explorer/process-graph`](/src/examples/process_explorer/process-graph) - Use the Process
   Explorer API to download all records and then displays them as a graph **(Node.js)**
 
