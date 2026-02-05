@@ -48,7 +48,7 @@ The OAuth 2.0 Client Credentials flow works in two steps:
 ```
 ┌─────────────┐                                    ┌──────────────────┐
 │             │  1. Request Access Token           │                  │
-│ Your App    │─────────────────────────────────>  │ Cognito (AWS)    │
+│  Your App   │─────────────────────────────────>  │  Cognito (AWS)   │
 │             │     (Client ID + Client Secret)    │                  │
 │             │                                    │                  │
 │             │  2. Receive Access Token (JWT)     │                  │
@@ -58,8 +58,8 @@ The OAuth 2.0 Client Credentials flow works in two steps:
        │ 3. Make API calls with token
        ▼
 ┌─────────────────────────────────────────────────┐
-│         QbDVision REST API                      │
-│  (Authorization: <access_token>)                │
+│          QbDVision REST API                     │
+│         (Authorization: <access_token>)         │
 └─────────────────────────────────────────────────┘
 ```
 
