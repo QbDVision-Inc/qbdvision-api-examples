@@ -81,7 +81,7 @@ Generated from the QbDVision UI (see [Getting Your OAuth Credentials](#getting-y
 The authorization endpoint varies by environment:
 Contact support@qbdvision.com if you need help with this entry.
 
-**Note on Scope**: QbDVision's M2M App Clients are preconfigured with `api/full` scope by default, which grants full API access.
+**Note on Scope**: QbDVision's OAuth 2.0 Keys (App Clients) are preconfigured with `api/full` scope by default, which grants access to all APIs.
 
 ## Making Your First Authentication Request
 
@@ -102,9 +102,9 @@ curl -X POST "https://your-cognito-domain.auth.region.amazoncognito.com/oauth2/t
 ```javascript
 const axios = require('axios');
 
-const CLIENT_ID = 'your_client_id';
-const CLIENT_SECRET = 'your_client_secret';
-const COGNITO_URL = 'https://your-cognito-domain.auth.region.amazoncognito.com/oauth2/token';
+const CLIENT_ID = 'YOUR_CLIENT_ID';
+const CLIENT_SECRET = 'YOUR_CLIENT_SECRET';
+const COGNITO_AUTHORIZATION_URL = 'https://your-cognito-domain.auth.region.amazoncognito.com/oauth2/token';
 
 async function getAccessToken() {
   const params = new URLSearchParams();
@@ -112,7 +112,7 @@ async function getAccessToken() {
   params.append('client_id', CLIENT_ID);
   params.append('client_secret', CLIENT_SECRET);
 
-  const response = await axios.post(COGNITO_URL, params, {
+  const response = await axios.post(COGNITO_AUTHORIZATION_URL, params, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
@@ -127,9 +127,9 @@ async function getAccessToken() {
 ```python
 import requests
 
-CLIENT_ID = 'your_client_id'
-CLIENT_SECRET = 'your_client_secret'
-COGNITO_URL = 'https://your-cognito-domain.auth.region.amazoncognito.com/oauth2/token'
+CLIENT_ID = 'YOUR_CLIENT_ID'
+CLIENT_SECRET = 'YOUR_CLIENT_SECRET'
+COGNITO_AUTHORIZATION_URL = 'https://your-cognito-domain.auth.region.amazoncognito.com/oauth2/token'
 
 def get_access_token():
     payload = {
@@ -142,7 +142,7 @@ def get_access_token():
         'Content-Type': 'application/x-www-form-urlencoded'
     }
     
-    response = requests.post(COGNITO_URL, data=payload, headers=headers)
+    response = requests.post(COGNITO_AUTHORIZATION_URL, data=payload, headers=headers)
     response.raise_for_status()
     
     return response.json()['access_token']
