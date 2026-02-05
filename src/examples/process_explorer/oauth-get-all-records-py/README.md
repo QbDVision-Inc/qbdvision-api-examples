@@ -7,7 +7,10 @@ process using the QbDVision REST API with Python.
 
 - Python 3.9 or higher
 - A QbDVision OAuth 2.0 API key
-  - Currently you need to contact support@qbdvision.com to get an OAuth 2.0 key created.
+  - You can generate your own OAuth 2.0 credentials from the ([API Keys page](https://sandbox.qbdvision.com/users/list.html?showAPIKeys=true))
+  - Select **OAuth2** as the API Key Type when creating an API Key.
+  - You'll also need the Cognito authorization URL for your environment - contact support@qbdvision.com if you don't have this.
+  - **For detailed OAuth setup instructions, see the [OAuth 2.0 Authentication Guide](/docs/OAUTH_AUTHENTICATION.md)**
 
 ## Getting Started
 
@@ -30,15 +33,15 @@ Here are some instructions to get you started with this sample:
    pip install -r requirements.txt
    ```
 3. Copy `.env.example` to `.env` and fill in:
-    1. Modify `CLIENT_ID` to be your QbDVision OAuth 2.0 Client ID.
-    1. Modify `CLIENT_SECRET` to be your QbDVision OAuth 2.0 Client Secret.
-    3. Modify `COGNITO_AUTHORIZATION_URL` to be the Authorization URL provided by QbDVision.
-    2. Modify `BASE_URL` to point to your QbDVision environment if you're not using Sandbox.
-    3. Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to see.
+   - Modify `CLIENT_ID` to be your QbDVision OAuth 2.0 Client ID
+   - Modify `CLIENT_SECRET` to be your QbDVision OAuth 2.0 Client Secret
+   - Modify `COGNITO_AUTHORIZATION_URL` to be the Authorization URL provided by QbDVision
+   - Modify `BASE_URL` to point to your QbDVision environment if you're not using Sandbox
+   - Modify `PROJECT_ID` and `PROCESS_ID` to be the project and process ID that you want to see
 4. Run the example:
 ```bash
 python src/index.py
-````
+```
 
 ## Output
 The output will look something like this, with the full results written to a file named `all-records.json`:

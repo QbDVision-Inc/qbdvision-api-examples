@@ -10,8 +10,10 @@ To use these examples, you'll need:
 
 - A QbDVision account with your organization (or
   a [sandbox account](https://sandbox.qbdvision.com/))
-- An API
-  key ([Get one from your API Keys page](https://sandbox.qbdvision.com/users/list.html?showAPIKeys=true))
+- An API Key from the [API Keys page](https://sandbox.qbdvision.com/users/list.html?showAPIKeys=true):
+  - **Static API Key**
+  - **OAuth 2.0 Credentials**: Generate your own Client ID and Client Secret through the QbDVision UI
+    - See our [OAuth 2.0 Authentication Guide](/docs/OAUTH_AUTHENTICATION.md) for detailed setup instructions
 - The interpreter for the example you're working with (either in Python 3.13+ or
   Node.js 20.18+)
 
@@ -60,7 +62,10 @@ cd qbdvision-api-examples/process_explorer
 
 ## Documentation
 
-* REST API Reference
+* **Authentication**
+  * [OAuth 2.0 Authentication Guide](/docs/OAUTH_AUTHENTICATION.md) - Comprehensive guide for setting up and using OAuth 2.0 credentials
+
+* **REST API Reference**
   * This differs by environment, since different environments are different releases (with different features).
     * [Sandbox API Reference](https://sandbox.qbdvision.com/restAPI/index.html)
     * [Standard API Reference](https://login.qbdvision.com/restAPI/index.html)
