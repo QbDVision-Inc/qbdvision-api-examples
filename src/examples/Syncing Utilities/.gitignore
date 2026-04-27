@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.py[cod]
+
+logs/
+project_id_map.json
+process_id_map.json
