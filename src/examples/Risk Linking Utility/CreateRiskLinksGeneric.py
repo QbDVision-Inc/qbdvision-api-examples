@@ -75,7 +75,7 @@ RECORD_CONFIG = {
         "owner_id_key": "IPAId",
         "self_link_id_key": "LinkedIPAId",
         "self_link_target_key": "TargetIPAId",
-        "uncertainty_key": "Uncertainty",
+        "uncertainty_key": "uncertainty",
         "link_specs": {
             "FPA": {"field": "IPAToFPAs", "id_key": "FPAId"},
             "FQA": {"field": "IPAToFQAs", "id_key": "FQAId"},
@@ -91,7 +91,7 @@ RECORD_CONFIG = {
         "label": "MA",
         "endpoint": "MaterialAttribute",
         "owner_id_key": "MaterialAttributeId",
-        "uncertainty_key": "Uncertainty",
+        "uncertainty_key": "uncertainty",
         "link_specs": {
             "FPA": {"field": "MaterialAttributeToFPAs", "id_key": "FPAId"},
             "FQA": {"field": "MaterialAttributeToFQAs", "id_key": "FQAId"},
@@ -103,7 +103,7 @@ RECORD_CONFIG = {
         "label": "PP",
         "endpoint": "ProcessParameter",
         "owner_id_key": "ProcessParameterId",
-        "uncertainty_key": "Uncertainty",
+        "uncertainty_key": "uncertainty",
         "link_specs": {
             "FPA": {"field": "ProcessParameterToFPAs", "id_key": "FPAId"},
             "FQA": {"field": "ProcessParameterToFQAs", "id_key": "FQAId"},
