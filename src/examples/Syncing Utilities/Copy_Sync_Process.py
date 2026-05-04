@@ -5,7 +5,7 @@ Also handles DS / DP flows
 from a source project into an existing target project.
 
 We do NOT sync the supplier list between environments. SupplierId for Materials and Process Components is remapped
-by supplier name (create if missing). Theze are synced at the very end, after records are created - to preserve
+by supplier name (create if missing). These are synced at the very end, after records are created - to preserve
 unit ops, steps, and flows.
 """
 
