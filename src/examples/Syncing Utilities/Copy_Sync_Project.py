@@ -78,7 +78,7 @@ ALLOWED_PROJECT_FIELDS = [
     "regulatoryPath", "regulatoryPhase", "referenceListedDrug",
     "productRiskAssessmentType", "riskAssessmentMethod",
     "manufacturingLeadId", "RMPId"
-    # the following fields are user IDs. We dont sync user IDs between environments so we can not sync these.
+    # the following fields are user IDs. We don't sync user IDs between environments so we can not sync these.
     # "projectManagerId", "projectSponsorId",
     # "cmcLeadId", "deviceLeadId", "qcLeadId", "qaLeadId", "regulatoryLeadId",
 ]
