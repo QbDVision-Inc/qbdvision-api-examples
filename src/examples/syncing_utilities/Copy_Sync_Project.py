@@ -7,8 +7,10 @@ you can run this again and it will continue.
 We do NOT sync the supplier list between environments, so ControlMethod.SupplierId
 is remapped by supplier name (create if missing) much like the RMP.
 
+Smart Content and User fields are not synced
+
 You may end up with more TPPs and GAs in the target if any of the defaults are archived in the source.
-This does not yet handle archiving records in the target.
+This does not handle archiving records in the target.
 """
 
 import requests
@@ -78,9 +80,6 @@ ALLOWED_PROJECT_FIELDS = [
     "regulatoryPath", "regulatoryPhase", "referenceListedDrug",
     "productRiskAssessmentType", "riskAssessmentMethod",
     "manufacturingLeadId", "RMPId"
-    # the following fields are user IDs. We don't sync user IDs between environments so we can not sync these.
-    # "projectManagerId", "projectSponsorId",
-    # "cmcLeadId", "deviceLeadId", "qcLeadId", "qaLeadId", "regulatoryLeadId",
 ]
 PROJECT_SYNC_FIELDS = [
     f for f in ALLOWED_PROJECT_FIELDS
