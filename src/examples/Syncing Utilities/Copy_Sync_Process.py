@@ -32,7 +32,7 @@ SRC_BASE_PATH = os.getenv("SOURCE_BASE_PATH")
 TGT_HOST = os.getenv("TARGET_HOST")
 TGT_BASE_PATH = os.getenv("TARGET_BASE_PATH")
 
-def _required_int(name: str, value: str | None) -> int:
+def required_int(name: str, value: str | None) -> int:
     try:
         return int(value)
     except (TypeError, ValueError):
@@ -67,9 +67,9 @@ def validate_config():
         print("Copy .env.example to .env and fill in all required values.")
         sys.exit(1)
 
-    SRC_PROJECT_ID = _required_int("SOURCE_PROJECT_ID", SRC_PROJECT_ID)
-    SRC_PROCESS_ID = _required_int("SOURCE_PROCESS_ID", SRC_PROCESS_ID)
-    TGT_PROJECT_ID = _required_int("TARGET_PROJECT_ID", TGT_PROJECT_ID)
+    SRC_PROJECT_ID = required_int("SOURCE_PROJECT_ID", SRC_PROJECT_ID)
+    SRC_PROCESS_ID = required_int("SOURCE_PROCESS_ID", SRC_PROCESS_ID)
+    TGT_PROJECT_ID = required_int("TARGET_PROJECT_ID", TGT_PROJECT_ID)
 # --------------------- LOGGING ---------------------
 LOG_DIR = "logs"
 
@@ -124,6 +124,9 @@ ALLOWED_PROCESS_FIELDS = [
 ALLOWED_UNIT_OPERATION_FIELDS = [
     "name", "description", "risk", "input",
     "output", "links", "order"
+]
+ALLOWED_TIMEPOINT_FIELDS = [
+    "name", "recordOrder"
 ]
 ALLOWED_STEP_FIELDS = [
     "name", "description", "links"
@@ -547,7 +550,7 @@ def add_tgt_acr_for_diff(tgt_full: dict) -> dict:
 
     return tgt_full
 # --------------------- NORMALIZATION & DIFF ---------------------
-def _normalize_whitespace(text: str):
+def normalize_whitespace(text: str):
     collapsed = " ".join(text.split())
     return collapsed if collapsed else None
 
@@ -562,10 +565,10 @@ def normalize(val):
             if isinstance(obj, (list, dict)):
                 return normalize(obj)
             if isinstance(obj, str):
-                return _normalize_whitespace(obj)
+                return normalize_whitespace(obj)
         except Exception:
             pass
-        return _normalize_whitespace(val)
+        return normalize_whitespace(val)
 
     if isinstance(val, list):
         return [normalize(v) for v in val]
@@ -611,6 +614,147 @@ def sanitize_payload(src: dict, allowed_fields: list, extra_fields: dict) -> dic
     payload = {k: src[k] for k in allowed_fields if k in src}
     payload.update(extra_fields)
     return strip_attachment_links(payload)
+
+def coerce_list(value) -> list:
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except Exception:
+            return []
+    return value if isinstance(value, list) else []
+
+def normalize_timepoints_for_compare(timepoints) -> list:
+    cleaned = []
+    for tp in coerce_list(timepoints):
+        if not isinstance(tp, dict) or tp.get("deletedAt"):
+            continue
+        cleaned.append({field: normalize(tp.get(field)) for field in ALLOWED_TIMEPOINT_FIELDS})
+
+    return sorted(
+        cleaned,
+        key=lambda tp: (
+            tp.get("recordOrder") is None,
+            str(tp.get("recordOrder")),
+            str(tp.get("name") or ""),
+        ),
+    )
+
+def unique_lookup(records: list, key_fn) -> dict:
+    counts = Counter()
+    by_key = {}
+    for record in records:
+        key = key_fn(record)
+        if key is None:
+            continue
+        counts[key] += 1
+        by_key[key] = record
+    return {key: record for key, record in by_key.items() if counts[key] == 1}
+
+def build_timepoints_payload(src_timepoints, tgt_timepoints, tgt_uo_id: int) -> list:
+    tgt_active = [
+        tp for tp in coerce_list(tgt_timepoints)
+        if isinstance(tp, dict) and not tp.get("deletedAt")
+    ]
+    tgt_by_name = unique_lookup(tgt_active, lambda tp: normalize(tp.get("name")))
+    tgt_by_order = unique_lookup(tgt_active, lambda tp: normalize(tp.get("recordOrder")))
+
+    payload = []
+    for src_tp in coerce_list(src_timepoints):
+        if not isinstance(src_tp, dict) or src_tp.get("deletedAt"):
+            continue
+
+        item = {
+            field: src_tp.get(field)
+            for field in ALLOWED_TIMEPOINT_FIELDS
+            if field in src_tp
+        }
+        item["UnitOperationId"] = tgt_uo_id
+
+        tgt_tp = tgt_by_name.get(normalize(src_tp.get("name")))
+        if not tgt_tp:
+            tgt_tp = tgt_by_order.get(normalize(src_tp.get("recordOrder")))
+        if tgt_tp and tgt_tp.get("id"):
+            item["id"] = tgt_tp["id"]
+
+        payload.append(item)
+
+    return sorted(
+        payload,
+        key=lambda tp: (
+            tp.get("recordOrder") is None,
+            str(tp.get("recordOrder")),
+            str(tp.get("name") or ""),
+        ),
+    )
+
+def _timepoint_label(timepoint: dict) -> str:
+    label = timepoint.get("label")
+    if label:
+        return label
+    return f"TP-{timepoint.get('id')} - {timepoint.get('name')}"
+
+def build_sample_timepoints_payload(src_timepoints, tgt_uo_timepoints, tgt_uo_id: int) -> list:
+    tgt_active = [
+        tp for tp in coerce_list(tgt_uo_timepoints)
+        if isinstance(tp, dict) and not tp.get("deletedAt")
+    ]
+    tgt_by_name = unique_lookup(tgt_active, lambda tp: normalize(tp.get("name")))
+    tgt_by_order = unique_lookup(tgt_active, lambda tp: normalize(tp.get("recordOrder")))
+
+    payload = []
+    for src_tp in coerce_list(src_timepoints):
+        if not isinstance(src_tp, dict) or src_tp.get("deletedAt"):
+            continue
+
+        tgt_tp = tgt_by_name.get(normalize(src_tp.get("name")))
+        if not tgt_tp:
+            tgt_tp = tgt_by_order.get(normalize(src_tp.get("recordOrder")))
+        if not tgt_tp or not tgt_tp.get("id"):
+            logger.warning(
+                "Skipping Sample Timepoint '%s'; no matching target Timepoint on UnitOperation %s",
+                src_tp.get("name"),
+                tgt_uo_id,
+            )
+            continue
+
+        payload.append({
+            "id": tgt_tp["id"],
+            "name": tgt_tp.get("name"),
+            "label": _timepoint_label(tgt_tp),
+            "typeCode": tgt_tp.get("typeCode") or "TP",
+            "unitOperationId": tgt_tp.get("unitOperationId") or tgt_tp.get("UnitOperationId") or tgt_uo_id,
+            "recordOrder": tgt_tp.get("recordOrder"),
+        })
+
+    return sorted(
+        payload,
+        key=lambda tp: (
+            tp.get("recordOrder") is None,
+            str(tp.get("recordOrder")),
+            str(tp.get("name") or ""),
+        ),
+    )
+
+def normalize_sample_timepoints_for_compare(timepoints) -> list:
+    cleaned = []
+    for tp in coerce_list(timepoints):
+        if not isinstance(tp, dict) or tp.get("deletedAt"):
+            continue
+        cleaned.append({
+            "id": normalize(tp.get("id")),
+            "name": normalize(tp.get("name")),
+            "recordOrder": normalize(tp.get("recordOrder")),
+        })
+
+    return sorted(
+        cleaned,
+        key=lambda tp: (
+            tp.get("recordOrder") is None,
+            str(tp.get("recordOrder")),
+            str(tp.get("name") or ""),
+            str(tp.get("id") or ""),
+        ),
+    )
 
 def is_archived(record: dict) -> bool:
     return isinstance(record, dict) and record.get("currentState") == "Archived"
@@ -747,10 +891,10 @@ def map_and_diff_control_methods(
 
     return mapped_payload, src_names != tgt_names
 
-def _canonical_type_code(code: str) -> str:
+def canonical_type_code(code: str) -> str:
     return "".join(ch for ch in str(code or "").upper() if ch.isalnum())
 
-def _normalize_applies_to_maps(applies_to_maps: dict | None) -> dict:
+def normalize_applies_to_maps(applies_to_maps: dict | None) -> dict:
     aliases = {
         "MA": "MATERIALATTRIBUTE",
         "MATERIALATTRIBUTE": "MATERIALATTRIBUTE",
@@ -776,11 +920,11 @@ def _normalize_applies_to_maps(applies_to_maps: dict | None) -> dict:
     for key, mapping in (applies_to_maps or {}).items():
         if not isinstance(mapping, dict):
             continue
-        canonical = aliases.get(_canonical_type_code(key), _canonical_type_code(key))
+        canonical = aliases.get(canonical_type_code(key), canonical_type_code(key))
         normalized[canonical] = mapping
     return normalized
 
-def _map_applies_to_ref(ref, applies_to_maps: dict) -> str | None:
+def map_applies_to_ref(ref, applies_to_maps: dict) -> str | None:
     if not isinstance(ref, str):
         return None
     ref = ref.strip()
@@ -812,7 +956,7 @@ def _map_applies_to_ref(ref, applies_to_maps: dict) -> str | None:
         "FQA": "FQA",
     }
 
-    canonical = aliases.get(_canonical_type_code(type_code), _canonical_type_code(type_code))
+    canonical = aliases.get(canonical_type_code(type_code), canonical_type_code(type_code))
     mapping = applies_to_maps.get(canonical)
     if not mapping:
         return ref
@@ -823,7 +967,7 @@ def _map_applies_to_ref(ref, applies_to_maps: dict) -> str | None:
 
     return f"{type_code}-{mapped_id}"
 
-def _sanitize_risk_link_links(links_value, applies_to_maps: dict) -> str:
+def sanitize_risk_link_links(links_value, applies_to_maps: dict) -> str:
     links = links_value
     if isinstance(links, str):
         try:
@@ -849,7 +993,7 @@ def _sanitize_risk_link_links(links_value, applies_to_maps: dict) -> str:
             mapped = []
             seen = set()
             for ref in applies_to:
-                mapped_ref = _map_applies_to_ref(ref, applies_to_maps)
+                mapped_ref = map_applies_to_ref(ref, applies_to_maps)
                 if not mapped_ref or mapped_ref in seen:
                     continue
                 mapped.append(mapped_ref)
@@ -882,7 +1026,7 @@ def sync_risk_links(
         - (resolver_fn, id_key_name)
         - {"resolver": resolver_fn, "id_key": "...", "parent_id_key": "..."}
     """
-    normalized_applies_maps = _normalize_applies_to_maps(applies_to_maps)
+    normalized_applies_maps = normalize_applies_to_maps(applies_to_maps)
 
     for src_id, tgt_record_id in records.items():
         src_record = http_get(individual_record_url(src_base, record_type, src_id), src_key)
@@ -918,7 +1062,7 @@ def sync_risk_links(
                         "uncertainty": link.get("uncertainty", 1),
                         "effect": link.get("effect", "Adds"),
                         "justification": link.get("justification", ""),
-                        "links": _sanitize_risk_link_links(link.get("links", "[]"), normalized_applies_maps),
+                        "links": sanitize_risk_link_links(link.get("links", "[]"), normalized_applies_maps),
                     }
 
                     if parent_id_key:
@@ -954,8 +1098,8 @@ def sync_risk_links(
                         tgt_link[k] = src_val
                         changed = True
 
-                src_links_json = _sanitize_risk_link_links(src_link.get("links", "[]"), normalized_applies_maps)
-                tgt_links_json = _sanitize_risk_link_links(tgt_link.get("links", "[]"), normalized_applies_maps)
+                src_links_json = sanitize_risk_link_links(src_link.get("links", "[]"), normalized_applies_maps)
+                tgt_links_json = sanitize_risk_link_links(tgt_link.get("links", "[]"), normalized_applies_maps)
                 if tgt_links_json != src_links_json:
                     tgt_link["links"] = src_links_json
                     changed = True
@@ -1283,6 +1427,8 @@ def copy_unit_operations(
         tgt_uo_id = map_lookup(prev_mapping, src_id)
         tgt_uo = http_get(individual_record_url(tgt_base, "UnitOperation", tgt_uo_id), tgt_key) if tgt_uo_id else None
         tgt_uo = validate_target_scope(tgt_uo, tgt_project_id, tgt_process_id, "UnitOperation")
+        if tgt_uo_id and not tgt_uo:
+            tgt_uo_id = None
 
         # Fallback to name-based lookup
         if not tgt_uo_id and src_name in tgt_by_name and src_name not in dup_uo_names:
@@ -1294,12 +1440,21 @@ def copy_unit_operations(
 
         if tgt_uo:
             tgt_uo = ensure_full_record("UnitOperation", tgt_uo, tgt_base, tgt_key)
+            if tgt_uo and "Timepoints" not in tgt_uo:
+                tgt_uo = http_get(individual_record_url(tgt_base, "UnitOperation", tgt_uo["id"]), tgt_key)
 
         payload = sanitize_payload(
             src_uo,
             ALLOWED_UNIT_OPERATION_FIELDS,
             {"ProjectId": tgt_project_id, "ProcessId": tgt_process_id},
         )
+        sync_timepoints = "Timepoints" in src_uo
+        if sync_timepoints and tgt_uo_id:
+            payload["Timepoints"] = build_timepoints_payload(
+                src_uo.get("Timepoints"),
+                tgt_uo.get("Timepoints") if tgt_uo else [],
+                tgt_uo_id,
+            )
 
         changed_fields = []
         if tgt_uo:
@@ -1313,6 +1468,11 @@ def copy_unit_operations(
             for field in ALLOWED_UNIT_OPERATION_FIELDS:
                 if freeze_for_compare(payload.get(field)) != freeze_for_compare(tgt_uo_for_diff.get(field)):
                     changed_fields.append(field)
+            if sync_timepoints:
+                src_timepoints = normalize_timepoints_for_compare(payload.get("Timepoints"))
+                tgt_timepoints = normalize_timepoints_for_compare(tgt_uo_for_diff.get("Timepoints"))
+                if src_timepoints != tgt_timepoints:
+                    changed_fields.append("Timepoints")
             # Ignore order-only changes
             if changed_fields == ["order"]:
                 changed_fields = []
@@ -1339,6 +1499,29 @@ def copy_unit_operations(
             new_uo = http_put(f"{tgt_base}editables/UnitOperation/addOrEdit", tgt_key, payload)
             tgt_uo_id = new_uo["id"]
             logger.info("Created UnitOperation '%s': %s -> %s", src_name, src_id, tgt_uo_id)
+            if sync_timepoints:
+                new_uo_full = new_uo
+                if not new_uo_full.get("LastVersionId"):
+                    new_uo_full = http_get(individual_record_url(tgt_base, "UnitOperation", tgt_uo_id), tgt_key)
+                timepoints_payload = build_timepoints_payload(
+                    src_uo.get("Timepoints"),
+                    new_uo_full.get("Timepoints", []),
+                    tgt_uo_id,
+                )
+                if timepoints_payload:
+                    timepoint_update = sanitize_payload(
+                        src_uo,
+                        ALLOWED_UNIT_OPERATION_FIELDS,
+                        {
+                            "id": tgt_uo_id,
+                            "LastVersionId": new_uo_full["LastVersionId"],
+                            "ProjectId": tgt_project_id,
+                            "ProcessId": tgt_process_id,
+                            "Timepoints": timepoints_payload,
+                        },
+                    )
+                    logger.info("Updating UnitOperation '%s' timepoints after create", src_name)
+                    http_put(f"{tgt_base}editables/UnitOperation/addOrEdit", tgt_key, timepoint_update)
 
         mapping[normalize_id(src_id)] = tgt_uo_id
 
@@ -2659,6 +2842,16 @@ def copy_samples(
         tgt_lookup[key] = sample
 
     mapping = {}
+    tgt_uo_cache = {}
+
+    def get_tgt_uo_timepoints(tgt_uo_id: int | None) -> list:
+        if not tgt_uo_id:
+            return []
+        if tgt_uo_id not in tgt_uo_cache:
+            tgt_uo = http_get(individual_record_url(tgt_base, "UnitOperation", tgt_uo_id), tgt_key)
+            tgt_uo = validate_target_scope(tgt_uo, tgt_project_id, tgt_process_id, "UnitOperation")
+            tgt_uo_cache[tgt_uo_id] = tgt_uo or {}
+        return tgt_uo_cache[tgt_uo_id].get("Timepoints", [])
 
     for src_sample in src_samples:
         if is_archived(src_sample):
@@ -2701,25 +2894,47 @@ def copy_samples(
         tgt_mat_id = map_lookup(material_mapping, full_src.get("MaterialId")) if full_src.get("MaterialId") else None
         tgt_matrix_mat_id = map_lookup(material_mapping, full_src.get("MatrixMaterialId")) if full_src.get("MatrixMaterialId") else None
 
+        extra_fields = {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "UnitOperationId": tgt_uo_id,
+            "StepId": tgt_step_id,
+            "MaterialId": tgt_mat_id,
+            "MatrixMaterialId": tgt_matrix_mat_id,
+        }
+        sync_timepoints = "Timepoints" in full_src
+        if sync_timepoints:
+            if tgt_uo_id:
+                extra_fields["Timepoints"] = build_sample_timepoints_payload(
+                    full_src.get("Timepoints"),
+                    get_tgt_uo_timepoints(tgt_uo_id),
+                    tgt_uo_id,
+                )
+            else:
+                logger.warning(
+                    "Skipping Sample '%s' timepoints; sample has no target UnitOperation",
+                    full_src.get("name"),
+                )
+
         payload = sanitize_payload(
             full_src,
             ALLOWED_SAMPLE_FIELDS,
-            {
-                "ProjectId": tgt_project_id,
-                "ProcessId": tgt_process_id,
-                "UnitOperationId": tgt_uo_id,
-                "StepId": tgt_step_id,
-                "MaterialId": tgt_mat_id,
-                "MatrixMaterialId": tgt_matrix_mat_id,
-            }
+            extra_fields,
         )
 
         changed_fields = []
         if tgt_stub:
             tgt_stub = ensure_full_record("Sample", tgt_stub, tgt_base, tgt_key)
+            if sync_timepoints and tgt_stub and "Timepoints" not in tgt_stub:
+                tgt_stub = http_get(individual_record_url(tgt_base, "Sample", tgt_stub["id"]), tgt_key)
             for field in ALLOWED_SAMPLE_FIELDS:
                 if param_changed(payload.get(field), tgt_stub.get(field)):
                     changed_fields.append(field)
+            if sync_timepoints:
+                src_timepoints = normalize_sample_timepoints_for_compare(payload.get("Timepoints"))
+                tgt_timepoints = normalize_sample_timepoints_for_compare(tgt_stub.get("Timepoints"))
+                if src_timepoints != tgt_timepoints:
+                    changed_fields.append("Timepoints")
 
         if tgt_stub:
             if not changed_fields:
