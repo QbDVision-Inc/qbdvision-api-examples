@@ -69,7 +69,7 @@ All required values must be present in `.env`; the scripts do not prompt for mis
 | `TARGET_HOST` | Both | Target host, for example `api.sandbox.qbdvision.com` |
 | `TARGET_BASE_PATH` | Both | Target base path, for example `sandbox` |
 
-If a required value is missing, or an ID value is not a whole number, the script exits with an error.
+If a required value is missing, or an ID value is not a whole number, the script reports the configuration error and stops.
 
 ## Run
 
@@ -101,6 +101,23 @@ Recommended handling:
 - Do not manually edit the mapping files
 
 ## Script Behavior
+
+### `sync_common.py`
+
+Shared helper module used by both sync scripts. Keep this file in the same folder as `Copy_Sync_Project.py` and `Copy_Sync_Process.py`.
+
+Common responsibilities:
+
+- Validates required `.env` values and integer IDs.
+- Builds QbDVision API clients from host, base path, and API key values.
+- Wraps API `GET` and `PUT` calls used by the sync scripts.
+- Configures timestamped file logging.
+- Loads and saves ID mapping files.
+- Removes attachment links from `*links` fields before payloads are saved.
+- Builds sanitized payloads from allowed field lists.
+- Provides shared comparison, acceptance-criteria, ID mapping, and supplier-remapping helpers.
+
+The project and process scripts still own the business rules for which records to copy, which fields are allowed, and how each record type is remapped.
 
 ### `Copy_Sync_Project.py`
 
