@@ -11,64 +11,53 @@ unit ops, steps, and flows.
 Smart Content fields are not synced
 """
 
-import requests
 import json
 import logging
-import os
-import sys
-from datetime import datetime
 from dataclasses import dataclass
 from typing import Dict, Any, List
 from collections import Counter
+
+import requests
 from dotenv import load_dotenv
 
+from sync_common import (
+    QbdApiClient,
+    SyncWriter,
+    acceptance_criteria_ranges_from_container,
+    changed_fields_for,
+    frozen_changed_fields_for,
+    freeze_for_compare,
+    is_archived,
+    load_id_map_file,
+    map_lookup,
+    normalize,
+    normalize_acceptance_criteria_ranges_list as normalize_acr_ranges,
+    normalize_id,
+    param_changed,
+    parsed_list_or_none,
+    required_env,
+    required_int,
+    resolve_target_supplier_id as resolve_supplier_id,
+    sanitize_payload,
+    save_id_map_file,
+    setup_file_logging,
+    strip_attachment_links,
+)
 # --------------------- CONFIG ---------------------
-
 load_dotenv()
-
-def required_int(name: str, value: str | None) -> int:
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        print(f"Error: {name} must be a whole number.")
-        sys.exit(1)
-
-def required_env(name: str) -> str:
-    value = os.getenv(name)
-    if not value:
-        print(f"Error: Missing required environment value: {name}")
-        print("Copy .env.example to .env and fill in all required values.")
-        sys.exit(1)
-    return value
-
 # --------------------- LOGGING ---------------------
-
 LOG_DIR = "logs"
 
 def setup_logging(src_process_id: int, tgt_process_id: int | None = None) -> str:
-    os.makedirs(LOG_DIR, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    if tgt_process_id is None:
-        tgt_process_id = "unknown"
-    log_path = os.path.join(
-        LOG_DIR,
-        f"copy_process_src{src_process_id}_tgt{tgt_process_id}_{timestamp}.log",
+    return setup_file_logging(
+        log_dir=LOG_DIR,
+        filename_prefix="copy_process",
+        src_id=src_process_id,
+        tgt_id=tgt_process_id,
     )
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s: %(message)s",
-        handlers=[
-            logging.FileHandler(log_path, encoding="utf-8"),
-            logging.StreamHandler(),
-        ],
-    )
-    return log_path
 
 logger = logging.getLogger("qbd_copy_process")
-
 # --------------------- ALLOWED FIELDS ---------------------
-
 ALLOWED_MATERIAL_FIELDS = [
     "name", "chemicalNameCAS", "category", "gmp", "use", "links", "description",
     "descriptiveUnitAbsolute", "quantityAbsolute", "quantityRelative",
@@ -178,77 +167,6 @@ REQUIRED_FIELDS_BY_TYPE = {
     "Sample": ALLOWED_SAMPLE_FIELDS,
 }
 
-# --------------------- API CLIENTS ---------------------
-
-class QbdApiClient:
-    def __init__(self, base_url: str, api_key: str):
-        if not base_url:
-            raise ValueError("base_url is required")
-        if not api_key:
-            raise ValueError("api_key is required")
-        self.base_url = base_url.rstrip("/") + "/"
-        self.headers = {
-            "Content-Type": "application/json",
-            "qbdvision-api-key": api_key,
-        }
-
-    @classmethod
-    def from_host(cls, host: str, base_path: str, api_key: str) -> "QbdApiClient":
-        host = (host or "").strip().rstrip("/")
-        base_path = (base_path or "").strip().strip("/")
-        if not host or not base_path:
-            raise ValueError("host and base_path are required")
-        return cls(f"https://{host}/{base_path}/", api_key)
-
-    def get(self, path: str, params: dict | None = None) -> Any:
-        r = requests.get(self.url(path), headers=self.headers, params=self.clean_params(params))
-        r.raise_for_status()
-        return r.json() if r.text else {}
-
-    def put(self, path: str, payload: Dict[str, Any]) -> Any:
-        r = requests.put(self.url(path), headers=self.headers, json=payload)
-        r.raise_for_status()
-        return r.json() if r.text else {}
-
-    def get_record(self, record_type: str, record_id: int, *, approved: bool = False) -> dict:
-        return self.get(
-            f"editables/{record_type}/{record_id}",
-            params={"approved": str(approved).lower()},
-        )
-
-    def list_records(self, record_type: str, project_id: int | None = None, **params) -> dict:
-        path = f"editables/{record_type}/list"
-        if project_id is not None:
-            path = f"{path}/{project_id}"
-        return self.get(path, params=params)
-
-    def save_record(self, record_type: str, payload: Dict[str, Any]) -> Any:
-        return self.put(f"editables/{record_type}/addOrEdit", payload)
-
-    def process_explorer(self, project_id: int, process_id: int | None = None) -> dict:
-        return self.get("processExplorer/" + str(project_id), params={"processId": process_id})
-
-    def url(self, path: str) -> str:
-        return self.base_url + path.lstrip("/")
-
-    @staticmethod
-    def clean_params(params: dict | None) -> dict | None:
-        if not params:
-            return None
-        return {k: v for k, v in params.items() if v is not None}
-
-class SyncWriter:
-    def __init__(self, client: QbdApiClient):
-        self.client = client
-
-    def save_record(self, record_type: str, payload: Dict[str, Any], *, reason: str | None = None) -> Any:
-        if reason:
-            logger.debug("Saving %s: %s", record_type, reason)
-        return self.client.save_record(record_type, payload)
-
-    def save_fn(self, record_type: str, *, reason: str | None = None):
-        return lambda payload: self.save_record(record_type, payload, reason=reason)
-
 @dataclass(frozen=True)
 class SyncConfig:
     src_project_id: int
@@ -277,53 +195,7 @@ def load_config() -> SyncConfig:
             required_env("TARGET_KEY"),
         ),
     )
-
 # --------------------- RECORD HELPERS ---------------------
-
-def strip_attachment_links(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Remove Attachment links from any *links field (e.g., links, riskLinks, referencesLinks).
-    Applies recursively to nested dicts/lists. Preserves original type (JSON string or list).
-    """
-    stack = [payload]
-
-    while stack:
-        obj = stack.pop()
-        if isinstance(obj, dict):
-            for k, v in list(obj.items()):
-                if isinstance(k, str) and k.lower().endswith("links"):
-                    if isinstance(v, str):
-                        try:
-                            data = json.loads(v)
-                        except Exception:
-                            continue
-                        if isinstance(data, list):
-                            filtered = [
-                                item for item in data
-                                if not (isinstance(item, dict) and item.get("linkType") == "Attachment")
-                            ]
-                            obj[k] = json.dumps(filtered)
-                        continue
-
-                    if isinstance(v, list):
-                        filtered = [
-                            item for item in v
-                            if not (isinstance(item, dict) and item.get("linkType") == "Attachment")
-                        ]
-                        obj[k] = filtered
-                    continue
-
-                if isinstance(v, (dict, list)):
-                    stack.append(v)
-            continue
-
-        if isinstance(obj, list):
-            for item in obj:
-                if isinstance(item, (dict, list)):
-                    stack.append(item)
-
-    return payload
-
 def validate_target_scope(record: dict | None, project_id: int, process_id: int, label: str) -> dict | None:
     if not record or not isinstance(record, dict):
         return None
@@ -369,31 +241,7 @@ def get_process_explorer(
     process_id: int,
 ) -> dict:
     return client.process_explorer(project_id, process_id)
-
 # --------------------- LOOKUP & MAPPING HELPERS ---------------------
-
-def normalize_id(val):
-    try:
-        return int(val)
-    except Exception:
-        return val
-
-def map_lookup(mapping: dict, key):
-    if key is None:
-        return None
-    if key in mapping:
-        return mapping[key]
-    k = str(key)
-    if k in mapping:
-        return mapping[k]
-    try:
-        ik = int(key)
-        if ik in mapping:
-            return mapping[ik]
-    except Exception:
-        pass
-    return None
-
 def resolve_target_by_name(
     *,
     src_id,
@@ -556,37 +404,7 @@ def build_target_lookup(
         return {r["name"]: r for r in instances if r.get("name")}
     else:
         return {r["name"]: r["id"] for r in instances if r.get("name")}
-
 # --------------------- ACCEPTANCE CRITERIA ---------------------
-
-def parse_json_container(value):
-    if isinstance(value, str):
-        try:
-            return json.loads(value)
-        except Exception:
-            return value
-    return value
-
-def parsed_list_or_none(value) -> list | None:
-    value = parse_json_container(value)
-    return value if isinstance(value, list) else None
-
-def parsed_dict_or_none(value) -> dict | None:
-    value = parse_json_container(value)
-    return value if isinstance(value, dict) else None
-
-def acceptance_criteria_ranges_from_container(container) -> list | None:
-    container = parsed_dict_or_none(container)
-    if not container:
-        return None
-
-    for field in ("AcceptanceCriteriaRanges", "AcceptanceCriteriaRangeLinkedVersions"):
-        ranges = parsed_list_or_none(container.get(field))
-        if ranges is not None:
-            return ranges
-
-    return None
-
 def acceptance_criteria_ranges_from_record(record: dict) -> list | None:
     for source in (
         record.get("Requirement"),
@@ -599,35 +417,8 @@ def acceptance_criteria_ranges_from_record(record: dict) -> list | None:
 
     return None
 
-def normalize_acr_value(val):
-    if val in ("", None):
-        return None
-    if isinstance(val, str):
-        obj = parse_json_container(val)
-        if obj in ({}, []):
-            return None
-        if isinstance(obj, (list, dict)):
-            return obj
-    if val in ({}, []):
-        return None
-    return val
-
 def normalize_acceptance_criteria_ranges_list(ranges: list) -> list:
-    cleaned = []
-    for r in ranges:
-        if not isinstance(r, dict):
-            continue
-        cleaned.append({k: normalize_acr_value(r.get(k)) for k in ACR_FIELDS})
-
-    def _sortable(v):
-        if v is None:
-            return (0, "")
-        return (1, str(v))
-
-    def _key(item):
-        return tuple(_sortable(item.get(f)) for f in ACR_FIELDS)
-
-    return sorted(cleaned, key=_key)
+    return normalize_acr_ranges(ranges, ACR_FIELDS)
 
 def add_acr_to_payload(full_src: dict, payload: dict) -> dict | None:
     if not isinstance(full_src, dict):
@@ -655,83 +446,7 @@ def add_tgt_acr_for_diff(tgt_full: dict) -> dict:
         return copy
 
     return tgt_full
-
 # --------------------- NORMALIZATION & DIFF ---------------------
-
-def normalize_whitespace(text: str):
-    collapsed = " ".join(text.split())
-    return collapsed if collapsed else None
-
-def normalize(val):
-    """Normalize values for comparison and ignore whitespace-only string diffs."""
-    if val is None:
-        return None
-
-    if isinstance(val, str):
-        try:
-            obj = json.loads(val)
-            if isinstance(obj, (list, dict)):
-                return normalize(obj)
-            if isinstance(obj, str):
-                return normalize_whitespace(obj)
-        except Exception:
-            pass
-        return normalize_whitespace(val)
-
-    if isinstance(val, list):
-        return [normalize(v) for v in val]
-
-    if isinstance(val, dict):
-        return {k: normalize(v) for k, v in val.items()}
-
-    return val
-
-def param_changed(src, tgt):
-    """
-    Compare src and tgt after normalization.
-    Handles scalars (including numeric strings), lists, and dicts.
-    """
-    src_n = normalize(src)
-    tgt_n = normalize(tgt)
-
-    if isinstance(src_n, (list, dict)) or isinstance(tgt_n, (list, dict)):
-        return src_n != tgt_n
-
-    try:
-        if src_n is not None and tgt_n is not None:
-            return float(src_n) != float(tgt_n)
-    except (ValueError, TypeError):
-        pass
-
-    return src_n != tgt_n
-
-def freeze_for_compare(val):
-    val = normalize(val)
-
-    if isinstance(val, dict):
-        return {k: freeze_for_compare(v) for k, v in sorted(val.items())}
-
-    if isinstance(val, list):
-        frozen = [freeze_for_compare(v) for v in val]
-        return sorted(frozen, key=lambda v: json.dumps(v, sort_keys=True, default=str))
-
-    return val
-
-def changed_fields_for(payload: dict, target: dict, fields: list, *, skip: set | None = None) -> list:
-    skip = skip or set()
-    return [
-        field
-        for field in fields
-        if field not in skip and param_changed(payload.get(field), target.get(field))
-    ]
-
-def frozen_changed_fields_for(payload: dict, target: dict, fields: list) -> list:
-    return [
-        field
-        for field in fields
-        if freeze_for_compare(payload.get(field)) != freeze_for_compare(target.get(field))
-    ]
-
 def id_set(records: list | None) -> set:
     return {record.get("id") for record in records or []}
 
@@ -761,9 +476,7 @@ def append_relationship_id_diff(
         sorted(src_ids),
         sorted(tgt_ids),
     )
-
 # --------------------- RELATIONSHIP HELPERS ---------------------
-
 def mapped_id_relationships(records: list, mapping: dict, *source_id_fields: str, label_prefix: str | None = None) -> list:
     relationships = []
     for record in records:
@@ -836,15 +549,7 @@ def build_material_flow_relationships(
         if flow["StepId"]
     ]
     return mapped_flows, uos, steps
-
-
 # --------------------- PAYLOAD BUILDERS ---------------------
-
-def sanitize_payload(src: dict, allowed_fields: list, extra_fields: dict) -> dict:
-    payload = {k: src[k] for k in allowed_fields if k in src}
-    payload.update(extra_fields)
-    return strip_attachment_links(payload)
-
 def build_process_payload(src_process: dict, tgt_project_id: int) -> dict:
     return sanitize_payload(src_process, ALLOWED_PROCESS_FIELDS, {"ProjectId": tgt_project_id})
 
@@ -1150,9 +855,7 @@ def save_copy_payload(
     if source_id is not None:
         logger.info("Created %s '%s': %s -> %s", record_label, src_name, source_id, new_id)
     return new_id
-
 # --------------------- TIMEPOINT HELPERS ---------------------
-
 def coerce_list(value) -> list:
     if isinstance(value, str):
         try:
@@ -1282,40 +985,7 @@ def normalize_sample_timepoints_for_compare(timepoints) -> list:
         cleaned,
         key=lambda tp: timepoint_sort_key(tp, include_id=True),
     )
-
 # --------------------- SUPPLIER HELPERS ---------------------
-
-def is_archived(record: dict) -> bool:
-    return isinstance(record, dict) and record.get("currentState") == "Archived"
-
-def get_target_supplier_by_name(client: QbdApiClient, name):
-    data = client.list_records("Supplier")
-    suppliers = data.get("instances") if isinstance(data, dict) else data
-    if not isinstance(suppliers, list):
-        return None
-
-    for supplier in suppliers:
-        if not isinstance(supplier, dict):
-            continue
-        if supplier.get("name") == name and supplier.get("currentState") != "Archived":
-            return supplier.get("id")
-
-    return None
-
-def clean_supplier_payload(src_supplier: dict) -> dict:
-    payload = {k: src_supplier[k] for k in ALLOWED_SUPPLIER_FIELDS if k in src_supplier}
-    return strip_attachment_links(payload)
-
-def create_target_supplier(writer: SyncWriter, src_supplier: dict) -> int:
-    cleaned_payload = clean_supplier_payload(src_supplier)
-
-    if not cleaned_payload.get("name"):
-        raise ValueError("Supplier payload missing name")
-
-    supplier = writer.save_record("Supplier", cleaned_payload, reason="create Supplier")
-
-    return supplier["id"]
-
 def resolve_target_supplier_id(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
@@ -1323,78 +993,24 @@ def resolve_target_supplier_id(
     src_supplier_id: int,
     supplier_cache: dict | None = None,
 ) -> int | None:
-    if not src_supplier_id:
-        return None
-
-    supplier_cache = supplier_cache or {}
-    by_id = supplier_cache.setdefault("by_id", {})
-    by_name = supplier_cache.setdefault("by_name", {})
-
-    cache_key = str(src_supplier_id)
-    if cache_key in by_id:
-        return by_id[cache_key]
-
-    src_supplier = src_client.get_record("Supplier", src_supplier_id)
-    if isinstance(src_supplier, dict) and src_supplier.get("currentState") == "Archived":
-        logger.info(
-            "Skipping archived Supplier '%s' (%s)",
-            src_supplier.get("name"),
-            src_supplier_id,
-        )
-        return None
-
-    name = src_supplier.get("name") if isinstance(src_supplier, dict) else None
-    if not name:
-        logger.warning("Supplier id %s missing name; skipping remap", src_supplier_id)
-        return None
-
-    if name in by_name:
-        tgt_id = by_name[name]
-    else:
-        tgt_id = get_target_supplier_by_name(tgt_client, name)
-        if tgt_id:
-            logger.info(
-                "Mapped existing Supplier '%s': %s -> %s",
-                name,
-                src_supplier_id,
-                tgt_id,
-            )
-        else:
-            logger.info("Supplier '%s' not found in target; creating it", name)
-            tgt_id = create_target_supplier(writer, src_supplier)
-            logger.info(
-                "Created new Supplier '%s': %s -> %s",
-                name,
-                src_supplier_id,
-                tgt_id,
-            )
-        by_name[name] = tgt_id
-
-    by_id[cache_key] = tgt_id
-    return tgt_id
-
+    return resolve_supplier_id(
+        src_client,
+        tgt_client,
+        writer,
+        src_supplier_id,
+        supplier_cache,
+        ALLOWED_SUPPLIER_FIELDS,
+        logger=logger,
+    )
 # --------------------- ID MAP PERSISTENCE ---------------------
-
 ID_MAP_FILE = "process_id_map.json"
 
 def load_id_map() -> dict:
-    try:
-        with open(ID_MAP_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {"processes": {}}
-
-    if isinstance(data, dict) and "processes" in data:
-        return data
-
-    return {"processes": {}}
+    return load_id_map_file(ID_MAP_FILE, "processes", preserve_extra=True)
 
 def save_id_map(id_map: dict):
-    with open(ID_MAP_FILE, "w", encoding="utf-8") as f:
-        json.dump(id_map, f, indent=2)
-
+    save_id_map_file(ID_MAP_FILE, id_map)
 # --------------------- CONTROL METHODS & RISK LINKS ---------------------
-
 def map_and_diff_control_methods(
     src_cms: list,
     tgt_cms: list,
@@ -1556,7 +1172,6 @@ def sanitize_risk_link_links(links_value, applies_to_maps: dict) -> str:
 
     return json.dumps(cleaned)
 
-
 def sync_risk_links(
     records,
     record_type,
@@ -1565,6 +1180,7 @@ def sync_risk_links(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
     applies_to_maps=None,
+    include_risk_fields: bool = True,
 ):
     """
     Sync relationship links for IQAs, IPAs, MaterialAttributes, ProcessParameters, and Samples.
@@ -1605,15 +1221,17 @@ def sync_risk_links(
                 if not target_id:
                     continue
                 if target_id not in tgt_ids:
-                    new_entry = {
-                        id_key: target_id,
-                        "impact": link.get("impact", 1),
-                        "criticality": link.get("criticality", 1),
-                        "uncertainty": link.get("uncertainty", 1),
-                        "effect": link.get("effect", "Adds"),
-                        "justification": link.get("justification", ""),
-                        "links": sanitize_risk_link_links(link.get("links", "[]"), normalized_applies_maps),
-                    }
+                    new_entry = {id_key: target_id}
+
+                    if include_risk_fields:
+                        new_entry.update({
+                            "impact": link.get("impact", 1),
+                            "criticality": link.get("criticality", 1),
+                            "uncertainty": link.get("uncertainty", 1),
+                            "effect": link.get("effect", "Adds"),
+                            "justification": link.get("justification", ""),
+                            "links": sanitize_risk_link_links(link.get("links", "[]"), normalized_applies_maps),
+                        })
 
                     if parent_id_key:
                         new_entry[parent_id_key] = tgt_record_id
@@ -1635,23 +1253,24 @@ def sync_risk_links(
                 if not src_link:
                     continue
 
-                for k, default in (
-                    ("impact", 1),
-                    ("criticality", 1),
-                    ("uncertainty", 1),
-                    ("effect", "Adds"),
-                    ("justification", ""),
-                ):
-                    src_val = src_link.get(k, default)
-                    if tgt_link.get(k, default) != src_val:
-                        tgt_link[k] = src_val
-                        changed = True
+                if include_risk_fields:
+                    for k, default in (
+                        ("impact", 1),
+                        ("criticality", 1),
+                        ("uncertainty", 1),
+                        ("effect", "Adds"),
+                        ("justification", ""),
+                    ):
+                        src_val = src_link.get(k, default)
+                        if tgt_link.get(k, default) != src_val:
+                            tgt_link[k] = src_val
+                            changed = True
 
-                src_links_json = sanitize_risk_link_links(src_link.get("links", "[]"), normalized_applies_maps)
-                tgt_links_json = sanitize_risk_link_links(tgt_link.get("links", "[]"), normalized_applies_maps)
-                if tgt_links_json != src_links_json:
-                    tgt_link["links"] = src_links_json
-                    changed = True
+                    src_links_json = sanitize_risk_link_links(src_link.get("links", "[]"), normalized_applies_maps)
+                    tgt_links_json = sanitize_risk_link_links(tgt_link.get("links", "[]"), normalized_applies_maps)
+                    if tgt_links_json != src_links_json:
+                        tgt_link["links"] = src_links_json
+                        changed = True
 
             src_target_ids = {resolver(l) for l in src_links if resolver(l)}
             filtered_links = [l for l in payload[field_name] if l[id_key] in src_target_ids]
@@ -1659,15 +1278,13 @@ def sync_risk_links(
                 payload[field_name] = filtered_links
                 changed = True
 
+        link_label = "risk links" if include_risk_fields else "relationship links"
         if changed:
-            logger.info("Updating risk links for %s '%s'", record_type, tgt_record["name"])
+            logger.info("Updating %s for %s '%s'", link_label, record_type, tgt_record["name"])
             put_fn(payload)
         else:
-            logger.info("%s '%s' risk links unchanged - skipping", record_type, tgt_record["name"])
-
-
+            logger.info("%s '%s' %s unchanged - skipping", record_type, tgt_record["name"], link_label)
 # --------------------- DRUG FLOWS & IQA LINKS ---------------------
-
 def sync_drug_flows(
     records: dict,
     record_type: str,
@@ -1903,9 +1520,7 @@ def sync_iqa_drug_links(
                 "IQA '%s' links to DrugSubstance/DrugProduct unchanged - skipping",
                 tgt_iqa.get("name"),
             )
-
 # --------------------- COPY HELPERS ---------------------
-
 def copy_unit_operations(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
@@ -3113,9 +2728,7 @@ def copy_samples(
         )
 
     return mapping
-
 # --------------------- SUPPLIER SYNC ---------------------
-
 def list_or_none(value):
     if isinstance(value, str):
         try:
@@ -3344,9 +2957,7 @@ def sync_supplier_ids(
         supplier_cache=supplier_cache,
         build_update_payload=build_material_supplier_update,
     )
-
 # --------------------- MAIN COPY FLOW ---------------------
-
 def copy_process_record(config: SyncConfig, proc_entry: dict, writer: SyncWriter) -> tuple[dict, int | None]:
     src_project_id = config.src_project_id
     src_process_id = config.src_process_id
@@ -3612,6 +3223,7 @@ def sync_relationship_links(config: SyncConfig, writer: SyncWriter, mappings: di
             "SampleToIPAs": (lambda link: mappings["IPA"].get(link.get("IPAId")), "IPAId"),
         },
         applies_to_maps=mappings,
+        include_risk_fields=False,
     )
 
 def sync_drug_mappings(config: SyncConfig, writer: SyncWriter, mappings: dict, tgt_process_id: int):
@@ -3705,9 +3317,7 @@ def copy_process(config: SyncConfig):
         sync_supplier_mappings(config, writer, mappings, tgt_process_id)
     finally:
         save_id_map(id_map)
-
-# --------------------- ENTRYPOINT ---------------------
-
+# --------------------- MAIN ---------------------
 def main():
     try:
         config = load_config()

@@ -13,61 +13,33 @@ You may end up with more TPPs and GAs in the target if any of the defaults are a
 This does not handle archiving records in the target.
 """
 
-import requests
-import json
 import logging
 import uuid
-import os
-import sys
 import re
-from datetime import datetime
-from typing import Any, Dict, Optional
+from dataclasses import dataclass
+from typing import Any, Dict
+
+import requests
 from dotenv import load_dotenv
+
+from sync_common import (
+    QbdApiClient,
+    SyncWriter,
+    is_archived,
+    load_id_map_file,
+    normalize_acceptance_criteria_ranges_list as normalize_acr_ranges,
+    required_env,
+    required_int,
+    resolve_target_supplier_id as resolve_supplier_id,
+    sanitize_payload,
+    save_id_map_file,
+    setup_file_logging,
+    strip_attachment_links,
+)
 # --------------------- CONFIG ---------------------
-# Load environment variables
 load_dotenv()
 
-SRC_PROJECT_ID = os.getenv("SOURCE_PROJECT_ID")
-SRC_KEY = os.getenv("SOURCE_KEY")
-TGT_KEY = os.getenv("TARGET_KEY")
-SRC_HOST = os.getenv("SOURCE_HOST")
-SRC_BASE_PATH = os.getenv("SOURCE_BASE_PATH")
-TGT_HOST = os.getenv("TARGET_HOST")
-TGT_BASE_PATH = os.getenv("TARGET_BASE_PATH")
 LOG_DIR = "logs"
-
-def _required_int(name: str, value: str | None) -> int:
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        print(f"Error: {name} must be a whole number.")
-        sys.exit(1)
-
-def validate_config():
-    global SRC_PROJECT_ID
-
-    missing = []
-    if not SRC_PROJECT_ID:
-        missing.append("SOURCE_PROJECT_ID")
-    if not SRC_KEY:
-        missing.append("SOURCE_KEY")
-    if not TGT_KEY:
-        missing.append("TARGET_KEY")
-    if not SRC_HOST:
-        missing.append("SOURCE_HOST")
-    if not SRC_BASE_PATH:
-        missing.append("SOURCE_BASE_PATH")
-    if not TGT_HOST:
-        missing.append("TARGET_HOST")
-    if not TGT_BASE_PATH:
-        missing.append("TARGET_BASE_PATH")
-
-    if missing:
-        print(f"Error: Missing required environment values: {', '.join(missing)}")
-        print("Copy .env.example to .env and fill in all required values.")
-        sys.exit(1)
-
-    SRC_PROJECT_ID = _required_int("SOURCE_PROJECT_ID", SRC_PROJECT_ID)
 
 LOG_PATH = None
 logger = logging.getLogger("qbd_copy_project_only")
@@ -119,10 +91,10 @@ ACR_FIELDS = [
 ]
 ALLOWED_TPP_FIELDS = [
     "name", "target", "annotations", "comments", "links"
-    ]
+]
 ALLOWED_GENERAL_ATTRIBUTE_FIELDS = [
     "name", "target", "links"
-    ]
+]
 ALLOWED_CONTROL_METHOD_FIELDS = [
     "name", "type", "category", "compendialStandard", "internalId",
     "SupplierId", "description", "equipment", "controlMethodLinks", "status",
@@ -248,116 +220,42 @@ RMP_NESTED_ID_FIELDS = [
     "RMPToRPNScales",
 ]
 # --------------------- LOGGING ---------------------
-def setup_logging(tgt_project_id: int | None = None) -> str:
-    os.makedirs(LOG_DIR, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    if tgt_project_id is None:
-        tgt_project_id = "unknown"
-    log_path = os.path.join(LOG_DIR, f"copy_project_src{SRC_PROJECT_ID}_tgt{tgt_project_id}_{timestamp}.log")
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s: %(message)s",
-        handlers=[
-            logging.FileHandler(log_path, encoding="utf-8"),
-            logging.StreamHandler(),
-        ],
+def setup_logging(src_project_id: int, tgt_project_id: int | None = None) -> str:
+    return setup_file_logging(
+        log_dir=LOG_DIR,
+        filename_prefix="copy_project",
+        src_id=src_project_id,
+        tgt_id=tgt_project_id,
     )
-    return log_path
+
 # --------------------- ID MAP PERSISTENCE ---------------------
 def load_id_map() -> dict:
-    try:
-        with open(ID_MAP_FILE) as f:
-            data = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {"projects": {}}
-
-    if "projects" in data and isinstance(data["projects"], dict):
-        return {"projects": data["projects"]}
-    return {"projects": {}}
+    return load_id_map_file(ID_MAP_FILE, "projects")
 
 def save_id_map(id_map: dict):
-    with open(ID_MAP_FILE, "w") as f:
-        json.dump(id_map, f, indent=2)
-# --------------------- HTTP UTILITIES ---------------------
-def make_base_url(host: str, base_path: str) -> str:
-    """
-    Constructs the hosted base URL for API requests using the provided host and
-    base path.
+    save_id_map_file(ID_MAP_FILE, id_map)
 
-    Args:
-        host (str): The hostname for the API.
-        base_path (str): The base path for the API.
+@dataclass(frozen=True)
+class SyncConfig:
+    src_project_id: int
+    src_client: QbdApiClient
+    tgt_client: QbdApiClient
 
-    Returns:
-        str: The constructed base URL.
-    """
-    host = host.strip().rstrip("/")
-    base_path = base_path.strip().strip("/")
-    if not host or not base_path:
-        raise ValueError("Host and base path are required to build the API URL.")
-    return f"https://{host}/{base_path}/"
-
-def headers(api_key: str) -> Dict[str, str]:
-    return {"Content-Type": "application/json", "qbdvision-api-key": api_key}
-
-def http_get(url: str, api_key: str) -> Any:
-    r = requests.get(url, headers=headers(api_key))
-    r.raise_for_status()
-    return r.json() if r.text else {}
-
-def http_put(url: str, api_key: str, payload: Dict[str, Any]) -> Any:
-    r = requests.put(url, headers=headers(api_key), json=payload)
-    r.raise_for_status()
-    return r.json() if r.text else {}
-
-def individual_record_url(base: str, entity_type: str, entity_id: int) -> str:
-    return f"{base}editables/{entity_type}/{entity_id}?approved=false"
+def load_config() -> SyncConfig:
+    return SyncConfig(
+        src_project_id=required_int("SOURCE_PROJECT_ID", required_env("SOURCE_PROJECT_ID")),
+        src_client=QbdApiClient.from_host(
+            required_env("SOURCE_HOST"),
+            required_env("SOURCE_BASE_PATH"),
+            required_env("SOURCE_KEY"),
+        ),
+        tgt_client=QbdApiClient.from_host(
+            required_env("TARGET_HOST"),
+            required_env("TARGET_BASE_PATH"),
+            required_env("TARGET_KEY"),
+        ),
+    )
 # --------------------- LINK & PAYLOAD HELPERS ---------------------
-def strip_attachment_links(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Remove Attachment links from any *links field (e.g., links, riskLinks, referencesLinks).
-    Applies recursively to nested dicts/lists. Preserves original type (JSON string or list).
-    """
-    stack = [payload]
-
-    while stack:
-        obj = stack.pop()
-        if isinstance(obj, dict):
-            for k, v in list(obj.items()):
-                if isinstance(k, str) and k.lower().endswith("links"):
-                    if isinstance(v, str):
-                        try:
-                            data = json.loads(v)
-                        except Exception:
-                            continue
-                        if isinstance(data, list):
-                            filtered = [
-                                item for item in data
-                                if not (isinstance(item, dict) and item.get("linkType") == "Attachment")
-                            ]
-                            obj[k] = json.dumps(filtered)
-                        continue
-
-                    if isinstance(v, list):
-                        filtered = [
-                            item for item in v
-                            if not (isinstance(item, dict) and item.get("linkType") == "Attachment")
-                        ]
-                        obj[k] = filtered
-                    continue
-
-                if isinstance(v, (dict, list)):
-                    stack.append(v)
-            continue
-
-        if isinstance(obj, list):
-            for item in obj:
-                if isinstance(item, (dict, list)):
-                    stack.append(item)
-
-    return payload
-
 def clean_rmp_payload(src_rmp: dict) -> dict:
     payload = {}
 
@@ -391,15 +289,6 @@ def clean_rmp_payload(src_rmp: dict) -> dict:
             payload[k] = v
 
     return payload
-
-def sanitize_payload(payload: Dict[str, Any], allowed_fields: list, extra_fields: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    sanitized = {k: payload[k] for k in allowed_fields if k in payload}
-    if extra_fields:
-        sanitized.update(extra_fields)
-    return sanitized
-
-def is_archived(record: dict) -> bool:
-    return isinstance(record, dict) and record.get("currentState") == "Archived"
 
 def validate_target_scope(record: dict | None, project_id: int, label: str) -> dict | None:
     if not record or not isinstance(record, dict):
@@ -543,11 +432,8 @@ def apply_non_riskranking_risk_values(src_full: dict, payload: dict) -> dict:
 
     return payload
 # --------------------- FETCH & DIFF HELPERS ---------------------
-def fetch_full_editable(base: str, key: str, entity_type: str, entity_id: int) -> dict:
-    return http_get(
-        individual_record_url(base, entity_type, entity_id),
-        key
-    )
+def fetch_full_editable(client: QbdApiClient, entity_type: str, entity_id: int) -> dict:
+    return client.get_record(entity_type, entity_id)
 
 _WHITESPACE_RE = re.compile(r"\s+")
 
@@ -610,9 +496,8 @@ def diff_fields(
 
     return diffs
 # --------------------- RMP HELPERS ---------------------
-def get_target_rmp_by_name(base_url, api_key, name):
-    url = f"{base_url}editables/RMP/list"
-    data = http_get(url, api_key)
+def get_target_rmp_by_name(client: QbdApiClient, name):
+    data = client.list_records("RMP")
 
     for rmp in data.get("instances", []):
         if (
@@ -623,136 +508,39 @@ def get_target_rmp_by_name(base_url, api_key, name):
 
     return None
 
-def create_target_rmp(tgt_base, tgt_key, src_rmp: dict) -> int:
-    """
-    Creates an RMP in target using a cleaned source payload.
-    Returns target RMP id.
-    """
+def create_target_rmp(writer: SyncWriter, src_rmp: dict) -> int:
     cleaned_payload = clean_rmp_payload(src_rmp)
 
-    # make sure name is present
     if not cleaned_payload.get("name"):
         raise ValueError("RMP payload missing name")
 
-    rmp = http_put(
-        f"{tgt_base}editables/RMP/addOrEdit",
-        tgt_key,
-        cleaned_payload
-    )
-
+    rmp = writer.save_record("RMP", cleaned_payload, reason="create RMP")
     return rmp["id"]
 # --------------------- SUPPLIER HELPERS ---------------------
-def get_target_supplier_by_name(base_url, api_key, name):
-    url = f"{base_url}editables/Supplier/list"
-    data = http_get(url, api_key)
-
-    suppliers = data.get("instances") if isinstance(data, dict) else data
-    if not isinstance(suppliers, list):
-        return None
-
-    for supplier in suppliers:
-        if (
-            isinstance(supplier, dict)
-            and supplier.get("name") == name
-            and not is_archived(supplier)
-        ):
-            return supplier.get("id")
-
-    return None
-
-def clean_supplier_payload(src_supplier: dict) -> dict:
-    payload = sanitize_payload(src_supplier, ALLOWED_SUPPLIER_FIELDS)
-    return strip_attachment_links(payload)
-
-def create_target_supplier(tgt_base, tgt_key, src_supplier: dict) -> int:
-    # Creates a Supplier in target using a cleaned source payload.
-    cleaned_payload = clean_supplier_payload(src_supplier)
-
-    if not cleaned_payload.get("name"):
-        raise ValueError("Supplier payload missing name")
-
-    supplier = http_put(
-        f"{tgt_base}editables/Supplier/addOrEdit",
-        tgt_key,
-        cleaned_payload
-    )
-
-    return supplier["id"]
-
 def resolve_target_supplier_id(
-    src_base: str,
-    tgt_base: str,
-    src_key: str,
-    tgt_key: str,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_supplier_id: int,
     supplier_cache: dict | None = None,
 ) -> int | None:
-    if not src_supplier_id:
-        return None
-
-    supplier_cache = supplier_cache or {}
-    by_id = supplier_cache.setdefault("by_id", {})
-    by_name = supplier_cache.setdefault("by_name", {})
-
-    cache_key = str(src_supplier_id)
-    if cache_key in by_id:
-        return by_id[cache_key]
-
-    src_supplier = http_get(individual_record_url(src_base, "Supplier", src_supplier_id), src_key)
-    if is_archived(src_supplier):
-        logger.info(
-            "Skipping archived Supplier '%s' (%s)",
-            src_supplier.get("name"),
-            src_supplier_id,
-        )
-        return None
-
-    name = src_supplier.get("name")
-    if not name:
-        logger.warning("Supplier id %s missing name; skipping remap", src_supplier_id)
-        return None
-
-    if name in by_name:
-        tgt_id = by_name[name]
-    else:
-        tgt_id = get_target_supplier_by_name(tgt_base, tgt_key, name)
-        if tgt_id:
-            logger.info(
-                "Mapped existing Supplier '%s': %s -> %s",
-                name,
-                src_supplier_id,
-                tgt_id,
-            )
-        else:
-            logger.info("Supplier '%s' not found in target; creating it", name)
-            tgt_id = create_target_supplier(tgt_base, tgt_key, src_supplier)
-            logger.info(
-                "Created new Supplier '%s': %s -> %s",
-                name,
-                src_supplier_id,
-                tgt_id,
-            )
-        by_name[name] = tgt_id
-
-    by_id[cache_key] = tgt_id
-    return tgt_id
+    return resolve_supplier_id(
+        src_client,
+        tgt_client,
+        writer,
+        src_supplier_id,
+        supplier_cache,
+        ALLOWED_SUPPLIER_FIELDS,
+        logger=logger,
+    )
 # --------------------- ACCEPTANCE CRITERIA ---------------------
 def normalize_acceptance_criteria_ranges_list(ranges: list) -> list:
-    cleaned = []
-    for r in ranges:
-        if not isinstance(r, dict):
-            continue
-        cleaned.append({k: r.get(k) for k in ACR_FIELDS if k in r})
-
-    def _sortable(v):
-        if v is None:
-            return (0, "")
-        return (1, str(v))
-
-    def _key(item):
-        return tuple(_sortable(item.get(f)) for f in ACR_FIELDS)
-
-    return sorted(cleaned, key=_key)
+    return normalize_acr_ranges(
+        ranges,
+        ACR_FIELDS,
+        normalize_values=False,
+        include_missing=False,
+    )
 
 def extract_acceptance_criteria_ranges_from_source(src_full: dict) -> list:
     if not isinstance(src_full, dict):
@@ -967,10 +755,14 @@ def apply_remap(entity_type: str, payload: dict, ctx: dict) -> dict:
         )
 
     return payload
+
+for _entity_cfg in ENTITY_CONFIG.values():
+    if _entity_cfg.get("remap") == "apply_remap":
+        _entity_cfg["remap"] = apply_remap
+
 # --------------------- ENTITY HELPERS ---------------------
-def get_ga_name_map(base_url: str, api_key: str, project_id: int) -> Dict[int, str]:
-    url = f"{base_url}editables/GeneralAttribute/list/{project_id}"
-    data = http_get(url, api_key)
+def get_ga_name_map(client: QbdApiClient, project_id: int) -> Dict[int, str]:
+    data = client.list_records("GeneralAttribute", project_id)
     ga_list = data.get("instances", [])
     return {
         ga["id"]: ga["name"]
@@ -978,250 +770,356 @@ def get_ga_name_map(base_url: str, api_key: str, project_id: int) -> Dict[int, s
         if isinstance(ga, dict) and ga.get("id") and ga.get("name")
     }
 
-def get_entities(base_url: str, api_key: str, project_id: int, endpoint: str, name_field: str = "name") -> Dict[str, int]:
-    """Generic fetch function returning name -> id map."""
-    url = f"{base_url}{endpoint}/{project_id}"
-    data = http_get(url, api_key)
+def get_entities(client: QbdApiClient, project_id: int, entity_type: str, name_field: str = "name") -> Dict[str, int]:
+    data = client.list_records(entity_type, project_id)
 
     entities_list = data.get("instances") if isinstance(data, dict) else data
     if not isinstance(entities_list, list):
         return {}
 
-    return {e[name_field].strip(): e["id"] for e in entities_list if isinstance(e, dict) and e.get(name_field) and e.get("id") and not is_archived(e)}
-# --------------------- SYNC LOGIC ---------------------
-def sync_entity(
-    *,
+    return {
+        e[name_field].strip(): e["id"]
+        for e in entities_list
+        if isinstance(e, dict) and e.get(name_field) and e.get("id") and not is_archived(e)
+    }
+
+def active_source_record(
+    client: QbdApiClient,
     entity_type: str,
-    src_base: str,
-    tgt_base: str,
-    src_key: str,
-    tgt_key: str,
-    src_id: int,
-    tgt_id: int,
-    project_id: int,
-    remap_ctx: dict | None = None,
-):
-    """
-    Sync a single editable entity from source to target.
-
-    Always includes required fields, LastVersionId, and logs actual changes.
-    """
-    cfg = ENTITY_CONFIG[entity_type]
-    allowed_fields, diff_fields_cfg, sync_fields_cfg = get_effective_entity_fields(entity_type, cfg, remap_ctx)
-
-    # Fetch full source and target
-    src_full = fetch_full_editable(src_base, src_key, entity_type, src_id)
-    src_full = validate_target_scope(src_full, SRC_PROJECT_ID, f"source {entity_type}")
+    source_id: int,
+    source_project_id: int,
+) -> dict | None:
+    src_full = fetch_full_editable(client, entity_type, source_id)
+    src_full = validate_target_scope(src_full, source_project_id, f"source {entity_type}")
     if not src_full:
-        return
+        return None
     if is_archived(src_full):
         logger.info("Skipping archived %s '%s'", entity_type, src_full.get("name"))
-        return
-    tgt_full = fetch_full_editable(tgt_base, tgt_key, entity_type, tgt_id)
-    tgt_full = validate_target_scope(tgt_full, project_id, f"target {entity_type}")
-    if not tgt_full:
-        return
+        return None
+    return src_full
 
-    # Sanitize source payload
-    sanitized_src = sanitize_payload(src_full, allowed_fields)
+def apply_fpa_fqa_payload_rules(entity_type: str, src_full: dict, payload: dict, remap_ctx: dict | None) -> tuple[dict, dict | None]:
     requirement_payload = None
-    if entity_type in ("FPA", "FQA"):
-        src_ranges = build_acceptance_criteria_ranges(src_full)
-        if src_ranges:
-            sanitized_src["AcceptanceCriteriaRanges"] = src_ranges
-            requirement_payload = {"AcceptanceCriteriaRanges": src_ranges}
-        if not is_risk_ranking_method(remap_ctx):
-            sanitized_src = apply_non_riskranking_risk_values(src_full, sanitized_src)
-            resolved_method = resolve_non_riskranking_method(src_full, remap_ctx)
-            if not resolved_method and is_classification_method(remap_ctx):
-                resolved_method = "Classification"
-            if resolved_method:
-                sanitized_src["riskAssessmentMethod"] = resolved_method
-    sanitized_src = strip_attachment_links(sanitized_src)
+    if entity_type not in ("FPA", "FQA"):
+        return payload, requirement_payload
 
-    # Include LastVersionId from target
-    sanitized_src["LastVersionId"] = tgt_full.get("LastVersionId")
+    src_ranges = build_acceptance_criteria_ranges(src_full)
+    if src_ranges:
+        payload["AcceptanceCriteriaRanges"] = src_ranges
+        requirement_payload = {"AcceptanceCriteriaRanges": src_ranges}
+    if not is_risk_ranking_method(remap_ctx):
+        payload = apply_non_riskranking_risk_values(src_full, payload)
+        resolved_method = resolve_non_riskranking_method(src_full, remap_ctx)
+        if not resolved_method and is_classification_method(remap_ctx):
+            resolved_method = "Classification"
+        if resolved_method:
+            payload["riskAssessmentMethod"] = resolved_method
+    return payload, requirement_payload
 
-    # Apply remap if required
-    if cfg.get("remap") and remap_ctx:
-        remap_fn = globals()[cfg["remap"]]
-        sanitized_src = remap_fn(entity_type, sanitized_src, remap_ctx)
+def remap_entity_payload(entity_type: str, payload: dict, cfg: dict, remap_ctx: dict | None) -> dict:
+    remap_fn = cfg.get("remap")
+    if remap_fn and remap_ctx:
+        payload = remap_fn(entity_type, payload, remap_ctx)
+    return payload
+
+def remap_control_method_supplier(
+    payload: dict,
+    *,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_id: int,
+    target_full: dict | None,
+    remap_ctx: dict | None,
+    drop_on_missing: bool,
+) -> dict:
+    supplier_cache = remap_ctx.get("supplier_cache") if remap_ctx else None
+    src_supplier_id = payload.get("SupplierId")
+    if not src_supplier_id:
+        return payload
+
+    tgt_supplier_id = resolve_target_supplier_id(
+        src_client,
+        tgt_client,
+        writer,
+        src_supplier_id,
+        supplier_cache,
+    )
+    if tgt_supplier_id:
+        payload["SupplierId"] = tgt_supplier_id
+        return payload
+
+    if drop_on_missing:
+        logger.warning(
+            "Unable to map SupplierId %s for ControlMethod '%s' (%s); creating without supplier",
+            src_supplier_id,
+            payload.get("name"),
+            src_id,
+        )
+        payload.pop("SupplierId", None)
+        return payload
+
+    logger.warning(
+        "Unable to map SupplierId %s for ControlMethod '%s' (%s); leaving target value unchanged",
+        src_supplier_id,
+        payload.get("name"),
+        src_id,
+    )
+    if isinstance(target_full, dict) and "SupplierId" in target_full:
+        payload["SupplierId"] = target_full.get("SupplierId")
+    else:
+        payload.pop("SupplierId", None)
+    return payload
+
+def build_entity_payload(
+    *,
+    entity_type: str,
+    src_full: dict,
+    cfg: dict,
+    remap_ctx: dict | None,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_id: int,
+    target_full: dict | None = None,
+    drop_supplier_on_missing: bool = False,
+) -> tuple[dict, dict | None, list, list]:
+    allowed_fields, diff_fields_cfg, sync_fields_cfg = get_effective_entity_fields(entity_type, cfg, remap_ctx)
+    payload = sanitize_payload(src_full, allowed_fields)
+    payload, requirement_payload = apply_fpa_fqa_payload_rules(entity_type, src_full, payload, remap_ctx)
+    payload = strip_attachment_links(payload)
+    payload = remap_entity_payload(entity_type, payload, cfg, remap_ctx)
 
     if entity_type == "ControlMethod":
-        supplier_cache = remap_ctx.get("supplier_cache") if remap_ctx else None
-        src_supplier_id = sanitized_src.get("SupplierId")
-        if src_supplier_id:
-            tgt_supplier_id = resolve_target_supplier_id(
-                src_base,
-                tgt_base,
-                src_key,
-                tgt_key,
-                src_supplier_id,
-                supplier_cache,
-            )
-            if tgt_supplier_id:
-                sanitized_src["SupplierId"] = tgt_supplier_id
-            else:
-                logger.warning(
-                    "Unable to map SupplierId %s for ControlMethod '%s' (%s); leaving target value unchanged",
-                    src_supplier_id,
-                    sanitized_src.get("name"),
-                    src_id,
-                )
-                if isinstance(tgt_full, dict) and "SupplierId" in tgt_full:
-                    sanitized_src["SupplierId"] = tgt_full.get("SupplierId")
-                else:
-                    sanitized_src.pop("SupplierId", None)
-
-    # diffs for logging only
-    if entity_type in ("FPA", "FQA"):
-        tgt_req = tgt_full.get("Requirement") if isinstance(tgt_full, dict) else None
-        if isinstance(tgt_req, dict):
-            tgt_ranges = tgt_req.get("AcceptanceCriteriaRanges")
-            if isinstance(tgt_ranges, list):
-                tgt_full = dict(tgt_full)
-                tgt_full["AcceptanceCriteriaRanges"] = normalize_acceptance_criteria_ranges_list(tgt_ranges)
-    sync_fields_for_update = sync_fields_cfg
-    sanitized_src = _preserve_whitespace_only_changes(sanitized_src, tgt_full, sync_fields_for_update)
-
-    diffs = diff_fields(sanitized_src, tgt_full, diff_fields_cfg)
-    if entity_type in ("FPA", "FQA"):
-        rel_diffs = {}
-
-        def _ids(items, id_keys=("id",)):
-            ids = set()
-            for item in items or []:
-                if not isinstance(item, dict):
-                    continue
-                for key in id_keys:
-                    val = item.get(key)
-                    if val is not None:
-                        ids.add(val)
-                        break
-            return ids
-
-        ga_field = (
-            "FPAToGeneralAttributeRisks"
-            if entity_type == "FPA"
-            else "FQAToGeneralAttributeRisks"
+        payload = remap_control_method_supplier(
+            payload,
+            src_client=src_client,
+            tgt_client=tgt_client,
+            writer=writer,
+            src_id=src_id,
+            target_full=target_full,
+            remap_ctx=remap_ctx,
+            drop_on_missing=drop_supplier_on_missing,
         )
 
-        def _ga_tuples(items):
-            tuples = set()
-            for item in items or []:
-                if not isinstance(item, dict):
-                    continue
-                ga_id = item.get("GeneralAttributeId")
-                if not ga_id and isinstance(item.get("GeneralAttribute"), dict):
-                    ga_id = item["GeneralAttribute"].get("id")
-                if not ga_id:
-                    continue
-                tuples.add((ga_id, item.get("impact"), item.get("uncertainty"), item.get("justification")))
-            return tuples
+    return payload, requirement_payload, diff_fields_cfg, sync_fields_cfg
 
-        src_tpp_ids = _ids(sanitized_src.get("TPPSections", []))
-        tgt_tpp_ids = _ids(tgt_full.get("TPPSections", []))
-        if src_tpp_ids != tgt_tpp_ids:
-            rel_diffs["TPPSections"] = {
-                "from": sorted(tgt_tpp_ids),
-                "to": sorted(src_tpp_ids),
-            }
+def relationship_ids(items, id_keys=("id",)) -> set:
+    ids = set()
+    for item in items or []:
+        if not isinstance(item, dict):
+            continue
+        for key in id_keys:
+            val = item.get(key)
+            if val is not None:
+                ids.add(val)
+                break
+    return ids
 
-        src_general_attribute_ids = _ids(sanitized_src.get("GeneralAttributes", []))
-        tgt_general_attribute_ids = _ids(tgt_full.get("GeneralAttributes", []))
-        if src_general_attribute_ids != tgt_general_attribute_ids:
-            rel_diffs["GeneralAttributes"] = {
-                "from": sorted(tgt_general_attribute_ids),
-                "to": sorted(src_general_attribute_ids),
-            }
+def general_attribute_risk_tuples(items) -> set:
+    tuples = set()
+    for item in items or []:
+        if not isinstance(item, dict):
+            continue
+        ga_id = item.get("GeneralAttributeId")
+        if not ga_id and isinstance(item.get("GeneralAttribute"), dict):
+            ga_id = item["GeneralAttribute"].get("id")
+        if ga_id:
+            tuples.add((ga_id, item.get("impact"), item.get("uncertainty"), item.get("justification")))
+    return tuples
 
-        src_cm_ids = _ids(sanitized_src.get("ControlMethods", []), id_keys=("id", "ControlMethodId"))
-        tgt_cm_ids = _ids(tgt_full.get("ControlMethods", []), id_keys=("id", "ControlMethodId"))
-        if src_cm_ids != tgt_cm_ids:
-            rel_diffs["ControlMethods"] = {
-                "from": sorted(tgt_cm_ids),
-                "to": sorted(src_cm_ids),
-            }
+def append_id_relationship_diff(diffs: dict, field_name: str, src_items: list, tgt_items: list, id_keys=("id",)) -> None:
+    src_ids = relationship_ids(src_items, id_keys)
+    tgt_ids = relationship_ids(tgt_items, id_keys)
+    if src_ids != tgt_ids:
+        diffs[field_name] = {
+            "from": sorted(tgt_ids),
+            "to": sorted(src_ids),
+        }
 
+def relationship_diffs(entity_type: str, sanitized_src: dict, tgt_full: dict, remap_ctx: dict | None) -> dict:
+    diffs = {}
+    if entity_type in ("FPA", "FQA"):
+        ga_field = "FPAToGeneralAttributeRisks" if entity_type == "FPA" else "FQAToGeneralAttributeRisks"
+        append_id_relationship_diff(
+            diffs,
+            "TPPSections",
+            sanitized_src.get("TPPSections", []),
+            tgt_full.get("TPPSections", []),
+        )
+        append_id_relationship_diff(
+            diffs,
+            "GeneralAttributes",
+            sanitized_src.get("GeneralAttributes", []),
+            tgt_full.get("GeneralAttributes", []),
+        )
+        append_id_relationship_diff(
+            diffs,
+            "ControlMethods",
+            sanitized_src.get("ControlMethods", []),
+            tgt_full.get("ControlMethods", []),
+            id_keys=("id", "ControlMethodId"),
+        )
         if is_risk_ranking_method(remap_ctx):
-            src_ga = _ga_tuples(sanitized_src.get(ga_field, []))
-            tgt_ga = _ga_tuples(tgt_full.get(ga_field, []))
+            src_ga = general_attribute_risk_tuples(sanitized_src.get(ga_field, []))
+            tgt_ga = general_attribute_risk_tuples(tgt_full.get(ga_field, []))
             if src_ga != tgt_ga:
-                rel_diffs[ga_field] = {
+                diffs[ga_field] = {
                     "from": sorted(tgt_ga),
                     "to": sorted(src_ga),
                 }
-
-        if rel_diffs:
-            diffs.update(rel_diffs)
-
-    if entity_type in ("DrugSubstance", "DrugProduct"):
-        rel_diffs = {}
-
-        def _fqa_ids(items):
-            ids = set()
-            for item in items or []:
-                if not isinstance(item, dict):
-                    continue
-                val = item.get("FQAId")
-                if val is not None:
-                    ids.add(val)
-            return ids
-
-        field_name = (
-            "DrugSubstanceToFQAs"
-            if entity_type == "DrugSubstance"
-            else "DrugProductToFQAs"
+    elif entity_type in ("DrugSubstance", "DrugProduct"):
+        field_name = "DrugSubstanceToFQAs" if entity_type == "DrugSubstance" else "DrugProductToFQAs"
+        append_id_relationship_diff(
+            diffs,
+            field_name,
+            sanitized_src.get(field_name, []),
+            tgt_full.get(field_name, []),
+            id_keys=("FQAId",),
         )
+    return diffs
 
-        src_ids = _fqa_ids(sanitized_src.get(field_name, []))
-        tgt_ids = _fqa_ids(tgt_full.get(field_name, []))
-        if src_ids != tgt_ids:
-            rel_diffs[field_name] = {
-                "from": sorted(tgt_ids),
-                "to": sorted(src_ids),
-            }
+def target_with_requirement_ranges(entity_type: str, target: dict) -> dict:
+    if entity_type not in ("FPA", "FQA"):
+        return target
+    tgt_req = target.get("Requirement") if isinstance(target, dict) else None
+    if not isinstance(tgt_req, dict):
+        return target
+    tgt_ranges = tgt_req.get("AcceptanceCriteriaRanges")
+    if not isinstance(tgt_ranges, list):
+        return target
+    target = dict(target)
+    target["AcceptanceCriteriaRanges"] = normalize_acceptance_criteria_ranges_list(tgt_ranges)
+    return target
 
-        if rel_diffs:
-            diffs.update(rel_diffs)
+def build_update_payload(
+    *,
+    entity_type: str,
+    sanitized_src: dict,
+    target_full: dict,
+    target_id: int,
+    project_id: int,
+    sync_fields: list,
+    requirement_payload: dict | None,
+    remap_ctx: dict | None,
+) -> dict:
+    payload = {"id": target_id, "ProjectId": project_id, "LastVersionId": sanitized_src["LastVersionId"]}
+    payload.update({k: sanitized_src[k] for k in sync_fields if k in sanitized_src})
+    if requirement_payload:
+        payload.pop("AcceptanceCriteriaRanges", None)
+        payload["Requirement"] = requirement_payload
+    if entity_type == "Project":
+        rmp_id = remap_ctx.get("project_rmp_id") if remap_ctx else None
+        if not rmp_id and isinstance(target_full, dict):
+            rmp_id = target_full.get("RMPId")
+        if rmp_id:
+            payload["RMPId"] = rmp_id
+    return payload
+
+def resolve_target_entity(
+    *,
+    tgt_client: QbdApiClient,
+    entity_type: str,
+    source_id: int,
+    source_name: str,
+    target_project_id: int,
+    target_entities: Dict[str, int],
+    prev_mapping: dict,
+) -> int | None:
+    prev_tgt_id = prev_mapping.get(source_id) or prev_mapping.get(str(source_id))
+    if prev_tgt_id:
+        try:
+            tgt_full = fetch_full_editable(tgt_client, entity_type, prev_tgt_id)
+        except requests.HTTPError:
+            logger.warning(
+                "Mapped target %s id %s not found; falling back to name lookup",
+                entity_type,
+                prev_tgt_id,
+            )
+        else:
+            tgt_full = validate_target_scope(tgt_full, target_project_id, f"target {entity_type}")
+            if tgt_full:
+                return prev_tgt_id
+
+    return target_entities.get(source_name)
+# --------------------- SYNC LOGIC ---------------------
+
+
+def sync_entity(
+    *,
+    entity_type: str,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_id: int,
+    tgt_id: int,
+    source_project_id: int,
+    target_project_id: int,
+    remap_ctx: dict | None = None,
+):
+    cfg = ENTITY_CONFIG[entity_type]
+
+    src_full = active_source_record(src_client, entity_type, src_id, source_project_id)
+    if not src_full:
+        return
+
+    tgt_full = fetch_full_editable(tgt_client, entity_type, tgt_id)
+    tgt_full = validate_target_scope(tgt_full, target_project_id, f"target {entity_type}")
+    if not tgt_full:
+        return
+
+    sanitized_src, requirement_payload, diff_fields_cfg, sync_fields_cfg = build_entity_payload(
+        entity_type=entity_type,
+        src_full=src_full,
+        cfg=cfg,
+        remap_ctx=remap_ctx,
+        src_client=src_client,
+        tgt_client=tgt_client,
+        writer=writer,
+        src_id=src_id,
+        target_full=tgt_full,
+        drop_supplier_on_missing=False,
+    )
+    sanitized_src["LastVersionId"] = tgt_full.get("LastVersionId")
+
+    tgt_full = target_with_requirement_ranges(entity_type, tgt_full)
+    sanitized_src = _preserve_whitespace_only_changes(sanitized_src, tgt_full, sync_fields_cfg)
+
+    diffs = diff_fields(sanitized_src, tgt_full, diff_fields_cfg)
+    diffs.update(relationship_diffs(entity_type, sanitized_src, tgt_full, remap_ctx))
 
     if not diffs:
         logger.info(
             "No changes detected for %s '%s' (%s)",
             entity_type,
             sanitized_src.get("name"),
-            tgt_id
-        )
-        return  # skip PUT if nothing changed
-    else:
-        logger.info(
-            "Updating %s '%s' (%s): %s",
-            entity_type,
-            sanitized_src.get("name"),
             tgt_id,
-            list(diffs.keys())
         )
-        for field, change in diffs.items():
-            logger.info("  - %s: %r → %r", field, change["from"], change["to"])
+        return
 
-        # Always send full allowed_fields + LastVersionId + id + ProjectId
-        payload = {"id": tgt_id, "ProjectId": project_id, "LastVersionId": sanitized_src["LastVersionId"]}
-        sync_fields = sync_fields_cfg
-        payload.update({k: sanitized_src[k] for k in sync_fields if k in sanitized_src})
-        if requirement_payload:
-            payload.pop("AcceptanceCriteriaRanges", None)
-            payload["Requirement"] = requirement_payload
-        if entity_type == "Project":
-            rmp_id = None
-            if remap_ctx:
-                rmp_id = remap_ctx.get("project_rmp_id")
-            if not rmp_id and isinstance(tgt_full, dict):
-                rmp_id = tgt_full.get("RMPId")
-            if rmp_id:
-                payload["RMPId"] = rmp_id
+    logger.info(
+        "Updating %s '%s' (%s): %s",
+        entity_type,
+        sanitized_src.get("name"),
+        tgt_id,
+        list(diffs.keys()),
+    )
+    for field, change in diffs.items():
+        logger.info("  - %s: %r -> %r", field, change["from"], change["to"])
+
+    payload = build_update_payload(
+        entity_type=entity_type,
+        sanitized_src=sanitized_src,
+        target_full=tgt_full,
+        target_id=tgt_id,
+        project_id=target_project_id,
+        sync_fields=sync_fields_cfg,
+        requirement_payload=requirement_payload,
+        remap_ctx=remap_ctx,
+    )
 
     try:
-        http_put(f"{tgt_base}{cfg['endpoint']}/addOrEdit", tgt_key, payload)
+        writer.save_record(entity_type, payload, reason=f"update {entity_type}")
     except requests.HTTPError:
         logger.error(
             "Failed updating %s '%s' (%s)",
@@ -1231,328 +1129,310 @@ def sync_entity(
         )
         raise
 
+def create_entity(
+    *,
+    entity_type: str,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_id: int,
+    src_name: str,
+    source_project_id: int,
+    target_project_id: int,
+    remap_ctx: dict | None = None,
+) -> int | None:
+    src_full = active_source_record(src_client, entity_type, src_id, source_project_id)
+    if not src_full:
+        return None
+
+    cfg = ENTITY_CONFIG[entity_type]
+    payload, requirement_payload, _, _ = build_entity_payload(
+        entity_type=entity_type,
+        src_full=src_full,
+        cfg=cfg,
+        remap_ctx=remap_ctx,
+        src_client=src_client,
+        tgt_client=tgt_client,
+        writer=writer,
+        src_id=src_id,
+        drop_supplier_on_missing=True,
+    )
+    if requirement_payload:
+        payload.pop("AcceptanceCriteriaRanges", None)
+        payload["Requirement"] = requirement_payload
+    payload["ProjectId"] = target_project_id
+
+    try:
+        new_entity = writer.save_record(entity_type, payload, reason=f"create {entity_type}")
+    except requests.HTTPError:
+        logger.error(
+            "Failed creating %s '%s' (%s)",
+            entity_type,
+            src_name,
+            src_id,
+        )
+        raise
+
+    tgt_id = new_entity.get("id")
+    logger.info("Created new %s '%s': %s -> %s", entity_type, src_name, src_id, tgt_id)
+    return tgt_id
+
 def sync_or_create_entities(
     entity_type: str,
-    src_base: str,
-    tgt_base: str,
-    src_key: str,
-    tgt_key: str,
-    project_id: int,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    source_project_id: int,
+    target_project_id: int,
     remap_ctx: dict | None = None,
     prev_mapping: dict | None = None,
 ) -> Dict[int, int]:
-    """
-    Syncs all source entities of a given type to target.
-    Returns mapping: source_id -> target_id
-    """
     prev_mapping = prev_mapping or {}
 
-    # Fetch source and target entities (name -> id)
-    src_entities = get_entities(src_base, src_key, SRC_PROJECT_ID, f"editables/{entity_type}/list")
-    tgt_entities = get_entities(tgt_base, tgt_key, project_id, f"editables/{entity_type}/list")
+    src_entities = get_entities(src_client, source_project_id, entity_type)
+    tgt_entities = get_entities(tgt_client, target_project_id, entity_type)
 
     logger.info("Syncing %s: %s source, %s target", entity_type, len(src_entities), len(tgt_entities))
 
     mapping: Dict[int, int] = {}
 
     for src_name, src_id in src_entities.items():
-        tgt_id = None
-
-        # Prefer persisted mapping by source ID to handle renames
-        prev_tgt_id = prev_mapping.get(src_id) or prev_mapping.get(str(src_id))
-        if prev_tgt_id:
-            try:
-                tgt_full = fetch_full_editable(tgt_base, tgt_key, entity_type, prev_tgt_id)
-            except requests.HTTPError:
-                logger.warning(
-                    "Mapped target %s id %s not found; falling back to name lookup",
-                    entity_type,
-                    prev_tgt_id,
-                )
-            else:
-                tgt_full = validate_target_scope(tgt_full, project_id, f"target {entity_type}")
-                if tgt_full:
-                    tgt_id = prev_tgt_id
-
-        if not tgt_id:
-            tgt_id = tgt_entities.get(src_name)
+        tgt_id = resolve_target_entity(
+            tgt_client=tgt_client,
+            entity_type=entity_type,
+            source_id=src_id,
+            source_name=src_name,
+            target_project_id=target_project_id,
+            target_entities=tgt_entities,
+            prev_mapping=prev_mapping,
+        )
 
         if tgt_id:
-            # Existing entity -> diff check + sync
             sync_entity(
                 entity_type=entity_type,
                 src_id=src_id,
                 tgt_id=tgt_id,
-                src_base=src_base,
-                tgt_base=tgt_base,
-                src_key=src_key,
-                tgt_key=tgt_key,
-                project_id=project_id,
+                src_client=src_client,
+                tgt_client=tgt_client,
+                writer=writer,
+                source_project_id=source_project_id,
+                target_project_id=target_project_id,
                 remap_ctx=remap_ctx,
             )
             mapping[src_id] = tgt_id
-        else:
-            # New entity -> create full payload
-            src_full = fetch_full_editable(src_base, src_key, entity_type, src_id)
-            src_full = validate_target_scope(src_full, SRC_PROJECT_ID, f"source {entity_type}")
-            if not src_full:
-                continue
-            if is_archived(src_full):
-                logger.info("Skipping archived %s '%s'", entity_type, src_full.get("name"))
-                continue
-            cfg = ENTITY_CONFIG[entity_type]
-            allowed_fields, _, _ = get_effective_entity_fields(entity_type, cfg, remap_ctx)
+            continue
 
-            payload = sanitize_payload(src_full, allowed_fields)
-            if entity_type in ("FPA", "FQA"):
-                src_ranges = build_acceptance_criteria_ranges(src_full)
-                if src_ranges:
-                    payload["Requirement"] = {"AcceptanceCriteriaRanges": src_ranges}
-                payload.pop("AcceptanceCriteriaRanges", None)
-                if not is_risk_ranking_method(remap_ctx):
-                    payload = apply_non_riskranking_risk_values(src_full, payload)
-                    resolved_method = resolve_non_riskranking_method(src_full, remap_ctx)
-                    if not resolved_method and is_classification_method(remap_ctx):
-                        resolved_method = "Classification"
-                    if resolved_method:
-                        payload["riskAssessmentMethod"] = resolved_method
-            payload = strip_attachment_links(payload)
-            if entity_type == "ControlMethod":
-                supplier_cache = remap_ctx.get("supplier_cache") if remap_ctx else None
-                src_supplier_id = payload.get("SupplierId")
-                if src_supplier_id:
-                    tgt_supplier_id = resolve_target_supplier_id(
-                        src_base,
-                        tgt_base,
-                        src_key,
-                        tgt_key,
-                        src_supplier_id,
-                        supplier_cache,
-                    )
-                    if tgt_supplier_id:
-                        payload["SupplierId"] = tgt_supplier_id
-                    else:
-                        logger.warning(
-                            "Unable to map SupplierId %s for ControlMethod '%s' (%s); creating without supplier",
-                            src_supplier_id,
-                            src_name,
-                            src_id,
-                        )
-                        payload.pop("SupplierId", None)
-            payload["ProjectId"] = project_id
-
-            # Apply remap if required
-            if cfg.get("remap") and remap_ctx:
-                remap_fn = globals()[cfg["remap"]]
-                payload = remap_fn(entity_type, payload, remap_ctx)
-
-            try:
-                new_entity = http_put(f"{tgt_base}{cfg['endpoint']}/addOrEdit", tgt_key, payload)
-            except requests.HTTPError:
-                logger.error(
-                    "Failed creating %s '%s' (%s)",
-                    entity_type,
-                    src_name,
-                    src_id,
-                )
-                raise
-
-            tgt_id = new_entity.get("id")
-            logger.info("Created new %s '%s': %s -> %s", entity_type, src_name, src_id, tgt_id)
-
+        tgt_id = create_entity(
+            entity_type=entity_type,
+            src_client=src_client,
+            tgt_client=tgt_client,
+            writer=writer,
+            src_id=src_id,
+            src_name=src_name,
+            source_project_id=source_project_id,
+            target_project_id=target_project_id,
+            remap_ctx=remap_ctx,
+        )
+        if tgt_id:
             mapping[src_id] = tgt_id
 
     return mapping
 # --------------------- MAIN ---------------------
+def resolve_project_rmp(config: SyncConfig, writer: SyncWriter, sanitized_src_project: dict) -> int | None:
+    src_rmp_id = sanitized_src_project.get("RMPId")
+    if not src_rmp_id:
+        return None
+
+    src_rmp = config.src_client.get_record("RMP", src_rmp_id)
+    src_rmp_name = src_rmp.get("name")
+    tgt_rmp_id = get_target_rmp_by_name(config.tgt_client, src_rmp_name)
+
+    if tgt_rmp_id:
+        logger.info("Mapped existing RMP '%s': %s -> %s", src_rmp_name, src_rmp_id, tgt_rmp_id)
+    else:
+        logger.info("RMP '%s' not found in target; creating it", src_rmp_name)
+        tgt_rmp_id = create_target_rmp(writer, src_rmp)
+        logger.info("Created new RMP '%s': %s -> %s", src_rmp_name, src_rmp_id, tgt_rmp_id)
+
+    sanitized_src_project["RMPId"] = tgt_rmp_id
+    return tgt_rmp_id
+
+def copy_project_record(
+    config: SyncConfig,
+    writer: SyncWriter,
+    projects_map: dict,
+) -> tuple[dict, int | None, dict]:
+    src_project_id = config.src_project_id
+    src_project = config.src_client.get_record("Project", src_project_id)
+    if is_archived(src_project):
+        logger.info("Source project %s is archived; skipping copy", src_project_id)
+        return src_project, None, {}
+
+    sanitized_src_project = sanitize_payload(src_project, ALLOWED_PROJECT_FIELDS)
+    sanitized_src_project = strip_attachment_links(sanitized_src_project)
+    tgt_rmp_id = resolve_project_rmp(config, writer, sanitized_src_project)
+
+    project_key = str(src_project_id)
+    if project_key not in projects_map:
+        logger.info("No existing mapping found. Creating new project.")
+        new_project = writer.save_record("Project", sanitized_src_project, reason="create Project")
+        tgt_project_id = new_project["id"]
+        projects_map[project_key] = {"targetProjectId": tgt_project_id}
+        logger.info("Created new project: %s -> %s", src_project_id, tgt_project_id)
+    else:
+        tgt_project_id = projects_map[project_key]["targetProjectId"]
+        logger.info("Using existing project mapping: %s -> %s", src_project_id, tgt_project_id)
+
+    sync_entity(
+        entity_type="Project",
+        src_id=src_project_id,
+        tgt_id=tgt_project_id,
+        src_client=config.src_client,
+        tgt_client=config.tgt_client,
+        writer=writer,
+        source_project_id=src_project_id,
+        target_project_id=tgt_project_id,
+        remap_ctx={"project_rmp_id": tgt_rmp_id},
+    )
+
+    return src_project, tgt_project_id, projects_map[project_key]
+
+def build_project_remap_context(config: SyncConfig, tgt_project_id: int, src_project: dict) -> dict:
+    tgt_project = config.tgt_client.get_record("Project", tgt_project_id)
+    return {
+        "supplier_cache": {"by_id": {}, "by_name": {}},
+        "project_risk_assessment_method": src_project.get("riskAssessmentMethod"),
+        "project_product_risk_assessment_type": src_project.get("productRiskAssessmentType"),
+        "target_project_risk_assessment_method": tgt_project.get("riskAssessmentMethod"),
+        "target_project_product_risk_assessment_type": tgt_project.get("productRiskAssessmentType"),
+    }
+
+def persist_mapping(project_state: dict, state_key: str, mapping: dict) -> dict:
+    project_state[state_key] = {str(k): v for k, v in mapping.items()}
+    return project_state[state_key]
+
+def sync_project_entities(
+    config: SyncConfig,
+    writer: SyncWriter,
+    project_state: dict,
+    src_project: dict,
+    tgt_project_id: int,
+) -> None:
+    remap_ctx = build_project_remap_context(config, tgt_project_id, src_project)
+
+    tpp_mapping = sync_or_create_entities(
+        "TPPSection",
+        config.src_client,
+        config.tgt_client,
+        writer,
+        config.src_project_id,
+        tgt_project_id,
+        remap_ctx,
+        prev_mapping=project_state.get("tppSections", {}),
+    )
+    remap_ctx["tpp_id_map"] = persist_mapping(project_state, "tppSections", tpp_mapping)
+
+    ga_mapping = sync_or_create_entities(
+        "GeneralAttribute",
+        config.src_client,
+        config.tgt_client,
+        writer,
+        config.src_project_id,
+        tgt_project_id,
+        remap_ctx,
+        prev_mapping=project_state.get("generalAttributes", {}),
+    )
+    remap_ctx["ga_id_map"] = persist_mapping(project_state, "generalAttributes", ga_mapping)
+    remap_ctx["tgt_ga_name_map"] = get_ga_name_map(config.tgt_client, tgt_project_id)
+
+    cm_mapping = sync_or_create_entities(
+        "ControlMethod",
+        config.src_client,
+        config.tgt_client,
+        writer,
+        config.src_project_id,
+        tgt_project_id,
+        remap_ctx,
+        prev_mapping=project_state.get("controlMethods", {}),
+    )
+    remap_ctx["cm_id_map"] = persist_mapping(project_state, "controlMethods", cm_mapping)
+
+    fpa_mapping = sync_or_create_entities(
+        "FPA",
+        config.src_client,
+        config.tgt_client,
+        writer,
+        config.src_project_id,
+        tgt_project_id,
+        remap_ctx,
+        prev_mapping=project_state.get("fpas", {}),
+    )
+    persist_mapping(project_state, "fpas", fpa_mapping)
+
+    fqa_mapping = sync_or_create_entities(
+        "FQA",
+        config.src_client,
+        config.tgt_client,
+        writer,
+        config.src_project_id,
+        tgt_project_id,
+        remap_ctx,
+        prev_mapping=project_state.get("fqas", {}),
+    )
+    persist_mapping(project_state, "fqas", fqa_mapping)
+
+    drug_remap_ctx = {"fqa_id_map": {str(k): v for k, v in fqa_mapping.items()}}
+    ds_mapping = sync_or_create_entities(
+        "DrugSubstance",
+        config.src_client,
+        config.tgt_client,
+        writer,
+        config.src_project_id,
+        tgt_project_id,
+        drug_remap_ctx,
+        prev_mapping=project_state.get("drugSubstances", {}),
+    )
+    persist_mapping(project_state, "drugSubstances", ds_mapping)
+
+    dp_mapping = sync_or_create_entities(
+        "DrugProduct",
+        config.src_client,
+        config.tgt_client,
+        writer,
+        config.src_project_id,
+        tgt_project_id,
+        drug_remap_ctx,
+        prev_mapping=project_state.get("drugProducts", {}),
+    )
+    persist_mapping(project_state, "drugProducts", dp_mapping)
+
 def main():
-    validate_config()
-    src_base = make_base_url(SRC_HOST, SRC_BASE_PATH)
-    tgt_base = make_base_url(TGT_HOST, TGT_BASE_PATH)
-    logger.info("Source base URL: %s", src_base)
-    logger.info("Target base URL: %s", tgt_base)
+    config = load_config()
+    writer = SyncWriter(config.tgt_client)
+    logger.info("Source base URL: %s", config.src_client.base_url)
+    logger.info("Target base URL: %s", config.tgt_client.base_url)
 
     id_map = load_id_map()
     projects_map = id_map.setdefault("projects", {})
-    existing_project = projects_map.get(str(SRC_PROJECT_ID), {})
+    existing_project = projects_map.get(str(config.src_project_id), {})
     existing_tgt_id = existing_project.get("targetProjectId")
 
     global LOG_PATH
-    LOG_PATH = setup_logging(existing_tgt_id)
+    LOG_PATH = setup_logging(config.src_project_id, existing_tgt_id)
     logger.info("Log file: %s", LOG_PATH)
-    logger.info("Starting sync run for source project %s", SRC_PROJECT_ID)
+    logger.info("Starting sync run for source project %s", config.src_project_id)
 
     saved_id_map = False
 
     try:
-        # FETCH SOURCE PROJECT
-        src_project = http_get(individual_record_url(src_base, "Project", SRC_PROJECT_ID), SRC_KEY)
-        if is_archived(src_project):
-            logger.info("Source project %s is archived; skipping copy", SRC_PROJECT_ID)
+        src_project, tgt_project_id, project_state = copy_project_record(config, writer, projects_map)
+        if tgt_project_id is None:
             return
-        sanitized_src_project = sanitize_payload(src_project, ALLOWED_PROJECT_FIELDS)
-        sanitized_src_project = strip_attachment_links(sanitized_src_project)
-        # REMAP RMP
-        src_rmp_id = sanitized_src_project.get("RMPId")
-        tgt_rmp_id = None
 
-        if src_rmp_id:
-            src_rmp = http_get(individual_record_url(src_base, "RMP", src_rmp_id), SRC_KEY)
-            src_rmp_name = src_rmp.get("name")
-
-            tgt_rmp_id = get_target_rmp_by_name(
-                tgt_base,
-                TGT_KEY,
-                src_rmp_name
-            )
-
-            if tgt_rmp_id:
-                logger.info(
-                    "Mapped existing RMP '%s': %s → %s",
-                    src_rmp_name,
-                    src_rmp_id,
-                    tgt_rmp_id
-                )
-            else:
-                logger.info(
-                    "RMP '%s' not found in target; creating it",
-                    src_rmp_name
-                )
-                tgt_rmp_id = create_target_rmp(
-                    tgt_base,
-                    TGT_KEY,
-                    src_rmp
-                )
-                logger.info(
-                    "Created new RMP '%s': %s → %s",
-                    src_rmp_name,
-                    src_rmp_id,
-                    tgt_rmp_id
-                )
-
-            sanitized_src_project["RMPId"] = tgt_rmp_id
-        # CREATE OR REUSE TARGET PROJECT
-        if str(SRC_PROJECT_ID) not in projects_map:
-            logger.info("No existing mapping found. Creating new project.")
-
-            new_project = http_put(f"{tgt_base}editables/Project/addOrEdit", TGT_KEY, sanitized_src_project)
-            tgt_project_id = new_project["id"]
-
-            LOG_PATH = setup_logging(tgt_project_id)
-            logger.info("Log file: %s", LOG_PATH)
-
-            projects_map[str(SRC_PROJECT_ID)] = {
-                "targetProjectId": tgt_project_id,
-            }
-
-            logger.info("Created new project: %s → %s", SRC_PROJECT_ID, tgt_project_id)
-        else:
-            tgt_project_id = projects_map[str(SRC_PROJECT_ID)]["targetProjectId"]
-            logger.info("Using existing project mapping: %s → %s", SRC_PROJECT_ID, tgt_project_id)
-
-        project_state = projects_map[str(SRC_PROJECT_ID)]
-        # SYNC PROJECT RECORD DATA
-        sync_entity(
-            entity_type="Project",
-            src_id=SRC_PROJECT_ID,
-            tgt_id=tgt_project_id,
-            src_base=src_base,
-            tgt_base=tgt_base,
-            src_key=SRC_KEY,
-            tgt_key=TGT_KEY,
-            project_id=tgt_project_id,
-            remap_ctx={"project_rmp_id": tgt_rmp_id},
-        )
-
-        # SYNC ALL ENTITY TYPES
-        # First build remap context
-        remap_ctx = {}
-        remap_ctx["supplier_cache"] = {"by_id": {}, "by_name": {}}
-        remap_ctx["project_risk_assessment_method"] = src_project.get("riskAssessmentMethod")
-        remap_ctx["project_product_risk_assessment_type"] = src_project.get("productRiskAssessmentType")
-
-        tgt_project = http_get(individual_record_url(tgt_base, "Project", tgt_project_id), TGT_KEY)
-        remap_ctx["target_project_risk_assessment_method"] = tgt_project.get("riskAssessmentMethod")
-        remap_ctx["target_project_product_risk_assessment_type"] = tgt_project.get("productRiskAssessmentType")
-
-        # TPPSections
-        tpp_mapping = sync_or_create_entities(
-            "TPPSection", src_base, tgt_base, SRC_KEY, TGT_KEY,
-            tgt_project_id, remap_ctx,
-            prev_mapping=project_state.get("tppSections", {}),
-        )
-        project_state["tppSections"] = {str(k): v for k, v in tpp_mapping.items()}
-        remap_ctx["tpp_id_map"] = {str(k): v for k, v in tpp_mapping.items()}
-
-        # GeneralAttributes
-        ga_mapping = sync_or_create_entities(
-            "GeneralAttribute", src_base, tgt_base, SRC_KEY, TGT_KEY,
-            tgt_project_id, remap_ctx,
-            prev_mapping=project_state.get("generalAttributes", {}),
-        )
-        project_state["generalAttributes"] = {str(k): v for k, v in ga_mapping.items()}
-        tgt_ga_name_map = get_ga_name_map(tgt_base, TGT_KEY, tgt_project_id)
-        remap_ctx["ga_id_map"] = {str(k): v for k, v in ga_mapping.items()}
-        remap_ctx["tgt_ga_name_map"] = tgt_ga_name_map
-
-        # ControlMethods
-        cm_mapping = sync_or_create_entities(
-            "ControlMethod", src_base, tgt_base, SRC_KEY, TGT_KEY,
-            tgt_project_id, remap_ctx,
-            prev_mapping=project_state.get("controlMethods", {}),
-        )
-        project_state["controlMethods"] = {str(k): v for k, v in cm_mapping.items()}
-        remap_ctx["cm_id_map"] = {str(k): v for k, v in cm_mapping.items()}
-
-        # FPAs
-        fpa_mapping = sync_or_create_entities(
-            "FPA", src_base, tgt_base, SRC_KEY, TGT_KEY,
-            tgt_project_id, remap_ctx,
-            prev_mapping=project_state.get("fpas", {}),
-        )
-        project_state["fpas"] = {str(k): v for k, v in fpa_mapping.items()}
-
-        # FQAs
-        fqa_mapping = sync_or_create_entities(
-            "FQA", src_base, tgt_base, SRC_KEY, TGT_KEY,
-            tgt_project_id, remap_ctx,
-            prev_mapping=project_state.get("fqas", {}),
-        )
-        project_state["fqas"] = {str(k): v for k, v in fqa_mapping.items()}
-
-        # Drug Substances
-        ds_mapping = sync_or_create_entities(
-            "DrugSubstance",
-            src_base,
-            tgt_base,
-            SRC_KEY,
-            TGT_KEY,
-            tgt_project_id,
-            remap_ctx={
-                "fqa_id_map": {str(k): v for k, v in fqa_mapping.items()}
-            },
-            prev_mapping=project_state.get("drugSubstances", {}),
-        )
-        project_state["drugSubstances"] = {str(k): v for k, v in ds_mapping.items()}
-
-        # Drug Products
-        dp_mapping = sync_or_create_entities(
-            "DrugProduct",
-            src_base,
-            tgt_base,
-            SRC_KEY,
-            TGT_KEY,
-            tgt_project_id,
-            remap_ctx={
-                "fqa_id_map": {str(k): v for k, v in fqa_mapping.items()}
-            },
-            prev_mapping=project_state.get("drugProducts", {}),
-        )
-        project_state["drugProducts"] = {str(k): v for k, v in dp_mapping.items()}
-
-        # SAVE STATE
+        sync_project_entities(config, writer, project_state, src_project, tgt_project_id)
         save_id_map(id_map)
         saved_id_map = True
-        logger.info("Sync complete for source project %s", SRC_PROJECT_ID)
+        logger.info("Sync complete for source project %s", config.src_project_id)
 
     except requests.HTTPError as e:
         logger.error("HTTP error: %s", e)
@@ -1563,6 +1443,6 @@ def main():
     finally:
         if not saved_id_map:
             save_id_map(id_map)
-            
+
 if __name__ == "__main__":
     main()
