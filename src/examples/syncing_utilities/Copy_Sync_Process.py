@@ -3322,6 +3322,8 @@ def main():
     try:
         config = load_config()
         copy_process(config)
+    except ValueError as e:
+        print(f"Error: {e}")
     except requests.HTTPError as e:
         logger.error("HTTP error: %s", e)
         if hasattr(e, "response") and e.response is not None:

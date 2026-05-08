@@ -1407,7 +1407,12 @@ def sync_project_entities(
     persist_mapping(project_state, "drugProducts", dp_mapping)
 
 def main():
-    config = load_config()
+    try:
+        config = load_config()
+    except ValueError as e:
+        print(f"Error: {e}")
+        return
+
     writer = SyncWriter(config.tgt_client)
     logger.info("Source base URL: %s", config.src_client.base_url)
     logger.info("Target base URL: %s", config.tgt_client.base_url)

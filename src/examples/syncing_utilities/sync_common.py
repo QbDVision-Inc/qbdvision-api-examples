@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import sys
 from datetime import datetime
 from typing import Any, Dict
 
@@ -12,15 +11,15 @@ def required_int(name: str, value: str | None) -> int:
     try:
         return int(value)
     except (TypeError, ValueError):
-        print(f"Error: {name} must be a whole number.")
-        sys.exit(1)
+        raise ValueError(f"{name} must be a whole number.")
 
 def required_env(name: str) -> str:
     value = os.getenv(name)
     if not value:
-        print(f"Error: Missing required environment value: {name}")
-        print("Copy .env.example to .env and fill in all required values.")
-        sys.exit(1)
+        raise ValueError(
+            f"Missing required environment value: {name}. "
+            "Copy .env.example to .env and fill in all required values."
+        )
     return value
 
 def setup_file_logging(
