@@ -17,22 +17,13 @@ import logging
 import os
 import sys
 from datetime import datetime
+from dataclasses import dataclass
 from typing import Dict, Any, List
 from collections import Counter
 from dotenv import load_dotenv
 # --------------------- CONFIG ---------------------
 # Load environment variables
 load_dotenv()
-
-SRC_PROJECT_ID = os.getenv("SOURCE_PROJECT_ID")
-SRC_PROCESS_ID = os.getenv("SOURCE_PROCESS_ID")
-TGT_PROJECT_ID = os.getenv("TARGET_PROJECT_ID")
-SRC_KEY = os.getenv("SOURCE_KEY")
-TGT_KEY = os.getenv("TARGET_KEY")
-SRC_HOST = os.getenv("SOURCE_HOST")
-SRC_BASE_PATH = os.getenv("SOURCE_BASE_PATH")
-TGT_HOST = os.getenv("TARGET_HOST")
-TGT_BASE_PATH = os.getenv("TARGET_BASE_PATH")
 
 def required_int(name: str, value: str | None) -> int:
     try:
@@ -41,48 +32,24 @@ def required_int(name: str, value: str | None) -> int:
         print(f"Error: {name} must be a whole number.")
         sys.exit(1)
 
-def validate_config():
-    global SRC_PROJECT_ID, SRC_PROCESS_ID, TGT_PROJECT_ID
-
-    missing = []
-    if not SRC_PROJECT_ID:
-        missing.append("SOURCE_PROJECT_ID")
-    if not SRC_PROCESS_ID:
-        missing.append("SOURCE_PROCESS_ID")
-    if not TGT_PROJECT_ID:
-        missing.append("TARGET_PROJECT_ID")
-    if not SRC_KEY:
-        missing.append("SOURCE_KEY")
-    if not TGT_KEY:
-        missing.append("TARGET_KEY")
-    if not SRC_HOST:
-        missing.append("SOURCE_HOST")
-    if not SRC_BASE_PATH:
-        missing.append("SOURCE_BASE_PATH")
-    if not TGT_HOST:
-        missing.append("TARGET_HOST")
-    if not TGT_BASE_PATH:
-        missing.append("TARGET_BASE_PATH")
-
-    if missing:
-        print(f"Error: Missing required environment values: {', '.join(missing)}")
+def required_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        print(f"Error: Missing required environment value: {name}")
         print("Copy .env.example to .env and fill in all required values.")
         sys.exit(1)
-
-    SRC_PROJECT_ID = required_int("SOURCE_PROJECT_ID", SRC_PROJECT_ID)
-    SRC_PROCESS_ID = required_int("SOURCE_PROCESS_ID", SRC_PROCESS_ID)
-    TGT_PROJECT_ID = required_int("TARGET_PROJECT_ID", TGT_PROJECT_ID)
+    return value
 # --------------------- LOGGING ---------------------
 LOG_DIR = "logs"
 
-def setup_logging(tgt_process_id: int | None = None) -> str:
+def setup_logging(src_process_id: int, tgt_process_id: int | None = None) -> str:
     os.makedirs(LOG_DIR, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     if tgt_process_id is None:
         tgt_process_id = "unknown"
     log_path = os.path.join(
         LOG_DIR,
-        f"copy_process_src{SRC_PROCESS_ID}_tgt{tgt_process_id}_{timestamp}.log",
+        f"copy_process_src{src_process_id}_tgt{tgt_process_id}_{timestamp}.log",
     )
 
     logging.basicConfig(
@@ -95,7 +62,6 @@ def setup_logging(tgt_process_id: int | None = None) -> str:
     )
     return log_path
 
-LOG_PATH = None
 logger = logging.getLogger("qbd_copy_process")
 # --------------------- ALLOWED FIELDS ---------------------
 ALLOWED_MATERIAL_FIELDS = [
@@ -265,6 +231,47 @@ class QbdApiClient:
         if not params:
             return None
         return {k: v for k, v in params.items() if v is not None}
+
+class SyncWriter:
+    def __init__(self, client: QbdApiClient):
+        self.client = client
+
+    def save_record(self, record_type: str, payload: Dict[str, Any], *, reason: str | None = None) -> Any:
+        if reason:
+            logger.debug("Saving %s: %s", record_type, reason)
+        return self.client.save_record(record_type, payload)
+
+    def save_fn(self, record_type: str, *, reason: str | None = None):
+        return lambda payload: self.save_record(record_type, payload, reason=reason)
+
+@dataclass(frozen=True)
+class SyncConfig:
+    src_project_id: int
+    src_process_id: int
+    tgt_project_id: int
+    src_client: QbdApiClient
+    tgt_client: QbdApiClient
+
+def load_config() -> SyncConfig:
+    src_project_id = required_int("SOURCE_PROJECT_ID", required_env("SOURCE_PROJECT_ID"))
+    src_process_id = required_int("SOURCE_PROCESS_ID", required_env("SOURCE_PROCESS_ID"))
+    tgt_project_id = required_int("TARGET_PROJECT_ID", required_env("TARGET_PROJECT_ID"))
+
+    return SyncConfig(
+        src_project_id=src_project_id,
+        src_process_id=src_process_id,
+        tgt_project_id=tgt_project_id,
+        src_client=QbdApiClient.from_host(
+            required_env("SOURCE_HOST"),
+            required_env("SOURCE_BASE_PATH"),
+            required_env("SOURCE_KEY"),
+        ),
+        tgt_client=QbdApiClient.from_host(
+            required_env("TARGET_HOST"),
+            required_env("TARGET_BASE_PATH"),
+            required_env("TARGET_KEY"),
+        ),
+    )
 # --------------------- RECORD & PAYLOAD HELPERS ---------------------
 def strip_attachment_links(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -328,7 +335,7 @@ def validate_target_scope(record: dict | None, project_id: int, process_id: int,
 
     return record
 
-# ensure we have the full record and arent trying to sync on partial records from lists 
+# Ensure we have the full record before diffing list responses.
 def ensure_full_record(record_type: str, record: dict | None, client: QbdApiClient) -> dict | None:
     if not record or not isinstance(record, dict):
         return record
@@ -379,6 +386,60 @@ def map_lookup(mapping: dict, key):
     except Exception:
         pass
     return None
+
+def resolve_target_by_name(
+    *,
+    src_id,
+    src_name,
+    prev_mapping: dict,
+    tgt_by_name: dict,
+    duplicate_names: set,
+    record_type: str,
+    record_label: str,
+    tgt_client: QbdApiClient,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    fallback_when_mapped_invalid: bool = False,
+    fetch_fallback_full: bool = True,
+) -> tuple[int | None, dict | None]:
+    tgt_id = map_lookup(prev_mapping, src_id)
+    tgt_record = tgt_client.get_record(record_type, tgt_id) if tgt_id else None
+    tgt_record = validate_target_scope(tgt_record, tgt_project_id, tgt_process_id, record_label)
+
+    if tgt_id and not tgt_record and fallback_when_mapped_invalid:
+        tgt_id = None
+
+    if not tgt_id and src_name in tgt_by_name and src_name not in duplicate_names:
+        tgt_record = tgt_by_name[src_name]
+        tgt_id = tgt_record["id"]
+        if fetch_fallback_full:
+            tgt_record = tgt_client.get_record(record_type, tgt_id)
+
+    if not tgt_id and src_name in duplicate_names:
+        logger.info("%s '%s' has duplicate name in source; skipping name-based fallback", record_label, src_name)
+
+    return tgt_id, tgt_record
+
+def resolve_target_by_lookup(
+    *,
+    src_id,
+    prev_mapping: dict,
+    fallback_key,
+    tgt_lookup: dict,
+    record_type: str,
+    record_label: str,
+    tgt_client: QbdApiClient,
+    tgt_project_id: int,
+    tgt_process_id: int,
+) -> tuple[int | None, dict | None]:
+    tgt_id = map_lookup(prev_mapping, src_id)
+    if tgt_id:
+        tgt_record = tgt_client.get_record(record_type, tgt_id)
+        tgt_record = validate_target_scope(tgt_record, tgt_project_id, tgt_process_id, record_label)
+        return tgt_id, tgt_record
+
+    tgt_record = tgt_lookup.get(fallback_key)
+    return (tgt_record.get("id"), tgt_record) if tgt_record else (None, None)
 
 # account for duplicate names
 def find_duplicate_keys(records, key_fn):
@@ -623,11 +684,362 @@ def freeze_for_compare(val):
 
     return val
 
+def changed_fields_for(payload: dict, target: dict, fields: list, *, skip: set | None = None) -> list:
+    skip = skip or set()
+    return [
+        field
+        for field in fields
+        if field not in skip and param_changed(payload.get(field), target.get(field))
+    ]
+
+def frozen_changed_fields_for(payload: dict, target: dict, fields: list) -> list:
+    return [
+        field
+        for field in fields
+        if freeze_for_compare(payload.get(field)) != freeze_for_compare(target.get(field))
+    ]
+
+def id_set(records: list | None) -> set:
+    return {record.get("id") for record in records or []}
+
+def tuple_set(records: list | None, fields: tuple[str, ...]) -> set:
+    return {tuple(record.get(field) for field in fields) for record in records or []}
+
+def append_relationship_id_diff(
+    changed_fields: list,
+    field_name: str,
+    src_records: list,
+    tgt_records: list,
+    *,
+    record_label: str,
+    record_name: str,
+) -> None:
+    src_ids = id_set(src_records)
+    tgt_ids = id_set(tgt_records)
+    if src_ids == tgt_ids:
+        return
+
+    changed_fields.append(field_name)
+    logger.info(
+        "%s '%s' %s diff: src=%s tgt=%s",
+        record_label,
+        record_name,
+        field_name,
+        sorted(src_ids),
+        sorted(tgt_ids),
+    )
+
 # --------------------- PAYLOAD & ARCHIVE HELPERS ---------------------
 def sanitize_payload(src: dict, allowed_fields: list, extra_fields: dict) -> dict:
     payload = {k: src[k] for k in allowed_fields if k in src}
     payload.update(extra_fields)
     return strip_attachment_links(payload)
+
+def build_process_payload(src_process: dict, tgt_project_id: int) -> dict:
+    return sanitize_payload(src_process, ALLOWED_PROCESS_FIELDS, {"ProjectId": tgt_project_id})
+
+def build_unit_operation_order_payload(tgt_process: dict, tgt_order: list) -> dict:
+    payload = sanitize_payload(
+        tgt_process,
+        ALLOWED_PROCESS_FIELDS,
+        {"unitOperationOrder": json.dumps(tgt_order)},
+    )
+    payload["id"] = tgt_process["id"]
+    payload["LastVersionId"] = tgt_process["LastVersionId"]
+    return payload
+
+def build_unit_operation_payload(
+    src_uo: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    timepoints: list | None = None,
+) -> dict:
+    extra = {"ProjectId": tgt_project_id, "ProcessId": tgt_process_id}
+    if timepoints is not None:
+        extra["Timepoints"] = timepoints
+    return sanitize_payload(src_uo, ALLOWED_UNIT_OPERATION_FIELDS, extra)
+
+def build_unit_operation_timepoints_update_payload(
+    src_uo: dict,
+    tgt_uo_id: int,
+    last_version_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    timepoints: list,
+) -> dict:
+    return sanitize_payload(
+        src_uo,
+        ALLOWED_UNIT_OPERATION_FIELDS,
+        {
+            "id": tgt_uo_id,
+            "LastVersionId": last_version_id,
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "Timepoints": timepoints,
+        },
+    )
+
+def build_step_payload(full_src: dict, tgt_project_id: int, tgt_process_id: int, tgt_uo_id: int) -> dict:
+    return sanitize_payload(
+        full_src,
+        ALLOWED_STEP_FIELDS,
+        {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "UnitOperationId": tgt_uo_id,
+        },
+    )
+
+def build_step_order_payload(tgt_uo: dict, tgt_uo_id: int, new_order: list) -> dict:
+    return sanitize_payload(
+        tgt_uo,
+        ALLOWED_UNIT_OPERATION_FIELDS,
+        {
+            "id": tgt_uo_id,
+            "LastVersionId": tgt_uo["LastVersionId"],
+            "ProcessId": tgt_uo["ProcessId"],
+            "stepOrder": json.dumps(new_order),
+        },
+    )
+
+def build_process_component_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    uos: list,
+    steps: list,
+) -> dict:
+    return sanitize_payload(
+        full_src,
+        ALLOWED_PROCESS_COMPONENT_FIELDS,
+        {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "UnitOperations": uos,
+            "Steps": steps,
+        },
+    )
+
+def build_material_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    uos: list,
+    steps: list,
+    material_flows: list,
+) -> dict:
+    return sanitize_payload(
+        full_src,
+        ALLOWED_MATERIAL_FIELDS,
+        {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "UnitOperations": uos,
+            "Steps": steps,
+            "MaterialFlows": material_flows,
+        },
+    )
+
+def build_material_attribute_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    uo_id: int | None,
+    step_id: int | None,
+    pc_id: int | None,
+    mat_id: int | None,
+    control_methods: list,
+) -> dict:
+    return sanitize_payload(
+        full_src,
+        ALLOWED_MATERIAL_ATTRIBUTE_FIELDS,
+        {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "UnitOperationId": uo_id,
+            "StepId": step_id,
+            "ProcessComponentId": pc_id,
+            "MaterialId": mat_id,
+            "ControlMethods": control_methods,
+        },
+    )
+
+def build_process_parameter_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    tgt_uo_id: int | None,
+    tgt_step_id: int | None,
+    tgt_pc_id: int | None,
+    tgt_mat_id: int | None,
+) -> dict:
+    extra = {
+        "ProjectId": tgt_project_id,
+        "ProcessId": tgt_process_id,
+        "UnitOperationId": tgt_uo_id,
+    }
+    if tgt_step_id:
+        extra["StepId"] = tgt_step_id
+    if tgt_pc_id:
+        extra["ProcessComponentId"] = tgt_pc_id
+    if tgt_mat_id:
+        extra["MaterialId"] = tgt_mat_id
+    return sanitize_payload(full_src, ALLOWED_PROCESS_PARAMETER_FIELDS, extra)
+
+def build_iqa_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    tgt_uo_id: int | None,
+    tgt_step_id: int | None,
+    control_methods: list,
+) -> dict:
+    return sanitize_payload(
+        full_src,
+        ALLOWED_IQA_FIELDS,
+        {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "UnitOperationId": tgt_uo_id,
+            "StepId": tgt_step_id,
+            "ControlMethods": control_methods,
+        },
+    )
+
+def build_ipa_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    tgt_uo_id: int | None,
+    tgt_step_id: int | None,
+    control_methods: list,
+) -> dict:
+    return sanitize_payload(
+        full_src,
+        ALLOWED_IPA_FIELDS,
+        {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "UnitOperationId": tgt_uo_id,
+            "StepId": tgt_step_id,
+            "ControlMethods": control_methods,
+        },
+    )
+
+def build_sample_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    tgt_uo_id: int | None,
+    tgt_step_id: int | None,
+    tgt_mat_id: int | None,
+    tgt_matrix_mat_id: int | None,
+    timepoints: list | None = None,
+) -> dict:
+    extra = {
+        "ProjectId": tgt_project_id,
+        "ProcessId": tgt_process_id,
+        "UnitOperationId": tgt_uo_id,
+        "StepId": tgt_step_id,
+        "MaterialId": tgt_mat_id,
+        "MatrixMaterialId": tgt_matrix_mat_id,
+    }
+    if timepoints is not None:
+        extra["Timepoints"] = timepoints
+    return sanitize_payload(full_src, ALLOWED_SAMPLE_FIELDS, extra)
+
+def build_process_component_supplier_payload(
+    tgt_id: int,
+    name: str,
+    component_type: str,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    tgt_supplier_id: int,
+    last_version_id: int,
+    steps: list,
+    uos: list,
+) -> dict:
+    return {
+        "id": tgt_id,
+        "name": name,
+        "type": component_type,
+        "ProcessId": tgt_process_id,
+        "ProjectId": tgt_project_id,
+        "SupplierId": tgt_supplier_id,
+        "LastVersionId": last_version_id,
+        "Steps": steps,
+        "UnitOperations": uos,
+    }
+
+def build_material_supplier_payload(
+    tgt_id: int,
+    name: str,
+    category: str,
+    material_use: str,
+    tgt_process_id: int,
+    tgt_supplier_id: int,
+    last_version_id: int,
+    steps: list,
+    uos: list,
+    flows: list,
+) -> dict:
+    return {
+        "id": tgt_id,
+        "name": name,
+        "category": category,
+        "use": material_use,
+        "ProcessId": tgt_process_id,
+        "SupplierId": tgt_supplier_id,
+        "LastVersionId": last_version_id,
+        "Steps": steps,
+        "UnitOperations": uos,
+        "MaterialFlows": flows,
+    }
+
+def attach_requirement_payload(payload: dict, requirement_payload: dict | None) -> None:
+    if requirement_payload:
+        payload.pop("AcceptanceCriteriaRanges", None)
+        payload["Requirement"] = requirement_payload
+
+def save_copy_payload(
+    *,
+    record_type: str,
+    record_label: str,
+    writer: SyncWriter,
+    payload: dict,
+    src_name: str,
+    tgt_record: dict | None,
+    tgt_id: int | None,
+    changed_fields: list,
+    requirement_payload: dict | None = None,
+    source_id: int | None = None,
+) -> int:
+    if tgt_record:
+        resolved_tgt_id = tgt_id or tgt_record["id"]
+        if not changed_fields:
+            logger.info("%s '%s' unchanged - skipping", record_label, src_name)
+            return resolved_tgt_id
+
+        payload["id"] = resolved_tgt_id
+        payload["LastVersionId"] = tgt_record["LastVersionId"]
+        attach_requirement_payload(payload, requirement_payload)
+        logger.info(
+            "Updating %s '%s' (id %s): changed fields: %s",
+            record_label,
+            src_name,
+            resolved_tgt_id,
+            changed_fields,
+        )
+        writer.save_record(record_type, payload, reason=f"update {record_label}")
+        return resolved_tgt_id
+
+    logger.info("Creating %s '%s'", record_label, src_name)
+    attach_requirement_payload(payload, requirement_payload)
+    new_record = writer.save_record(record_type, payload, reason=f"create {record_label}")
+    new_id = new_record["id"]
+    if source_id is not None:
+        logger.info("Created %s '%s': %s -> %s", record_label, src_name, source_id, new_id)
+    return new_id
 
 def coerce_list(value) -> list:
     if isinstance(value, str):
@@ -792,19 +1204,20 @@ def clean_supplier_payload(src_supplier: dict) -> dict:
     payload = {k: src_supplier[k] for k in ALLOWED_SUPPLIER_FIELDS if k in src_supplier}
     return strip_attachment_links(payload)
 
-def create_target_supplier(tgt_client: QbdApiClient, src_supplier: dict) -> int:
+def create_target_supplier(writer: SyncWriter, src_supplier: dict) -> int:
     cleaned_payload = clean_supplier_payload(src_supplier)
 
     if not cleaned_payload.get("name"):
         raise ValueError("Supplier payload missing name")
 
-    supplier = tgt_client.save_record("Supplier", cleaned_payload)
+    supplier = writer.save_record("Supplier", cleaned_payload, reason="create Supplier")
 
     return supplier["id"]
 
 def resolve_target_supplier_id(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_supplier_id: int,
     supplier_cache: dict | None = None,
 ) -> int | None:
@@ -846,7 +1259,7 @@ def resolve_target_supplier_id(
             )
         else:
             logger.info("Supplier '%s' not found in target; creating it", name)
-            tgt_id = create_target_supplier(tgt_client, src_supplier)
+            tgt_id = create_target_supplier(writer, src_supplier)
             logger.info(
                 "Created new Supplier '%s': %s -> %s",
                 name,
@@ -1128,6 +1541,7 @@ def sync_drug_flows(
     flow_field: str,                # "DrugSubstanceFlows" or "DrugProductFlows"
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     tgt_project_id: int,
     src_process_id: int | None = None,
     tgt_process_id: int | None = None,
@@ -1305,10 +1719,10 @@ def sync_drug_flows(
                 record_type,
                 tgt.get("name"),
             )
-            tgt_client.save_record(record_type, payload)
+            writer.save_record(record_type, payload, reason=f"sync {flow_field}")
         else:
             logger.info(
-                "%s '%s' flows unchanged — skipping",
+                "%s '%s' flows unchanged - skipping",
                 record_type,
                 tgt.get("name"),
             )
@@ -1319,6 +1733,7 @@ def sync_iqa_drug_links(
     drug_product_mapping: dict,  # {src_dp_id: tgt_dp_id}
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
 ):
@@ -1357,16 +1772,17 @@ def sync_iqa_drug_links(
                 "Updating IQA '%s' links to DrugSubstance/DrugProduct",
                 tgt_iqa.get("name"),
             )
-            tgt_client.save_record("IQA", tgt_iqa)
+            writer.save_record("IQA", tgt_iqa, reason="sync IQA drug links")
         else:
             logger.info(
-                "IQA '%s' links to DrugSubstance/DrugProduct unchanged — skipping",
+                "IQA '%s' links to DrugSubstance/DrugProduct unchanged - skipping",
                 tgt_iqa.get("name"),
             )
 # --------------------- COPY HELPERS ---------------------
 def copy_unit_operations(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -1419,38 +1835,40 @@ def copy_unit_operations(
         src_id = src_uo["id"]
         src_name = src_uo.get("name")
 
-        # Use persisted mapping first
-        tgt_uo_id = map_lookup(prev_mapping, src_id)
-        tgt_uo = tgt_client.get_record("UnitOperation", tgt_uo_id) if tgt_uo_id else None
-        tgt_uo = validate_target_scope(tgt_uo, tgt_project_id, tgt_process_id, "UnitOperation")
-        if tgt_uo_id and not tgt_uo:
-            tgt_uo_id = None
-
-        # Fallback to name-based lookup
-        if not tgt_uo_id and src_name in tgt_by_name and src_name not in dup_uo_names:
-            tgt_uo = tgt_by_name[src_name]
-            tgt_uo_id = tgt_uo["id"]
-
-        if not tgt_uo_id and src_name in dup_uo_names:
-            logger.info("UnitOperation '%s' has duplicate name in source; skipping name-based fallback", src_name)
+        tgt_uo_id, tgt_uo = resolve_target_by_name(
+            src_id=src_id,
+            src_name=src_name,
+            prev_mapping=prev_mapping,
+            tgt_by_name=tgt_by_name,
+            duplicate_names=dup_uo_names,
+            record_type="UnitOperation",
+            record_label="UnitOperation",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+            fallback_when_mapped_invalid=True,
+            fetch_fallback_full=False,
+        )
 
         if tgt_uo:
             tgt_uo = ensure_full_record("UnitOperation", tgt_uo, tgt_client)
             if tgt_uo and "Timepoints" not in tgt_uo:
                 tgt_uo = tgt_client.get_record("UnitOperation", tgt_uo["id"])
 
-        payload = sanitize_payload(
-            src_uo,
-            ALLOWED_UNIT_OPERATION_FIELDS,
-            {"ProjectId": tgt_project_id, "ProcessId": tgt_process_id},
-        )
         sync_timepoints = "Timepoints" in src_uo
+        timepoints_payload = None
         if sync_timepoints and tgt_uo_id:
-            payload["Timepoints"] = build_timepoints_payload(
+            timepoints_payload = build_timepoints_payload(
                 src_uo.get("Timepoints"),
                 tgt_uo.get("Timepoints") if tgt_uo else [],
                 tgt_uo_id,
             )
+        payload = build_unit_operation_payload(
+            src_uo,
+            tgt_project_id,
+            tgt_process_id,
+            timepoints_payload,
+        )
 
         changed_fields = []
         if tgt_uo:
@@ -1461,9 +1879,7 @@ def copy_unit_operations(
                 tgt_uo_for_diff = dict(tgt_uo)
             tgt_uo_for_diff = strip_attachment_links(tgt_uo_for_diff)
 
-            for field in ALLOWED_UNIT_OPERATION_FIELDS:
-                if freeze_for_compare(payload.get(field)) != freeze_for_compare(tgt_uo_for_diff.get(field)):
-                    changed_fields.append(field)
+            changed_fields = frozen_changed_fields_for(payload, tgt_uo_for_diff, ALLOWED_UNIT_OPERATION_FIELDS)
             if sync_timepoints:
                 src_timepoints = normalize_timepoints_for_compare(payload.get("Timepoints"))
                 tgt_timepoints = normalize_timepoints_for_compare(tgt_uo_for_diff.get("Timepoints"))
@@ -1489,10 +1905,10 @@ def copy_unit_operations(
                 payload["id"] = tgt_uo_id
                 payload["LastVersionId"] = tgt_uo["LastVersionId"]
                 logger.info("Updating UnitOperation '%s' (id %s): changed fields: %s", src_name, tgt_uo_id, changed_fields)
-                tgt_client.save_record("UnitOperation", payload)
+                writer.save_record("UnitOperation", payload, reason="update UnitOperation")
         else:
             logger.info("Creating UnitOperation '%s'", src_name)
-            new_uo = tgt_client.save_record("UnitOperation", payload)
+            new_uo = writer.save_record("UnitOperation", payload, reason="create UnitOperation")
             tgt_uo_id = new_uo["id"]
             logger.info("Created UnitOperation '%s': %s -> %s", src_name, src_id, tgt_uo_id)
             if sync_timepoints:
@@ -1505,19 +1921,16 @@ def copy_unit_operations(
                     tgt_uo_id,
                 )
                 if timepoints_payload:
-                    timepoint_update = sanitize_payload(
+                    timepoint_update = build_unit_operation_timepoints_update_payload(
                         src_uo,
-                        ALLOWED_UNIT_OPERATION_FIELDS,
-                        {
-                            "id": tgt_uo_id,
-                            "LastVersionId": new_uo_full["LastVersionId"],
-                            "ProjectId": tgt_project_id,
-                            "ProcessId": tgt_process_id,
-                            "Timepoints": timepoints_payload,
-                        },
+                        tgt_uo_id,
+                        new_uo_full["LastVersionId"],
+                        tgt_project_id,
+                        tgt_process_id,
+                        timepoints_payload,
                     )
                     logger.info("Updating UnitOperation '%s' timepoints after create", src_name)
-                    tgt_client.save_record("UnitOperation", timepoint_update)
+                    writer.save_record("UnitOperation", timepoint_update, reason="update UnitOperation timepoints")
 
         mapping[normalize_id(src_id)] = tgt_uo_id
 
@@ -1564,21 +1977,12 @@ def sync_unit_operation_order(
 
     if not changed:
         logger.info(
-            "Unit operation order unchanged for Process '%s' — skipping",
+            "Unit operation order unchanged for Process '%s' - skipping",
             tgt_process.get("name"),
         )
         return
 
-    payload = sanitize_payload(
-        tgt_process,
-        ALLOWED_PROCESS_FIELDS,
-        {
-            "unitOperationOrder": json.dumps(tgt_order),
-        },
-    )
-
-    payload["id"] = tgt_process["id"]
-    payload["LastVersionId"] = tgt_process["LastVersionId"]
+    payload = build_unit_operation_order_payload(tgt_process, tgt_order)
 
     logger.info("Updating unit operation order on Process '%s'", tgt_process["name"])
 
@@ -1587,6 +1991,7 @@ def sync_unit_operation_order(
 def copy_steps(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -1684,33 +2089,24 @@ def copy_steps(
             full_src = src_client.get_record("Step", src_step_id)
             if is_archived(full_src):
                 continue
-            payload = sanitize_payload(full_src, ALLOWED_STEP_FIELDS, {
-                "ProjectId": tgt_project_id,
-                "ProcessId": tgt_process_id,
-                "UnitOperationId": tgt_uo_id,
-            })
+            payload = build_step_payload(full_src, tgt_project_id, tgt_process_id, tgt_uo_id)
 
             # Detect changes
             changed_fields = []
             if tgt_step:
-                for field in ALLOWED_STEP_FIELDS:
-                    if param_changed(payload.get(field), tgt_step.get(field)):
-                        changed_fields.append(field)
+                changed_fields = changed_fields_for(payload, tgt_step, ALLOWED_STEP_FIELDS)
 
-            # Create or update
-            if tgt_step:
-                if not changed_fields:
-                    logger.info("Step '%s' unchanged — skipping", src_name)
-                else:
-                    payload["id"] = tgt_step_id
-                    payload["LastVersionId"] = tgt_step["LastVersionId"]
-                    logger.info("Updating Step '%s' (id %s): changed fields: %s", src_name, tgt_step_id, changed_fields)
-                    tgt_client.save_record("Step", payload)
-            else:
-                logger.info("Creating Step '%s'", src_name)
-                new_step = tgt_client.save_record("Step", payload)
-                tgt_step_id = new_step["id"]
-                logger.info("Created Step '%s': %s -> %s", src_name, src_step_id, tgt_step_id)
+            tgt_step_id = save_copy_payload(
+                record_type="Step",
+                record_label="Step",
+                writer=writer,
+                payload=payload,
+                src_name=src_name,
+                tgt_record=tgt_step,
+                tgt_id=tgt_step_id,
+                changed_fields=changed_fields,
+                source_id=src_step_id,
+            )
 
             mapping[src_step_id] = tgt_step_id
 
@@ -1719,6 +2115,7 @@ def copy_steps(
 def sync_step_order(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     uo_mapping: dict,
     step_mapping: dict,
 ):  
@@ -1765,33 +2162,25 @@ def sync_step_order(
 
         if normalize(existing) == normalize(new_order):
             logger.info(
-                "Step order unchanged for UnitOperation %s — skipping",
+                "Step order unchanged for UnitOperation %s - skipping",
                 tgt_uo["name"],
             )
             continue
 
         # update UO 
-        payload = sanitize_payload(
-            tgt_uo,
-            ALLOWED_UNIT_OPERATION_FIELDS,
-            {
-                "id": tgt_uo_id,
-                "LastVersionId": tgt_uo["LastVersionId"],
-                "ProcessId": tgt_uo["ProcessId"],
-                "stepOrder": json.dumps(new_order),
-            }
-        )
+        payload = build_step_order_payload(tgt_uo, tgt_uo_id, new_order)
 
         logger.info(
             "Updating step order for UnitOperation '%s'",
             tgt_uo["name"],
         )
 
-        tgt_client.save_record("UnitOperation", payload)
+        writer.save_record("UnitOperation", payload, reason="sync step order")
 
 def copy_process_components(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -1841,19 +2230,19 @@ def copy_process_components(
         if not src_pc_scoped:
             continue
 
-        # Check previous mapping first
-        tgt_pc_id = map_lookup(prev_mapping, src_id)
-        tgt_full = tgt_client.get_record("ProcessComponent", tgt_pc_id) if tgt_pc_id else None
-        tgt_full = validate_target_scope(tgt_full, tgt_project_id, tgt_process_id, "ProcessComponent")
-
-        # Fallback to name-based lookup if no mapping
-        if not tgt_pc_id and src_name in tgt_by_name and src_name not in dup_pc_names:
-            tgt_pc = tgt_by_name[src_name]
-            tgt_pc_id = tgt_pc["id"]
-            tgt_full = tgt_client.get_record("ProcessComponent", tgt_pc_id)
-
-        if not tgt_pc_id and src_name in dup_pc_names:
-            logger.info("ProcessComponent '%s' has duplicate name in source; skipping name-based fallback", src_name)
+        tgt_pc_id, tgt_full = resolve_target_by_name(
+            src_id=src_id,
+            src_name=src_name,
+            prev_mapping=prev_mapping,
+            tgt_by_name=tgt_by_name,
+            duplicate_names=dup_pc_names,
+            record_type="ProcessComponent",
+            record_label="ProcessComponent",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+            fallback_when_mapped_invalid=True,
+        )
 
         # Fetch full source
         full_src = src_client.get_record("ProcessComponent", src_id)
@@ -1875,15 +2264,12 @@ def copy_process_components(
             if map_lookup(step_mapping, step.get("StepId") or step.get("id"))
         ]
 
-        payload = sanitize_payload(
+        payload = build_process_component_payload(
             full_src,
-            ALLOWED_PROCESS_COMPONENT_FIELDS,
-            {
-                "ProjectId": tgt_project_id,
-                "ProcessId": tgt_process_id,
-                "UnitOperations": uos,
-                "Steps": steps,
-            }
+            tgt_project_id,
+            tgt_process_id,
+            uos,
+            steps,
         )
 
         
@@ -1898,60 +2284,41 @@ def copy_process_components(
         if tgt_full:
             tgt_full = ensure_full_record("ProcessComponent", tgt_full, tgt_client)
             tgt_full = add_tgt_acr_for_diff(tgt_full)
-            for field in ALLOWED_PROCESS_COMPONENT_FIELDS:
-                if field in ["UnitOperations", "Steps"]:
-                    continue
-                if param_changed(payload.get(field), tgt_full.get(field)):
-                    changed_fields.append(field)
+            changed_fields = changed_fields_for(
+                payload,
+                tgt_full,
+                ALLOWED_PROCESS_COMPONENT_FIELDS,
+                skip={"UnitOperations", "Steps"},
+            )
 
-            # Compare UO and Step IDs separately
-            src_uo_ids_set = {uo["id"] for uo in payload.get("UnitOperations", [])}
-            tgt_uo_ids_set = {uo.get("id") for uo in tgt_full.get("UnitOperations", [])}
-            if src_uo_ids_set != tgt_uo_ids_set:
-                changed_fields.append("UnitOperations")
-                logger.info(
-                    "ProcessComponent '%s' UO diff: src=%s tgt=%s",
-                    src_name,
-                    sorted(src_uo_ids_set),
-                    sorted(tgt_uo_ids_set),
-                )
+            append_relationship_id_diff(
+                changed_fields,
+                "UnitOperations",
+                payload.get("UnitOperations", []),
+                tgt_full.get("UnitOperations", []),
+                record_label="ProcessComponent",
+                record_name=src_name,
+            )
+            append_relationship_id_diff(
+                changed_fields,
+                "Steps",
+                payload.get("Steps", []),
+                tgt_full.get("Steps", []),
+                record_label="ProcessComponent",
+                record_name=src_name,
+            )
 
-            src_step_ids_set = {s["id"] for s in payload.get("Steps", [])}
-            tgt_step_ids_set = {s.get("id") for s in tgt_full.get("Steps", [])}
-            if src_step_ids_set != tgt_step_ids_set:
-                changed_fields.append("Steps")
-                logger.info(
-                    "ProcessComponent '%s' Step diff: src=%s tgt=%s",
-                    src_name,
-                    sorted(src_step_ids_set),
-                    sorted(tgt_step_ids_set),
-                )
-
-        # Create or update
-        if tgt_full:
-            if not changed_fields:
-                logger.info("ProcessComponent '%s' unchanged — skipping", src_name)
-            else:
-                payload["id"] = tgt_pc_id
-                payload["LastVersionId"] = tgt_full.get("LastVersionId")
-                logger.info("Updating ProcessComponent '%s' (id %s): changed fields: %s", src_name, tgt_pc_id, changed_fields)
-                try:
-                    tgt_client.save_record("ProcessComponent", payload)
-                except requests.HTTPError as e:
-                    logger.error("HTTP error: %s", e)
-                    if getattr(e, "response", None) is not None:
-                        logger.error("Response body: %s", e.response.text)
-                    raise
-        else:
-            logger.info("Creating ProcessComponent '%s'", src_name)
-            try:
-                new_pc = tgt_client.save_record("ProcessComponent", payload)
-            except requests.HTTPError as e:
-                logger.error("HTTP error: %s", e)
-                if getattr(e, "response", None) is not None:
-                    logger.error("Response body: %s", e.response.text)
-                raise
-            tgt_pc_id = new_pc["id"]
+        tgt_pc_id = save_copy_payload(
+            record_type="ProcessComponent",
+            record_label="ProcessComponent",
+            writer=writer,
+            payload=payload,
+            src_name=src_name,
+            tgt_record=tgt_full,
+            tgt_id=tgt_pc_id,
+            changed_fields=changed_fields,
+            source_id=src_id,
+        )
 
         # Save mapping
         mapping[src_id] = tgt_pc_id
@@ -1961,6 +2328,7 @@ def copy_process_components(
 def copy_materials(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -2073,16 +2441,13 @@ def copy_materials(
         uos = [{"id": mf["UnitOperationId"], "label": f"UO-{mf['UnitOperationId']}"} for mf in material_flows if mf["UnitOperationId"]]
         steps = [{"id": mf["StepId"], "label": f"STP-{mf['StepId']}"} for mf in material_flows if mf["StepId"]]
 
-        payload = sanitize_payload(
+        payload = build_material_payload(
             full_src,
-            ALLOWED_MATERIAL_FIELDS,
-            {
-                "ProjectId": tgt_project_id,
-                "ProcessId": tgt_process_id,
-                "UnitOperations": uos,
-                "Steps": steps,
-                "MaterialFlows": material_flows
-            }
+            tgt_project_id,
+            tgt_process_id,
+            uos,
+            steps,
+            material_flows,
         )
 
         
@@ -2100,37 +2465,41 @@ def copy_materials(
                 tgt_full = dict(tgt_full)
             tgt_full = strip_attachment_links(tgt_full)
             tgt_full = add_tgt_acr_for_diff(tgt_full)
-            for field in ALLOWED_MATERIAL_FIELDS:
-                if param_changed(payload.get(field), tgt_full.get(field)):
-                    changed_fields.append(field)
+            changed_fields = changed_fields_for(payload, tgt_full, ALLOWED_MATERIAL_FIELDS)
 
-            # compare relationship IDs only
-            if {u["id"] for u in uos} != {u["id"] for u in tgt_full.get("UnitOperations", [])}:
-                changed_fields.append("UnitOperations")
-
-            if {s["id"] for s in steps} != {s["id"] for s in tgt_full.get("Steps", [])}:
-                changed_fields.append("Steps")
-
-            if { (mf.get("UnitOperationId"), mf.get("StepId"), mf.get("flow")) for mf in material_flows } != \
-               { (mf.get("UnitOperationId"), mf.get("StepId"), mf.get("flow")) for mf in tgt_full.get("MaterialFlows", []) }:
+            append_relationship_id_diff(
+                changed_fields,
+                "UnitOperations",
+                uos,
+                tgt_full.get("UnitOperations", []),
+                record_label="Material",
+                record_name=src_name,
+            )
+            append_relationship_id_diff(
+                changed_fields,
+                "Steps",
+                steps,
+                tgt_full.get("Steps", []),
+                record_label="Material",
+                record_name=src_name,
+            )
+            if tuple_set(material_flows, ("UnitOperationId", "StepId", "flow")) != tuple_set(
+                tgt_full.get("MaterialFlows", []),
+                ("UnitOperationId", "StepId", "flow"),
+            ):
                 changed_fields.append("MaterialFlows")
 
-        # create or update
-        if tgt_full:
-            if not changed_fields:
-                logger.info("Material '%s' unchanged — skipping", src_name)
-            else:
-                payload["id"] = tgt_mat_id
-                payload["LastVersionId"] = tgt_full["LastVersionId"]
-                logger.info(
-                    "Updating Material '%s' (id %s): changed fields: %s",
-                    src_name, tgt_mat_id, changed_fields
-                )
-                tgt_client.save_record("Material", payload)
-        else:
-            logger.info("Creating Material '%s'", src_name)
-            new_mat = tgt_client.save_record("Material", payload)
-            tgt_mat_id = new_mat["id"]
+        tgt_mat_id = save_copy_payload(
+            record_type="Material",
+            record_label="Material",
+            writer=writer,
+            payload=payload,
+            src_name=src_name,
+            tgt_record=tgt_full,
+            tgt_id=tgt_mat_id,
+            changed_fields=changed_fields,
+            source_id=src_id,
+        )
 
         mapping[src_id] = tgt_mat_id
 
@@ -2139,6 +2508,7 @@ def copy_materials(
 def copy_material_attributes(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -2199,18 +2569,19 @@ def copy_material_attributes(
         if not src_attr_scoped:
             continue
 
-        # Check persisted mapping
-        tgt_attr_id = map_lookup(prev_mapping, src_id)
-        tgt_full = tgt_client.get_record("MaterialAttribute", tgt_attr_id) if tgt_attr_id else None
-        tgt_full = validate_target_scope(tgt_full, tgt_project_id, tgt_process_id, "MaterialAttribute")
-
-        # Fallback by name
-        if not tgt_full and src_name in tgt_by_name and src_name not in dup_attr_names:
-            tgt_attr_id = tgt_by_name[src_name]["id"]
-            tgt_full = tgt_client.get_record("MaterialAttribute", tgt_attr_id)
-
-        if not tgt_full and src_name in dup_attr_names:
-            logger.info("Material Attribute '%s' has duplicate name in source; skipping name-based fallback", src_name)
+        tgt_attr_id, tgt_full = resolve_target_by_name(
+            src_id=src_id,
+            src_name=src_name,
+            prev_mapping=prev_mapping,
+            tgt_by_name=tgt_by_name,
+            duplicate_names=dup_attr_names,
+            record_type="MaterialAttribute",
+            record_label="Material Attribute",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+            fallback_when_mapped_invalid=True,
+        )
 
         # Fetch full source 
         full_src = src_client.get_record("MaterialAttribute", src_id)
@@ -2229,24 +2600,20 @@ def copy_material_attributes(
 
         # Map ControlMethods by name
         tgt_cms_mapped, cm_changed = map_and_diff_control_methods(
-        full_src.get("ControlMethods", []),
-        tgt_full.get("ControlMethods", []) if tgt_full else [],
-        cm_lookup,
-    )
+            full_src.get("ControlMethods", []),
+            tgt_full.get("ControlMethods", []) if tgt_full else [],
+            cm_lookup,
+        )
 
-        # Build sanitized payload
-        payload = sanitize_payload(
+        payload = build_material_attribute_payload(
             full_src,
-            ALLOWED_MATERIAL_ATTRIBUTE_FIELDS,
-            {
-                "ProjectId": tgt_project_id,
-                "ProcessId": tgt_process_id,
-                "UnitOperationId": uo_id,
-                "StepId": step_id,
-                "ProcessComponentId": pc_id,
-                "MaterialId": mat_id,
-                "ControlMethods": tgt_cms_mapped,
-            }
+            tgt_project_id,
+            tgt_process_id,
+            uo_id,
+            step_id,
+            pc_id,
+            mat_id,
+            tgt_cms_mapped,
         )
         requirement_payload = add_acr_to_payload(full_src, payload)
 
@@ -2255,58 +2622,43 @@ def copy_material_attributes(
         if tgt_full:
             tgt_full = ensure_full_record("MaterialAttribute", tgt_full, tgt_client)
             tgt_full = add_tgt_acr_for_diff(tgt_full)
-            for field in ALLOWED_MATERIAL_ATTRIBUTE_FIELDS:
-                if field == "ControlMethods":
-                    # Compare names instead of IDs
-                    src_names = {cm["name"] for cm in full_src.get("ControlMethods", [])}
-                    tgt_names = {cm.get("name") for cm in tgt_full.get("ControlMethods", [])}
-                    if src_names != tgt_names:
-                        changed_fields.append(field)
-                else:
-                    if field == "ControlMethods":
-                        if cm_changed:
-                            changed_fields.append(field)
-                    elif param_changed(payload.get(field), tgt_full.get(field)):
-                        if field == "AcceptanceCriteriaRanges":
-                            src_acr = requirement_payload.get("AcceptanceCriteriaRanges") if requirement_payload else []
-                            tgt_full_acr = add_tgt_acr_for_diff(tgt_full)
-                            tgt_acr = tgt_full_acr.get("AcceptanceCriteriaRanges") if isinstance(tgt_full_acr, dict) else None
-                            logger.info(
-                                "Material Attribute '%s' ACR diff: src=%s tgt=%s",
-                                src_name, src_acr, tgt_acr,
-                            )
-                            # Raw source fields to diagnose missing ACRs
-                            logger.info(
-                                "Material Attribute '%s' ACR raw: Requirement=%r, AcceptanceCriteriaRanges=%r, AcceptanceCriteriaRangeLinkedVersions=%r",
-                                src_name,
-                                full_src.get("Requirement"),
-                                full_src.get("AcceptanceCriteriaRanges"),
-                                full_src.get("AcceptanceCriteriaRangeLinkedVersions"),
-                            )
-                        changed_fields.append(field)
-
-        # Create or update
-        if tgt_full:
-            if not changed_fields:
-                logger.info("Material Attribute '%s' unchanged — skipping", src_name)
-            else:
-                payload["id"] = tgt_attr_id
-                payload["LastVersionId"] = tgt_full["LastVersionId"]
+            changed_fields = changed_fields_for(
+                payload,
+                tgt_full,
+                ALLOWED_MATERIAL_ATTRIBUTE_FIELDS,
+                skip={"ControlMethods", "AcceptanceCriteriaRanges"},
+            )
+            if cm_changed:
+                changed_fields.append("ControlMethods")
+            if param_changed(payload.get("AcceptanceCriteriaRanges"), tgt_full.get("AcceptanceCriteriaRanges")):
+                src_acr = requirement_payload.get("AcceptanceCriteriaRanges") if requirement_payload else []
+                tgt_full_acr = add_tgt_acr_for_diff(tgt_full)
+                tgt_acr = tgt_full_acr.get("AcceptanceCriteriaRanges") if isinstance(tgt_full_acr, dict) else None
                 logger.info(
-                    "Updating Material Attribute '%s' (id %s): changed fields: %s",
-                    src_name, tgt_attr_id, changed_fields
+                    "Material Attribute '%s' ACR diff: src=%s tgt=%s",
+                    src_name, src_acr, tgt_acr,
                 )
-                if requirement_payload:
-                    payload.pop("AcceptanceCriteriaRanges", None)
-                    payload["Requirement"] = requirement_payload
-                tgt_client.save_record("MaterialAttribute", payload)
-        else:
-            logger.info("Creating Material Attribute '%s'", src_name)
-            if requirement_payload:
-                payload.pop("AcceptanceCriteriaRanges", None)
-                payload["Requirement"] = requirement_payload
-            new_attr = tgt_client.save_record("MaterialAttribute", payload)
-            tgt_attr_id = new_attr["id"]
+                logger.info(
+                    "Material Attribute '%s' ACR raw: Requirement=%r, AcceptanceCriteriaRanges=%r, AcceptanceCriteriaRangeLinkedVersions=%r",
+                    src_name,
+                    full_src.get("Requirement"),
+                    full_src.get("AcceptanceCriteriaRanges"),
+                    full_src.get("AcceptanceCriteriaRangeLinkedVersions"),
+                )
+                changed_fields.append("AcceptanceCriteriaRanges")
+
+        tgt_attr_id = save_copy_payload(
+            record_type="MaterialAttribute",
+            record_label="Material Attribute",
+            writer=writer,
+            payload=payload,
+            src_name=src_name,
+            tgt_record=tgt_full,
+            tgt_id=tgt_attr_id,
+            changed_fields=changed_fields,
+            requirement_payload=requirement_payload,
+            source_id=src_id,
+        )
 
         mapping[src_id] = tgt_attr_id
 
@@ -2315,6 +2667,7 @@ def copy_material_attributes(
 def copy_process_parameters(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -2370,16 +2723,19 @@ def copy_process_parameters(
         tgt_uo_id = map_lookup(uo_mapping, src_pp.get("UnitOperationId"))
         tgt_step_id = map_lookup(step_mapping, src_pp.get("StepId")) if src_pp.get("StepId") else None
         tgt_pc_id = map_lookup(process_component_mapping, src_pp.get("ProcessComponentId")) if src_pp.get("ProcessComponentId") else None
-        tgt_mat_id = map_lookup(material_mapping, src_pp.get("MaterialId")) if src_pp.get("MaterialId") else None  # ✅ new
+        tgt_mat_id = map_lookup(material_mapping, src_pp.get("MaterialId")) if src_pp.get("MaterialId") else None
 
-        # Find target PP
-        tgt_pp_id = map_lookup(prev_mapping, src_id)
-        if tgt_pp_id:
-            tgt_pp_stub = tgt_client.get_record("ProcessParameter", tgt_pp_id)
-            tgt_pp_stub = validate_target_scope(tgt_pp_stub, tgt_project_id, tgt_process_id, "ProcessParameter")
-        else:
-            key = (src_pp["name"], tgt_uo_id, tgt_step_id, tgt_pc_id, tgt_mat_id)
-            tgt_pp_stub = tgt_lookup.get(key)
+        tgt_pp_id, tgt_pp_stub = resolve_target_by_lookup(
+            src_id=src_id,
+            prev_mapping=prev_mapping,
+            fallback_key=(src_pp["name"], tgt_uo_id, tgt_step_id, tgt_pc_id, tgt_mat_id),
+            tgt_lookup=tgt_lookup,
+            record_type="ProcessParameter",
+            record_label="ProcessParameter",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+        )
 
         # Fetch full source
         full_src = src_client.get_record("ProcessParameter", src_id)
@@ -2389,20 +2745,15 @@ def copy_process_parameters(
         if is_archived(full_src):
             continue
 
-        # Prepare payload 
-        payload_extra = {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperationId": tgt_uo_id,
-        }
-        if tgt_step_id:
-            payload_extra["StepId"] = tgt_step_id
-        if tgt_pc_id:
-            payload_extra["ProcessComponentId"] = tgt_pc_id
-        if tgt_mat_id: 
-            payload_extra["MaterialId"] = tgt_mat_id
-
-        payload = sanitize_payload(full_src, ALLOWED_PROCESS_PARAMETER_FIELDS, payload_extra)
+        payload = build_process_parameter_payload(
+            full_src,
+            tgt_project_id,
+            tgt_process_id,
+            tgt_uo_id,
+            tgt_step_id,
+            tgt_pc_id,
+            tgt_mat_id,
+        )
         requirement_payload = add_acr_to_payload(full_src, payload)
 
         # Diff detection
@@ -2411,46 +2762,29 @@ def copy_process_parameters(
             tgt_pp_stub = ensure_full_record("ProcessParameter", tgt_pp_stub, tgt_client)
             tgt_pp_stub = add_tgt_acr_for_diff(tgt_pp_stub)
 
-            fields_to_check = ALLOWED_PROCESS_PARAMETER_FIELDS + ["UnitOperationId", "StepId", "ProcessComponentId", "MaterialId"]  # ✅ include MaterialId
+            fields_to_check = ALLOWED_PROCESS_PARAMETER_FIELDS + ["UnitOperationId", "StepId", "ProcessComponentId", "MaterialId"]
 
-            for field in fields_to_check:
-                if param_changed(payload.get(field), tgt_pp_stub.get(field)):
-                    changed_fields.append(field)
+            changed_fields = changed_fields_for(payload, tgt_pp_stub, fields_to_check)
 
-        # Create or update
-        if tgt_pp_stub:
-            if not changed_fields:
-                logger.info("ProcessParameter '%s' unchanged — skipping", src_pp["name"])
-                mapping[src_id] = tgt_pp_stub["id"]
-                continue
-
-            # Update existing
-            payload["id"] = tgt_pp_stub["id"]
-            payload["LastVersionId"] = tgt_pp_stub["LastVersionId"]
-            logger.info(
-                "Updating ProcessParameter '%s' (id %s): changed fields: %s",
-                src_pp["name"], tgt_pp_stub["id"], changed_fields
-            )
-            if requirement_payload:
-                payload.pop("AcceptanceCriteriaRanges", None)
-                payload["Requirement"] = requirement_payload
-            tgt_client.save_record("ProcessParameter", payload)
-            mapping[src_id] = tgt_pp_stub["id"]
-
-        else:
-            # Create new
-            logger.info("Creating ProcessParameter '%s'", src_pp["name"])
-            if requirement_payload:
-                payload.pop("AcceptanceCriteriaRanges", None)
-                payload["Requirement"] = requirement_payload
-            new_pp = tgt_client.save_record("ProcessParameter", payload)
-            mapping[src_id] = new_pp["id"]
+        mapping[src_id] = save_copy_payload(
+            record_type="ProcessParameter",
+            record_label="ProcessParameter",
+            writer=writer,
+            payload=payload,
+            src_name=src_pp["name"],
+            tgt_record=tgt_pp_stub,
+            tgt_id=tgt_pp_id,
+            changed_fields=changed_fields,
+            requirement_payload=requirement_payload,
+            source_id=src_id,
+        )
 
     return mapping
 
 def copy_iqas(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -2502,17 +2836,19 @@ def copy_iqas(
         src_id = src_stub["id"]
         src_name = src_stub["name"]
 
-        # find existing target IQA 
-        tgt_id = map_lookup(prev_mapping, src_id)
-        tgt_full = tgt_client.get_record("IQA", tgt_id) if tgt_id else None
-        tgt_full = validate_target_scope(tgt_full, tgt_project_id, tgt_process_id, "IQA")
-
-        if not tgt_full and src_name in tgt_by_name and src_name not in dup_iqa_names:
-            tgt_id = tgt_by_name[src_name]["id"]
-            tgt_full = tgt_client.get_record("IQA", tgt_id)
-
-        if not tgt_full and src_name in dup_iqa_names:
-            logger.info("IQA '%s' has duplicate name in source; skipping name-based fallback", src_name)
+        tgt_id, tgt_full = resolve_target_by_name(
+            src_id=src_id,
+            src_name=src_name,
+            prev_mapping=prev_mapping,
+            tgt_by_name=tgt_by_name,
+            duplicate_names=dup_iqa_names,
+            record_type="IQA",
+            record_label="IQA",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+            fallback_when_mapped_invalid=True,
+        )
 
         # skip if indicates different project/process
         src_stub_scoped = validate_target_scope(src_stub, src_project_id, src_process_id, "source IQA")
@@ -2533,21 +2869,18 @@ def copy_iqas(
 
         # map ControlMethods by NAME
         tgt_cms_payload, cm_changed = map_and_diff_control_methods(
-        full_src.get("ControlMethods", []),
-        tgt_full.get("ControlMethods", []) if tgt_full else [],
-        cm_lookup,
-    )
+            full_src.get("ControlMethods", []),
+            tgt_full.get("ControlMethods", []) if tgt_full else [],
+            cm_lookup,
+        )
 
-        payload = sanitize_payload(
+        payload = build_iqa_payload(
             full_src,
-            ALLOWED_IQA_FIELDS,
-            {
-                "ProjectId": tgt_project_id,
-                "ProcessId": tgt_process_id,
-                "UnitOperationId": tgt_uo_id,
-                "StepId": tgt_step_id,
-                "ControlMethods": tgt_cms_payload,
-            }
+            tgt_project_id,
+            tgt_process_id,
+            tgt_uo_id,
+            tgt_step_id,
+            tgt_cms_payload,
         )
         requirement_payload = add_acr_to_payload(full_src, payload)
 
@@ -2557,41 +2890,27 @@ def copy_iqas(
         if tgt_full:
             tgt_full = ensure_full_record("IQA", tgt_full, tgt_client)
             tgt_full = add_tgt_acr_for_diff(tgt_full)
-            for field in ALLOWED_IQA_FIELDS:
-                if field == "ControlMethods":
-                    src_names = {cm["name"] for cm in full_src.get("ControlMethods", [])}
-                    tgt_names = {cm.get("name") for cm in tgt_full.get("ControlMethods", [])}
-                    if src_names != tgt_names:
-                        changed_fields.append(field)
-                else:
-                    if field == "ControlMethods":
-                        if cm_changed:
-                            changed_fields.append(field)
-                    elif param_changed(payload.get(field), tgt_full.get(field)):
-                        changed_fields.append(field)
+            changed_fields = changed_fields_for(
+                payload,
+                tgt_full,
+                ALLOWED_IQA_FIELDS,
+                skip={"ControlMethods"},
+            )
+            if cm_changed:
+                changed_fields.append("ControlMethods")
 
-        # create or update
-        if tgt_full:
-            if not changed_fields:
-                logger.info("IQA '%s' unchanged — skipping", src_name)
-            else:
-                payload["id"] = tgt_id
-                payload["LastVersionId"] = tgt_full["LastVersionId"]
-                logger.info(
-                    "Updating IQA '%s' (id %s): changed fields: %s",
-                    src_name, tgt_id, changed_fields
-                )
-                if requirement_payload:
-                    payload.pop("AcceptanceCriteriaRanges", None)
-                    payload["Requirement"] = requirement_payload
-                tgt_client.save_record("IQA", payload)
-        else:
-            logger.info("Creating IQA '%s'", src_name)
-            if requirement_payload:
-                payload.pop("AcceptanceCriteriaRanges", None)
-                payload["Requirement"] = requirement_payload
-            new_iqa = tgt_client.save_record("IQA", payload)
-            tgt_id = new_iqa["id"]
+        tgt_id = save_copy_payload(
+            record_type="IQA",
+            record_label="IQA",
+            writer=writer,
+            payload=payload,
+            src_name=src_name,
+            tgt_record=tgt_full,
+            tgt_id=tgt_id,
+            changed_fields=changed_fields,
+            requirement_payload=requirement_payload,
+            source_id=src_id,
+        )
 
         mapping[src_id] = tgt_id
 
@@ -2600,6 +2919,7 @@ def copy_iqas(
 def copy_ipas(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -2652,14 +2972,17 @@ def copy_ipas(
         tgt_uo_id = map_lookup(uo_mapping, src_ipa.get("UnitOperationId"))
         tgt_step_id = map_lookup(step_mapping, src_ipa.get("StepId")) if src_ipa.get("StepId") else None
 
-        # Find target
-        tgt_ipa_id = map_lookup(prev_mapping, src_id)
-        if tgt_ipa_id:
-            tgt_stub = tgt_client.get_record("IPA", tgt_ipa_id)
-            tgt_stub = validate_target_scope(tgt_stub, tgt_project_id, tgt_process_id, "IPA")
-        else:
-            key = (src_ipa["name"], tgt_uo_id, tgt_step_id)
-            tgt_stub = tgt_lookup.get(key)
+        tgt_ipa_id, tgt_stub = resolve_target_by_lookup(
+            src_id=src_id,
+            prev_mapping=prev_mapping,
+            fallback_key=(src_ipa["name"], tgt_uo_id, tgt_step_id),
+            tgt_lookup=tgt_lookup,
+            record_type="IPA",
+            record_label="IPA",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+        )
 
         # Fetch full source
         full_src = src_client.get_record("IPA", src_id)
@@ -2676,16 +2999,13 @@ def copy_ipas(
             cm_lookup,
         )
 
-        payload = sanitize_payload(
+        payload = build_ipa_payload(
             full_src,
-            ALLOWED_IPA_FIELDS,
-            {
-                "ProjectId": tgt_project_id,
-                "ProcessId": tgt_process_id,
-                "UnitOperationId": tgt_uo_id,
-                "StepId": tgt_step_id,
-                "ControlMethods": tgt_cms_payload,
-            }
+            tgt_project_id,
+            tgt_process_id,
+            tgt_uo_id,
+            tgt_step_id,
+            tgt_cms_payload,
         )
         requirement_payload = add_acr_to_payload(full_src, payload)
 
@@ -2697,47 +3017,29 @@ def copy_ipas(
 
             fields_to_check = ALLOWED_IPA_FIELDS + ["UnitOperationId", "StepId"]
 
-            for field in fields_to_check:
-                if field == "ControlMethods":
-                    if cm_changed:
-                        changed_fields.append(field)
-                elif param_changed(payload.get(field), tgt_stub.get(field)):
-                    changed_fields.append(field)
+            changed_fields = changed_fields_for(payload, tgt_stub, fields_to_check, skip={"ControlMethods"})
+            if cm_changed:
+                changed_fields.append("ControlMethods")
 
-        # Create / Update
-        if tgt_stub:
-            if not changed_fields:
-                logger.info("IPA '%s' unchanged — skipping", src_ipa["name"])
-                mapping[src_id] = tgt_stub["id"]
-                continue
-
-            payload["id"] = tgt_stub["id"]
-            payload["LastVersionId"] = tgt_stub["LastVersionId"]
-            logger.info(
-                "Updating IPA '%s' (id %s): changed fields: %s",
-                src_ipa["name"],
-                tgt_stub["id"],
-                changed_fields,
-            )
-            if requirement_payload:
-                payload.pop("AcceptanceCriteriaRanges", None)
-                payload["Requirement"] = requirement_payload
-            tgt_client.save_record("IPA", payload)
-            mapping[src_id] = tgt_stub["id"]
-
-        else:
-            logger.info("Creating IPA '%s'", src_ipa["name"])
-            if requirement_payload:
-                payload.pop("AcceptanceCriteriaRanges", None)
-                payload["Requirement"] = requirement_payload
-            new_ipa = tgt_client.save_record("IPA", payload)
-            mapping[src_id] = new_ipa["id"]
+        mapping[src_id] = save_copy_payload(
+            record_type="IPA",
+            record_label="IPA",
+            writer=writer,
+            payload=payload,
+            src_name=src_ipa["name"],
+            tgt_record=tgt_stub,
+            tgt_id=tgt_ipa_id,
+            changed_fields=changed_fields,
+            requirement_payload=requirement_payload,
+            source_id=src_id,
+        )
 
     return mapping
 
 def copy_samples(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -2802,20 +3104,24 @@ def copy_samples(
         tgt_mat_id = map_lookup(material_mapping, src_sample.get("MaterialId")) if src_sample.get("MaterialId") else None
         tgt_matrix_mat_id = map_lookup(material_mapping, src_sample.get("MatrixMaterialId")) if src_sample.get("MatrixMaterialId") else None
 
-        tgt_sample_id = map_lookup(prev_mapping, src_id)
-        if tgt_sample_id:
-            tgt_stub = tgt_client.get_record("Sample", tgt_sample_id)
-            tgt_stub = validate_target_scope(tgt_stub, tgt_project_id, tgt_process_id, "Sample")
-        else:
-            key = (
+        tgt_sample_id, tgt_stub = resolve_target_by_lookup(
+            src_id=src_id,
+            prev_mapping=prev_mapping,
+            fallback_key=(
                 src_sample.get("name"),
                 src_sample.get("type"),
                 tgt_uo_id,
                 tgt_step_id,
                 tgt_mat_id,
                 tgt_matrix_mat_id,
-            )
-            tgt_stub = tgt_lookup.get(key)
+            ),
+            tgt_lookup=tgt_lookup,
+            record_type="Sample",
+            record_label="Sample",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+        )
 
         full_src = src_client.get_record("Sample", src_id)
         full_src = validate_target_scope(full_src, src_project_id, src_process_id, "source Sample")
@@ -2829,18 +3135,11 @@ def copy_samples(
         tgt_mat_id = map_lookup(material_mapping, full_src.get("MaterialId")) if full_src.get("MaterialId") else None
         tgt_matrix_mat_id = map_lookup(material_mapping, full_src.get("MatrixMaterialId")) if full_src.get("MatrixMaterialId") else None
 
-        extra_fields = {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperationId": tgt_uo_id,
-            "StepId": tgt_step_id,
-            "MaterialId": tgt_mat_id,
-            "MatrixMaterialId": tgt_matrix_mat_id,
-        }
         sync_timepoints = "Timepoints" in full_src
+        timepoints_payload = None
         if sync_timepoints:
             if tgt_uo_id:
-                extra_fields["Timepoints"] = build_sample_timepoints_payload(
+                timepoints_payload = build_sample_timepoints_payload(
                     full_src.get("Timepoints"),
                     get_tgt_uo_timepoints(tgt_uo_id),
                     tgt_uo_id,
@@ -2851,10 +3150,15 @@ def copy_samples(
                     full_src.get("name"),
                 )
 
-        payload = sanitize_payload(
+        payload = build_sample_payload(
             full_src,
-            ALLOWED_SAMPLE_FIELDS,
-            extra_fields,
+            tgt_project_id,
+            tgt_process_id,
+            tgt_uo_id,
+            tgt_step_id,
+            tgt_mat_id,
+            tgt_matrix_mat_id,
+            timepoints_payload,
         )
 
         changed_fields = []
@@ -2862,44 +3166,214 @@ def copy_samples(
             tgt_stub = ensure_full_record("Sample", tgt_stub, tgt_client)
             if sync_timepoints and tgt_stub and "Timepoints" not in tgt_stub:
                 tgt_stub = tgt_client.get_record("Sample", tgt_stub["id"])
-            for field in ALLOWED_SAMPLE_FIELDS:
-                if param_changed(payload.get(field), tgt_stub.get(field)):
-                    changed_fields.append(field)
+            changed_fields = changed_fields_for(payload, tgt_stub, ALLOWED_SAMPLE_FIELDS)
             if sync_timepoints:
                 src_timepoints = normalize_sample_timepoints_for_compare(payload.get("Timepoints"))
                 tgt_timepoints = normalize_sample_timepoints_for_compare(tgt_stub.get("Timepoints"))
                 if src_timepoints != tgt_timepoints:
                     changed_fields.append("Timepoints")
 
-        if tgt_stub:
-            if not changed_fields:
-                logger.info("Sample '%s' unchanged - skipping", full_src.get("name"))
-                mapping[src_id] = tgt_stub["id"]
-                continue
-
-            payload["id"] = tgt_stub["id"]
-            payload["LastVersionId"] = tgt_stub.get("LastVersionId")
-            logger.info(
-                "Updating Sample '%s' (id %s): changed fields: %s",
-                full_src.get("name"),
-                tgt_stub["id"],
-                changed_fields,
-            )
-            tgt_client.save_record("Sample", payload)
-            mapping[src_id] = tgt_stub["id"]
-        else:
-            logger.info("Creating Sample '%s'", full_src.get("name"))
-            new_sample = tgt_client.save_record("Sample", payload)
-            mapping[src_id] = new_sample["id"]
+        mapping[src_id] = save_copy_payload(
+            record_type="Sample",
+            record_label="Sample",
+            writer=writer,
+            payload=payload,
+            src_name=full_src.get("name"),
+            tgt_record=tgt_stub,
+            tgt_id=tgt_sample_id,
+            changed_fields=changed_fields,
+            source_id=src_id,
+        )
 
     return mapping
 
 # --------------------- SUPPLIER SYNC ---------------------
 
+def list_or_none(value):
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except Exception:
+            return None
+    return value if isinstance(value, list) else None
+
+def build_process_component_supplier_update(
+    src_full: dict,
+    tgt_full: dict,
+    tgt_supplier_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+) -> tuple[dict | None, str | None, str | None]:
+    steps = list_or_none(tgt_full.get("Steps"))
+    uos = list_or_none(tgt_full.get("UnitOperations"))
+    if steps is None or uos is None:
+        return None, tgt_full.get("name"), "missing Steps/UnitOperations"
+
+    name_val = tgt_full.get("name") or src_full.get("name")
+    type_val = tgt_full.get("type") or src_full.get("type")
+    if not name_val or not type_val:
+        return None, tgt_full.get("name"), "missing name/type"
+
+    return (
+        build_process_component_supplier_payload(
+            tgt_full["id"],
+            name_val,
+            type_val,
+            tgt_project_id,
+            tgt_process_id,
+            tgt_supplier_id,
+            tgt_full.get("LastVersionId"),
+            steps,
+            uos,
+        ),
+        name_val,
+        None,
+    )
+
+def build_material_supplier_update(
+    src_full: dict,
+    tgt_full: dict,
+    tgt_supplier_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+) -> tuple[dict | None, str | None, str | None]:
+    steps = list_or_none(tgt_full.get("Steps"))
+    uos = list_or_none(tgt_full.get("UnitOperations"))
+    flows = list_or_none(tgt_full.get("MaterialFlows"))
+    if steps is None or uos is None or flows is None:
+        return None, tgt_full.get("name"), "missing Steps/UnitOperations/MaterialFlows"
+
+    name_val = tgt_full.get("name") or src_full.get("name")
+    category_val = tgt_full.get("category") or src_full.get("category")
+    use_val = tgt_full.get("use") or src_full.get("use")
+    if not name_val or category_val is None or use_val is None:
+        return None, tgt_full.get("name"), "missing name/category/use"
+
+    return (
+        build_material_supplier_payload(
+            tgt_full["id"],
+            name_val,
+            category_val,
+            use_val,
+            tgt_process_id,
+            tgt_supplier_id,
+            tgt_full.get("LastVersionId"),
+            steps,
+            uos,
+            flows,
+        ),
+        name_val,
+        None,
+    )
+
+def sync_supplier_id_records(
+    *,
+    record_type: str,
+    records: dict,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_project_id: int,
+    src_process_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    supplier_cache: dict,
+    build_update_payload,
+) -> dict:
+    stats = {"updated": 0, "unchanged": 0, "skipped": 0}
+    if records:
+        logger.info("Syncing SupplierId for %s %s records", len(records), record_type)
+    else:
+        logger.info("No %s records mapped for SupplierId sync", record_type)
+
+    for src_id, tgt_id in (records or {}).items():
+        src_full = src_client.get_record(record_type, src_id)
+        src_full = validate_target_scope(src_full, src_project_id, src_process_id, f"source {record_type}")
+        if not src_full:
+            stats["skipped"] += 1
+            logger.info("Skipping %s source id %s; out of scope or missing", record_type, src_id)
+            continue
+        if is_archived(src_full):
+            stats["skipped"] += 1
+            logger.info("Skipping archived %s '%s' (%s)", record_type, src_full.get("name"), src_id)
+            continue
+
+        src_supplier_id = src_full.get("SupplierId")
+        if not src_supplier_id:
+            stats["skipped"] += 1
+            logger.info("%s '%s' (%s) has no source SupplierId - skipping", record_type, src_full.get("name"), src_id)
+            continue
+
+        tgt_supplier_id = resolve_target_supplier_id(
+            src_client,
+            tgt_client,
+            writer,
+            src_supplier_id,
+            supplier_cache,
+        )
+        if not tgt_supplier_id:
+            stats["skipped"] += 1
+            logger.warning(
+                "Skipping %s '%s' (%s); unable to map source SupplierId %s",
+                record_type,
+                src_full.get("name"),
+                src_id,
+                src_supplier_id,
+            )
+            continue
+
+        tgt_full = tgt_client.get_record(record_type, tgt_id)
+        tgt_full = validate_target_scope(tgt_full, tgt_project_id, tgt_process_id, record_type)
+        if not tgt_full:
+            stats["skipped"] += 1
+            logger.info("Skipping target %s id %s; out of scope or missing", record_type, tgt_id)
+            continue
+        if is_archived(tgt_full):
+            stats["skipped"] += 1
+            logger.info("Skipping archived target %s '%s' (%s)", record_type, tgt_full.get("name"), tgt_id)
+            continue
+
+        tgt_full = ensure_full_record(record_type, tgt_full, tgt_client)
+        if tgt_full.get("SupplierId") == tgt_supplier_id:
+            stats["unchanged"] += 1
+            logger.info(
+                "%s '%s' (%s) SupplierId unchanged (%s) - skipping",
+                record_type,
+                tgt_full.get("name"),
+                tgt_id,
+                tgt_supplier_id,
+            )
+            continue
+
+        payload, name_val, skip_reason = build_update_payload(
+            src_full,
+            tgt_full,
+            tgt_supplier_id,
+            tgt_project_id,
+            tgt_process_id,
+        )
+        if not payload:
+            stats["skipped"] += 1
+            logger.warning(
+                "Skipping %s '%s' (%s) supplier update; %s",
+                record_type,
+                name_val,
+                tgt_id,
+                skip_reason,
+            )
+            continue
+
+        logger.info("Updating %s '%s' (%s) SupplierId -> %s", record_type, name_val, tgt_id, tgt_supplier_id)
+        writer.save_record(record_type, payload, reason=f"sync {record_type} SupplierId")
+        stats["updated"] += 1
+
+    return stats
+
 def sync_supplier_ids(
     *,
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
+    writer: SyncWriter,
     src_project_id: int,
     src_process_id: int,
     tgt_project_id: int,
@@ -2908,254 +3382,59 @@ def sync_supplier_ids(
     material_mapping: dict,
 ):
     supplier_cache = {"by_id": {}, "by_name": {}}
-
-    def _ensure_list(value):
-        if isinstance(value, str):
-            try:
-                value = json.loads(value)
-            except Exception:
-                return None
-        return value if isinstance(value, list) else None
-
-    # Process Components
-    pc_stats = {"updated": 0, "unchanged": 0, "skipped": 0}
-    if pc_mapping:
-        logger.info("Syncing SupplierId for %s ProcessComponents", len(pc_mapping))
-    else:
-        logger.info("No ProcessComponents mapped for SupplierId sync")
-
-    for src_id, tgt_id in (pc_mapping or {}).items():
-        src_full = src_client.get_record("ProcessComponent", src_id)
-        src_full = validate_target_scope(src_full, src_project_id, src_process_id, "source ProcessComponent")
-        if not src_full:
-            pc_stats["skipped"] += 1
-            logger.info("Skipping ProcessComponent source id %s; out of scope or missing", src_id)
-            continue
-        if is_archived(src_full):
-            pc_stats["skipped"] += 1
-            logger.info("Skipping archived ProcessComponent '%s' (%s)", src_full.get("name"), src_id)
-            continue
-
-        src_supplier_id = src_full.get("SupplierId")
-        if not src_supplier_id:
-            pc_stats["skipped"] += 1
-            logger.info("ProcessComponent '%s' (%s) has no source SupplierId - skipping", src_full.get("name"), src_id)
-            continue
-
-        tgt_supplier_id = resolve_target_supplier_id(
-            src_client,
-            tgt_client,
-            src_supplier_id,
-            supplier_cache,
-        )
-        if not tgt_supplier_id:
-            pc_stats["skipped"] += 1
-            logger.warning(
-                "Skipping ProcessComponent '%s' (%s); unable to map source SupplierId %s",
-                src_full.get("name"),
-                src_id,
-                src_supplier_id,
-            )
-            continue
-
-        tgt_full = tgt_client.get_record("ProcessComponent", tgt_id)
-        tgt_full = validate_target_scope(tgt_full, tgt_project_id, tgt_process_id, "ProcessComponent")
-        if not tgt_full:
-            pc_stats["skipped"] += 1
-            logger.info("Skipping target ProcessComponent id %s; out of scope or missing", tgt_id)
-            continue
-        if is_archived(tgt_full):
-            pc_stats["skipped"] += 1
-            logger.info("Skipping archived target ProcessComponent '%s' (%s)", tgt_full.get("name"), tgt_id)
-            continue
-
-        tgt_full = ensure_full_record("ProcessComponent", tgt_full, tgt_client)
-
-        if tgt_full.get("SupplierId") == tgt_supplier_id:
-            pc_stats["unchanged"] += 1
-            logger.info(
-                "ProcessComponent '%s' (%s) SupplierId unchanged (%s) - skipping",
-                tgt_full.get("name"),
-                tgt_id,
-                tgt_supplier_id,
-            )
-            continue
-
-        steps = _ensure_list(tgt_full.get("Steps"))
-        uos = _ensure_list(tgt_full.get("UnitOperations"))
-        if steps is None or uos is None:
-            pc_stats["skipped"] += 1
-            logger.warning(
-                "Skipping ProcessComponent '%s' (%s) supplier update; missing Steps/UnitOperations",
-                tgt_full.get("name"),
-                tgt_id,
-            )
-            continue
-
-        name_val = tgt_full.get("name") or src_full.get("name")
-        type_val = tgt_full.get("type") or src_full.get("type")
-        if not name_val or not type_val:
-            pc_stats["skipped"] += 1
-            logger.warning(
-                "Skipping ProcessComponent '%s' (%s) supplier update; missing name/type",
-                tgt_full.get("name"),
-                tgt_id,
-            )
-            continue
-
-        payload = {
-            "id": tgt_id,
-            "name": name_val,
-            "type": type_val,
-            "ProcessId": tgt_process_id,
-            "ProjectId": tgt_project_id,
-            "SupplierId": tgt_supplier_id,
-            "LastVersionId": tgt_full.get("LastVersionId"),
-            "Steps": steps,
-            "UnitOperations": uos,
-        }
-
-        logger.info(
-            "Updating ProcessComponent '%s' (%s) SupplierId -> %s",
-            name_val,
-            tgt_id,
-            tgt_supplier_id,
-        )
-        tgt_client.save_record("ProcessComponent", payload)
-        pc_stats["updated"] += 1
-
-    # Materials
-    material_stats = {"updated": 0, "unchanged": 0, "skipped": 0}
-    if material_mapping:
-        logger.info("Syncing SupplierId for %s Materials", len(material_mapping))
-    else:
-        logger.info("No Materials mapped for SupplierId sync")
-
-    for src_id, tgt_id in (material_mapping or {}).items():
-        src_full = src_client.get_record("Material", src_id)
-        src_full = validate_target_scope(src_full, src_project_id, src_process_id, "source Material")
-        if not src_full:
-            material_stats["skipped"] += 1
-            logger.info("Skipping Material source id %s; out of scope or missing", src_id)
-            continue
-        if is_archived(src_full):
-            material_stats["skipped"] += 1
-            logger.info("Skipping archived Material '%s' (%s)", src_full.get("name"), src_id)
-            continue
-
-        src_supplier_id = src_full.get("SupplierId")
-        if not src_supplier_id:
-            material_stats["skipped"] += 1
-            logger.info("Material '%s' (%s) has no source SupplierId - skipping", src_full.get("name"), src_id)
-            continue
-
-        tgt_supplier_id = resolve_target_supplier_id(
-            src_client,
-            tgt_client,
-            src_supplier_id,
-            supplier_cache,
-        )
-        if not tgt_supplier_id:
-            material_stats["skipped"] += 1
-            logger.warning(
-                "Skipping Material '%s' (%s); unable to map source SupplierId %s",
-                src_full.get("name"),
-                src_id,
-                src_supplier_id,
-            )
-            continue
-
-        tgt_full = tgt_client.get_record("Material", tgt_id)
-        tgt_full = validate_target_scope(tgt_full, tgt_project_id, tgt_process_id, "Material")
-        if not tgt_full:
-            material_stats["skipped"] += 1
-            logger.info("Skipping target Material id %s; out of scope or missing", tgt_id)
-            continue
-        if is_archived(tgt_full):
-            material_stats["skipped"] += 1
-            logger.info("Skipping archived target Material '%s' (%s)", tgt_full.get("name"), tgt_id)
-            continue
-
-        tgt_full = ensure_full_record("Material", tgt_full, tgt_client)
-
-        if tgt_full.get("SupplierId") == tgt_supplier_id:
-            material_stats["unchanged"] += 1
-            logger.info(
-                "Material '%s' (%s) SupplierId unchanged (%s) - skipping",
-                tgt_full.get("name"),
-                tgt_id,
-                tgt_supplier_id,
-            )
-            continue
-
-        steps = _ensure_list(tgt_full.get("Steps"))
-        uos = _ensure_list(tgt_full.get("UnitOperations"))
-        flows = _ensure_list(tgt_full.get("MaterialFlows"))
-        if steps is None or uos is None or flows is None:
-            material_stats["skipped"] += 1
-            logger.warning(
-                "Skipping Material '%s' (%s) supplier update; missing Steps/UnitOperations/MaterialFlows",
-                tgt_full.get("name"),
-                tgt_id,
-            )
-            continue
-
-        name_val = tgt_full.get("name") or src_full.get("name")
-        category_val = tgt_full.get("category") or src_full.get("category")
-        use_val = tgt_full.get("use") or src_full.get("use")
-        if not name_val or category_val is None or use_val is None:
-            material_stats["skipped"] += 1
-            logger.warning(
-                "Skipping Material '%s' (%s) supplier update; missing name/category/use",
-                tgt_full.get("name"),
-                tgt_id,
-            )
-            continue
-
-        payload = {
-            "id": tgt_id,
-            "name": name_val,
-            "category": category_val,
-            "use": use_val,
-            "ProcessId": tgt_process_id,
-            "SupplierId": tgt_supplier_id,
-            "LastVersionId": tgt_full.get("LastVersionId"),
-            "Steps": steps,
-            "UnitOperations": uos,
-            "MaterialFlows": flows,
-        }
-
-        logger.info(
-            "Updating Material '%s' (%s) SupplierId -> %s",
-            name_val,
-            tgt_id,
-            tgt_supplier_id,
-        )
-        tgt_client.save_record("Material", payload)
-        material_stats["updated"] += 1
+    sync_supplier_id_records(
+        record_type="ProcessComponent",
+        records=pc_mapping,
+        src_client=src_client,
+        tgt_client=tgt_client,
+        writer=writer,
+        src_project_id=src_project_id,
+        src_process_id=src_process_id,
+        tgt_project_id=tgt_project_id,
+        tgt_process_id=tgt_process_id,
+        supplier_cache=supplier_cache,
+        build_update_payload=build_process_component_supplier_update,
+    )
+    sync_supplier_id_records(
+        record_type="Material",
+        records=material_mapping,
+        src_client=src_client,
+        tgt_client=tgt_client,
+        writer=writer,
+        src_project_id=src_project_id,
+        src_process_id=src_process_id,
+        tgt_project_id=tgt_project_id,
+        tgt_process_id=tgt_process_id,
+        supplier_cache=supplier_cache,
+        build_update_payload=build_material_supplier_update,
+    )
 # --------------------- MAIN COPY LOGIC ---------------------
-def copy_process():
-    src_client = QbdApiClient.from_host(SRC_HOST, SRC_BASE_PATH, SRC_KEY)
-    tgt_client = QbdApiClient.from_host(TGT_HOST, TGT_BASE_PATH, TGT_KEY)
+def copy_process(config: SyncConfig):
+    src_project_id = config.src_project_id
+    src_process_id = config.src_process_id
+    tgt_project_id = config.tgt_project_id
+    src_client = config.src_client
+    tgt_client = config.tgt_client
+    writer = SyncWriter(tgt_client)
 
     # Load existing ID map
     id_map = load_id_map()
     process_map = id_map.setdefault("processes", {})
-    proc_entry = process_map.setdefault(str(SRC_PROCESS_ID), {})
+    proc_entry = process_map.setdefault(str(src_process_id), {})
 
 
     try:
 
         # Fetch and copy Process
-        src_process = src_client.get_record("Process", SRC_PROCESS_ID)
+        src_process = src_client.get_record("Process", src_process_id)
         if is_archived(src_process):
-            logger.info("Source process %s is archived; skipping copy", SRC_PROCESS_ID)
+            logger.info("Source process %s is archived; skipping copy", src_process_id)
             return
 
-        if src_process.get("ProjectId") != SRC_PROJECT_ID:
-            raise ValueError(f"Source process {SRC_PROCESS_ID} does not belong to project {SRC_PROJECT_ID}")
+        if src_process.get("ProjectId") != src_project_id:
+            raise ValueError(f"Source process {src_process_id} does not belong to project {src_project_id}")
 
-        payload = sanitize_payload(src_process, ALLOWED_PROCESS_FIELDS, {"ProjectId": TGT_PROJECT_ID})
+        payload = build_process_payload(src_process, tgt_project_id)
 
         # Check if process exists in target by previous mapping or by name
         tgt_process_id = proc_entry.get("targetProcessId")
@@ -3163,7 +3442,7 @@ def copy_process():
         if tgt_process_id:
             tgt_process_obj = tgt_client.get_record("Process", tgt_process_id)
         else:
-            tgt_processes = tgt_client.list_records("Process", TGT_PROJECT_ID).get("instances", [])
+            tgt_processes = tgt_client.list_records("Process", tgt_project_id).get("instances", [])
             tgt_process_obj = next((p for p in tgt_processes if p.get("name") == payload["name"]), None)
             if tgt_process_obj:
                 tgt_process_id = tgt_process_obj["id"]
@@ -3172,16 +3451,13 @@ def copy_process():
 
         # Create or update process
         if tgt_process_obj:
-            LOG_PATH = setup_logging(tgt_process_id)
-            logger.info("Log file: %s", LOG_PATH)
+            log_path = setup_logging(src_process_id, tgt_process_id)
+            logger.info("Log file: %s", log_path)
 
             # Normalize both sides for comparison (handles JSON strings and empty values)
-            changed_fields = []
-            for f in ALLOWED_PROCESS_FIELDS:
-                if param_changed(payload.get(f), tgt_process_obj.get(f)):
-                    changed_fields.append(f)
+            changed_fields = changed_fields_for(payload, tgt_process_obj, ALLOWED_PROCESS_FIELDS)
             if changed_fields:
-                # check ormalized values to avoid false updates
+                # Recheck normalized values to avoid false updates.
                 recheck = [f for f in changed_fields if param_changed(payload.get(f), tgt_process_obj.get(f))]
                 if not recheck:
                     logger.info("Process '%s' unchanged - skipping update", payload["name"])
@@ -3192,31 +3468,31 @@ def copy_process():
                     payload["id"] = tgt_process_id
                     payload["LastVersionId"] = tgt_process_obj["LastVersionId"]
                     logger.info("Updating Process '%s' (id %s): changed fields: %s", payload["name"], tgt_process_id, changed_fields)
-                    tgt_client.save_record("Process", payload)
+                    writer.save_record("Process", payload, reason="update Process")
             else:
                 logger.info("Process '%s' unchanged - skipping update", payload["name"])
         else:
-            LOG_PATH = setup_logging(tgt_process_id)
-            logger.info("Log file: %s", LOG_PATH)
+            log_path = setup_logging(src_process_id, tgt_process_id)
+            logger.info("Log file: %s", log_path)
 
             logger.info("Creating Process '%s'", payload["name"])
-            new_proc = tgt_client.save_record("Process", payload)
+            new_proc = writer.save_record("Process", payload, reason="create Process")
             tgt_process_id = new_proc["id"]
-            logger.info("Created Process '%s': %s -> %s", payload["name"], SRC_PROCESS_ID, tgt_process_id)
+            logger.info("Created Process '%s': %s -> %s", payload["name"], src_process_id, tgt_process_id)
 
         # Save process mapping
         proc_entry["targetProcessId"] = tgt_process_id
     
         # Copy UnitOperations
         uo_mapping = copy_unit_operations(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID, TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id, tgt_project_id, tgt_process_id,
             prev_mapping=proc_entry.get("unitOperations", {}),
         )
 
         proc_entry["unitOperations"] = {str(k): v for k, v in uo_mapping.items()}
 
-           # Fetch fresh target process
+        # Fetch fresh target process
         tgt_process = tgt_client.get_record("Process", tgt_process_id)
 
         # Sync UnitOperation order 
@@ -3224,13 +3500,13 @@ def copy_process():
             src_process=src_process,
             tgt_process=tgt_process,
             uo_mapping=uo_mapping,
-            put_process_fn=lambda payload: tgt_client.save_record("Process", payload),
+            put_process_fn=writer.save_fn("Process", reason="sync unit operation order"),
         )
 
         # Copy Steps
         step_mapping = copy_steps(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID, TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id, tgt_project_id, tgt_process_id,
             uo_mapping,
             prev_mapping=proc_entry.get("steps", {}),
         )
@@ -3241,14 +3517,15 @@ def copy_process():
         sync_step_order(
             src_client,
             tgt_client,
+            writer,
             uo_mapping,
             step_mapping,
         )
 
         # Copy Process Components 
         pc_mapping = copy_process_components(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID, TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id, tgt_project_id, tgt_process_id,
             uo_mapping, step_mapping,
             prev_mapping=proc_entry.get("processComponents", {}),
         )
@@ -3257,19 +3534,19 @@ def copy_process():
 
         # Copy Materials
         material_mapping = copy_materials(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID,
-            TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id,
+            tgt_project_id, tgt_process_id,
             uo_mapping, step_mapping,
             prev_mapping=proc_entry.get("materials", {}),
         )
         proc_entry["materials"] = {str(k): v for k, v in material_mapping.items()}
 
-         # Copy Material Attributes
+        # Copy Material Attributes
         material_attribute_mapping = copy_material_attributes(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID,
-            TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id,
+            tgt_project_id, tgt_process_id,
             uo_mapping, step_mapping, pc_mapping, material_mapping,
             prev_mapping=proc_entry.get("material_attributes", {})
         )
@@ -3277,8 +3554,8 @@ def copy_process():
 
         # Copy Process Parameters
         pp_mapping = copy_process_parameters(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID, TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id, tgt_project_id, tgt_process_id,
             uo_mapping, step_mapping, pc_mapping, material_mapping,
             prev_mapping=proc_entry.get("processParameters", {}),
         )
@@ -3287,9 +3564,9 @@ def copy_process():
 
         # Copy IQAs
         iqa_mapping = copy_iqas(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID,
-            TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id,
+            tgt_project_id, tgt_process_id,
             uo_mapping, step_mapping,
             prev_mapping=proc_entry.get("iqas", {}),
         )
@@ -3298,9 +3575,9 @@ def copy_process():
 
         # Copy IPAs
         ipa_mapping = copy_ipas(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID,
-            TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id,
+            tgt_project_id, tgt_process_id,
             uo_mapping, step_mapping,
             prev_mapping=proc_entry.get("ipas", {}),
         )
@@ -3309,17 +3586,17 @@ def copy_process():
 
         # Copy Samples
         sample_mapping = copy_samples(
-            src_client, tgt_client,
-            SRC_PROJECT_ID, SRC_PROCESS_ID,
-            TGT_PROJECT_ID, tgt_process_id,
+            src_client, tgt_client, writer,
+            src_project_id, src_process_id,
+            tgt_project_id, tgt_process_id,
             uo_mapping, step_mapping, material_mapping,
             prev_mapping=proc_entry.get("samples", {}),
         )
         proc_entry["samples"] = {str(k): v for k, v in sample_mapping.items()}
         # --------------------- SYNC RISK LINKS AFTER ALL RECORDS ARE CREATED ---------------------
         # Build name lookup for target FPA/FQA (name -> id)
-        tgt_fpa_by_name = build_target_lookup(tgt_client, TGT_PROJECT_ID, "FPA")
-        tgt_fqa_by_name = build_target_lookup(tgt_client, TGT_PROJECT_ID, "FQA")
+        tgt_fpa_by_name = build_target_lookup(tgt_client, tgt_project_id, "FPA")
+        tgt_fqa_by_name = build_target_lookup(tgt_client, tgt_project_id, "FQA")
 
         applies_to_maps = {
             "IQA": iqa_mapping,
@@ -3337,7 +3614,7 @@ def copy_process():
         sync_risk_links(
             records=iqa_mapping,
             record_type="IQA",
-            put_fn=lambda payload: tgt_client.save_record("IQA", payload),
+            put_fn=writer.save_fn("IQA", reason="sync IQA risk links"),
             link_fields={
                 "IQAToFPAs": (lambda link: tgt_fpa_by_name.get(link.get("FPA", {}).get("name")), "FPAId"),
                 "IQAToFQAs": (lambda link: tgt_fqa_by_name.get(link.get("FQA", {}).get("name")), "FQAId"),
@@ -3357,7 +3634,7 @@ def copy_process():
         sync_risk_links(
             records=ipa_mapping,
             record_type="IPA",
-            put_fn=lambda payload: tgt_client.save_record("IPA", payload),
+            put_fn=writer.save_fn("IPA", reason="sync IPA risk links"),
             link_fields={
                 "IPAToFPAs": (lambda link: tgt_fpa_by_name.get(link.get("FPA", {}).get("name")), "FPAId"),
                 "IPAToFQAs": (lambda link: tgt_fqa_by_name.get(link.get("FQA", {}).get("name")), "FQAId"),
@@ -3377,7 +3654,7 @@ def copy_process():
         sync_risk_links(
             records=material_attribute_mapping,
             record_type="MaterialAttribute",
-            put_fn=lambda payload: tgt_client.save_record("MaterialAttribute", payload),
+            put_fn=writer.save_fn("MaterialAttribute", reason="sync MaterialAttribute risk links"),
             link_fields={
                 "MaterialAttributeToFPAs": (lambda link: tgt_fpa_by_name.get(link.get("FPA", {}).get("name")), "FPAId"),
                 "MaterialAttributeToFQAs": (lambda link: tgt_fqa_by_name.get(link.get("FQA", {}).get("name")), "FQAId"),
@@ -3394,7 +3671,7 @@ def copy_process():
             record_type="ProcessParameter",
             src_client=src_client,
             tgt_client=tgt_client,
-            put_fn=lambda payload: tgt_client.save_record("ProcessParameter", payload),
+            put_fn=writer.save_fn("ProcessParameter", reason="sync ProcessParameter risk links"),
             link_fields={
                 "ProcessParameterToFPAs": (
                     lambda link: tgt_fpa_by_name.get(link.get("FPA", {}).get("name")),
@@ -3415,13 +3692,13 @@ def copy_process():
             },
             applies_to_maps=applies_to_maps,
         )
-        # Sync Sample relationship links - they arent risks but the structure is similar
+        # Sync Sample relationship links. They use the same relationship-link shape as risks.
         sync_risk_links(
             records=sample_mapping,
             record_type="Sample",
             src_client=src_client,
             tgt_client=tgt_client,
-            put_fn=lambda payload: tgt_client.save_record("Sample", payload),
+            put_fn=writer.save_fn("Sample", reason="sync Sample relationship links"),
             link_fields={
                 "SampleToIQAs": (
                     lambda link: iqa_mapping.get(link.get("IQAId")),
@@ -3442,29 +3719,29 @@ def copy_process():
             },
             applies_to_maps=applies_to_maps,
         )
-    # --------------------- SYNC DRUG SUBSTANCE / DRUG PRODUCT FLOWS ---------------------
+        # --------------------- SYNC DRUG SUBSTANCE / DRUG PRODUCT FLOWS ---------------------
         # Fetch all source DrugSubstances
         src_drug_substances = {
             ds["id"]: ds
-            for ds in src_client.list_records("DrugSubstance", SRC_PROJECT_ID).get("instances", [])
+            for ds in src_client.list_records("DrugSubstance", src_project_id).get("instances", [])
         }
 
         # Fetch all target DrugSubstances
         tgt_ds_by_name = {
             ds["name"]: ds["id"]
-            for ds in tgt_client.list_records("DrugSubstance", TGT_PROJECT_ID).get("instances", [])
+            for ds in tgt_client.list_records("DrugSubstance", tgt_project_id).get("instances", [])
         }
 
         # Fetch all source DrugProducts
         src_drug_products = {
             dp["id"]: dp
-            for dp in src_client.list_records("DrugProduct", SRC_PROJECT_ID).get("instances", [])
+            for dp in src_client.list_records("DrugProduct", src_project_id).get("instances", [])
         }
 
         # Fetch all target DrugProducts
         tgt_dp_by_name = {
             dp["name"]: dp["id"]
-            for dp in tgt_client.list_records("DrugProduct", TGT_PROJECT_ID).get("instances", [])
+            for dp in tgt_client.list_records("DrugProduct", tgt_project_id).get("instances", [])
         }
 
         #  Build mapping by name
@@ -3487,8 +3764,9 @@ def copy_process():
             flow_field="DrugSubstanceFlows",
             src_client=src_client,
             tgt_client=tgt_client,
-            tgt_project_id=TGT_PROJECT_ID,
-            src_process_id=SRC_PROCESS_ID,
+            writer=writer,
+            tgt_project_id=tgt_project_id,
+            src_process_id=src_process_id,
             tgt_process_id=tgt_process_id,
             uo_mapping=uo_mapping,
             step_mapping=step_mapping,
@@ -3501,8 +3779,9 @@ def copy_process():
             flow_field="DrugProductFlows",
             src_client=src_client,
             tgt_client=tgt_client,
-            tgt_project_id=TGT_PROJECT_ID,
-            src_process_id=SRC_PROCESS_ID,
+            writer=writer,
+            tgt_project_id=tgt_project_id,
+            src_process_id=src_process_id,
             tgt_process_id=tgt_process_id,
             uo_mapping=uo_mapping,
             step_mapping=step_mapping,
@@ -3514,17 +3793,19 @@ def copy_process():
             drug_product_mapping=drug_product_mapping,
             src_client=src_client,
             tgt_client=tgt_client,
-            src_project_id=SRC_PROJECT_ID,
-            src_process_id=SRC_PROCESS_ID,
+            writer=writer,
+            src_project_id=src_project_id,
+            src_process_id=src_process_id,
         )
 
         # Sync SupplierId for Materials and Process Components
         sync_supplier_ids(
             src_client=src_client,
             tgt_client=tgt_client,
-            src_project_id=SRC_PROJECT_ID,
-            src_process_id=SRC_PROCESS_ID,
-            tgt_project_id=TGT_PROJECT_ID,
+            writer=writer,
+            src_project_id=src_project_id,
+            src_process_id=src_process_id,
+            tgt_project_id=tgt_project_id,
             tgt_process_id=tgt_process_id,
             pc_mapping=pc_mapping,
             material_mapping=material_mapping,
@@ -3534,9 +3815,9 @@ def copy_process():
         save_id_map(id_map)
 # --------------------- MAIN ---------------------
 def main():
-    validate_config()
     try:
-        copy_process()
+        config = load_config()
+        copy_process(config)
     except requests.HTTPError as e:
         logger.error("HTTP error: %s", e)
         if hasattr(e, "response") and e.response is not None:
