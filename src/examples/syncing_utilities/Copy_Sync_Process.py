@@ -4,7 +4,7 @@ Copies a single Process and its Unit Operations, Steps, Process Params, Material
 Also handles DS / DP flows
 from a source project into an existing target project.
 
-We do NOT sync the supplier list between environments. SupplierId for Materials and Process Components is remapped
+Does NOT sync the supplier list between environments. SupplierId for Materials and Process Components is remapped
 by supplier name (create if missing). These are synced at the very end, after records are created - to preserve
 unit ops, steps, and flows.
 
@@ -21,7 +21,9 @@ from dataclasses import dataclass
 from typing import Dict, Any, List
 from collections import Counter
 from dotenv import load_dotenv
+
 # --------------------- CONFIG ---------------------
+
 load_dotenv()
 
 def required_int(name: str, value: str | None) -> int:
@@ -38,7 +40,9 @@ def required_env(name: str) -> str:
         print("Copy .env.example to .env and fill in all required values.")
         sys.exit(1)
     return value
+
 # --------------------- LOGGING ---------------------
+
 LOG_DIR = "logs"
 
 def setup_logging(src_process_id: int, tgt_process_id: int | None = None) -> str:
@@ -62,7 +66,9 @@ def setup_logging(src_process_id: int, tgt_process_id: int | None = None) -> str
     return log_path
 
 logger = logging.getLogger("qbd_copy_process")
+
 # --------------------- ALLOWED FIELDS ---------------------
+
 ALLOWED_MATERIAL_FIELDS = [
     "name", "chemicalNameCAS", "category", "gmp", "use", "links", "description",
     "descriptiveUnitAbsolute", "quantityAbsolute", "quantityRelative",
@@ -171,7 +177,9 @@ REQUIRED_FIELDS_BY_TYPE = {
     "IQA": ALLOWED_IQA_FIELDS,
     "Sample": ALLOWED_SAMPLE_FIELDS,
 }
-# --------------------- HTTP UTILITIES ---------------------
+
+# --------------------- API CLIENTS ---------------------
+
 class QbdApiClient:
     def __init__(self, base_url: str, api_key: str):
         if not base_url:
@@ -269,7 +277,9 @@ def load_config() -> SyncConfig:
             required_env("TARGET_KEY"),
         ),
     )
-# --------------------- RECORD & PAYLOAD HELPERS ---------------------
+
+# --------------------- RECORD HELPERS ---------------------
+
 def strip_attachment_links(payload: Dict[str, Any]) -> Dict[str, Any]:
     """
     Remove Attachment links from any *links field (e.g., links, riskLinks, referencesLinks).
@@ -331,7 +341,6 @@ def validate_target_scope(record: dict | None, project_id: int, process_id: int,
 
     return record
 
-# Ensure we have the full record before diffing list responses.
 def ensure_full_record(record_type: str, record: dict | None, client: QbdApiClient) -> dict | None:
     if not record or not isinstance(record, dict):
         return record
@@ -353,14 +362,16 @@ def ensure_full_record(record_type: str, record: dict | None, client: QbdApiClie
         return record
 
     return client.get_record(record_type, rec_id)
-# --------------------- PROCESS EXPLORER ---------------------
+
 def get_process_explorer(
     client: QbdApiClient,
     project_id: int,
     process_id: int,
 ) -> dict:
     return client.process_explorer(project_id, process_id)
+
 # --------------------- LOOKUP & MAPPING HELPERS ---------------------
+
 def normalize_id(val):
     try:
         return int(val)
@@ -468,6 +479,40 @@ def get_scoped_record(
     record = client.get_record(record_type, record_id)
     return validate_target_scope(record, project_id, process_id, label)
 
+def active_source_full_record(
+    client: QbdApiClient,
+    record_type: str,
+    source_stub: dict,
+    project_id: int,
+    process_id: int,
+    label: str,
+) -> dict | None:
+    if is_archived(source_stub):
+        return None
+
+    if not validate_target_scope(source_stub, project_id, process_id, label):
+        return None
+
+    full_source = get_scoped_record(
+        client,
+        record_type,
+        source_stub["id"],
+        project_id,
+        process_id,
+        label,
+    )
+    if not full_source or is_archived(full_source):
+        return None
+    return full_source
+
+def log_duplicate_name_fallback(record_label: str, duplicate_names: set) -> None:
+    if duplicate_names:
+        logger.info(
+            "Duplicate %s names in source; disabling name-based fallback for: %s",
+            record_label,
+            ", ".join(sorted(duplicate_names)),
+        )
+
 def name_record_lookup(records: list) -> dict:
     return {record["name"]: record for record in records if record.get("name")}
 
@@ -511,7 +556,9 @@ def build_target_lookup(
         return {r["name"]: r for r in instances if r.get("name")}
     else:
         return {r["name"]: r["id"] for r in instances if r.get("name")}
+
 # --------------------- ACCEPTANCE CRITERIA ---------------------
+
 def parse_json_container(value):
     if isinstance(value, str):
         try:
@@ -608,7 +655,9 @@ def add_tgt_acr_for_diff(tgt_full: dict) -> dict:
         return copy
 
     return tgt_full
+
 # --------------------- NORMALIZATION & DIFF ---------------------
+
 def normalize_whitespace(text: str):
     collapsed = " ".join(text.split())
     return collapsed if collapsed else None
@@ -713,7 +762,84 @@ def append_relationship_id_diff(
         sorted(tgt_ids),
     )
 
-# --------------------- PAYLOAD & ARCHIVE HELPERS ---------------------
+# --------------------- RELATIONSHIP HELPERS ---------------------
+
+def mapped_id_relationships(records: list, mapping: dict, *source_id_fields: str, label_prefix: str | None = None) -> list:
+    relationships = []
+    for record in records:
+        mapped_id = None
+        for field_name in source_id_fields:
+            mapped_id = map_lookup(mapping, record.get(field_name))
+            if mapped_id:
+                break
+        if not mapped_id:
+            continue
+
+        relationship = {"id": mapped_id}
+        if label_prefix:
+            relationship["label"] = f"{label_prefix}-{mapped_id}"
+        relationships.append(relationship)
+    return relationships
+
+def append_relationship_diffs(
+    changed_fields: list,
+    payload: dict,
+    target: dict,
+    field_names: tuple[str, ...],
+    *,
+    record_label: str,
+    record_name: str,
+) -> None:
+    for field_name in field_names:
+        append_relationship_id_diff(
+            changed_fields,
+            field_name,
+            payload.get(field_name, []),
+            target.get(field_name, []),
+            record_label=record_label,
+            record_name=record_name,
+        )
+
+def build_material_flow_relationships(
+    material_flows: list,
+    uo_mapping: dict,
+    step_mapping: dict,
+    tgt_process_id: int,
+) -> tuple[list, list, list]:
+    mapped_flows = []
+    for flow in material_flows:
+        tgt_uo_id = map_lookup(uo_mapping, flow.get("UnitOperationId"))
+        tgt_step_id = map_lookup(step_mapping, flow.get("StepId"))
+
+        if not tgt_uo_id and not tgt_step_id:
+            continue
+
+        flow_type = flow.get("flow", "Input")
+        if flow_type not in {"Input", "Intermediate", "Output"}:
+            flow_type = "Input"
+
+        mapped_flows.append({
+            "ProcessId": tgt_process_id,
+            "UnitOperationId": tgt_uo_id,
+            "StepId": tgt_step_id,
+            "flow": flow_type,
+        })
+
+    uos = [
+        {"id": flow["UnitOperationId"], "label": f"UO-{flow['UnitOperationId']}"}
+        for flow in mapped_flows
+        if flow["UnitOperationId"]
+    ]
+    steps = [
+        {"id": flow["StepId"], "label": f"STP-{flow['StepId']}"}
+        for flow in mapped_flows
+        if flow["StepId"]
+    ]
+    return mapped_flows, uos, steps
+
+
+# --------------------- PAYLOAD BUILDERS ---------------------
+
 def sanitize_payload(src: dict, allowed_fields: list, extra_fields: dict) -> dict:
     payload = {k: src[k] for k in allowed_fields if k in src}
     payload.update(extra_fields)
@@ -1025,6 +1151,8 @@ def save_copy_payload(
         logger.info("Created %s '%s': %s -> %s", record_label, src_name, source_id, new_id)
     return new_id
 
+# --------------------- TIMEPOINT HELPERS ---------------------
+
 def coerce_list(value) -> list:
     if isinstance(value, str):
         try:
@@ -1033,20 +1161,43 @@ def coerce_list(value) -> list:
             return []
     return value if isinstance(value, list) else []
 
-def normalize_timepoints_for_compare(timepoints) -> list:
-    cleaned = []
-    for tp in coerce_list(timepoints):
-        if not isinstance(tp, dict) or tp.get("deletedAt"):
-            continue
-        cleaned.append({field: normalize(tp.get(field)) for field in ALLOWED_TIMEPOINT_FIELDS})
+def active_timepoints(timepoints) -> list:
+    return [
+        tp for tp in coerce_list(timepoints)
+        if isinstance(tp, dict) and not tp.get("deletedAt")
+    ]
 
+def timepoint_sort_key(timepoint: dict, *, include_id: bool = False) -> tuple:
+    key = (
+        timepoint.get("recordOrder") is None,
+        str(timepoint.get("recordOrder")),
+        str(timepoint.get("name") or ""),
+    )
+    if include_id:
+        return key + (str(timepoint.get("id") or ""),)
+    return key
+
+def target_timepoint_lookups(timepoints) -> tuple[dict, dict]:
+    active = active_timepoints(timepoints)
+    return (
+        unique_lookup(active, lambda tp: normalize(tp.get("name"))),
+        unique_lookup(active, lambda tp: normalize(tp.get("recordOrder"))),
+    )
+
+def matching_target_timepoint(src_timepoint: dict, tgt_by_name: dict, tgt_by_order: dict) -> dict | None:
+    return (
+        tgt_by_name.get(normalize(src_timepoint.get("name")))
+        or tgt_by_order.get(normalize(src_timepoint.get("recordOrder")))
+    )
+
+def normalize_timepoints_for_compare(timepoints) -> list:
+    cleaned = [
+        {field: normalize(tp.get(field)) for field in ALLOWED_TIMEPOINT_FIELDS}
+        for tp in active_timepoints(timepoints)
+    ]
     return sorted(
         cleaned,
-        key=lambda tp: (
-            tp.get("recordOrder") is None,
-            str(tp.get("recordOrder")),
-            str(tp.get("name") or ""),
-        ),
+        key=timepoint_sort_key,
     )
 
 def unique_lookup(records: list, key_fn) -> dict:
@@ -1061,18 +1212,10 @@ def unique_lookup(records: list, key_fn) -> dict:
     return {key: record for key, record in by_key.items() if counts[key] == 1}
 
 def build_timepoints_payload(src_timepoints, tgt_timepoints, tgt_uo_id: int) -> list:
-    tgt_active = [
-        tp for tp in coerce_list(tgt_timepoints)
-        if isinstance(tp, dict) and not tp.get("deletedAt")
-    ]
-    tgt_by_name = unique_lookup(tgt_active, lambda tp: normalize(tp.get("name")))
-    tgt_by_order = unique_lookup(tgt_active, lambda tp: normalize(tp.get("recordOrder")))
+    tgt_by_name, tgt_by_order = target_timepoint_lookups(tgt_timepoints)
 
     payload = []
-    for src_tp in coerce_list(src_timepoints):
-        if not isinstance(src_tp, dict) or src_tp.get("deletedAt"):
-            continue
-
+    for src_tp in active_timepoints(src_timepoints):
         item = {
             field: src_tp.get(field)
             for field in ALLOWED_TIMEPOINT_FIELDS
@@ -1080,9 +1223,7 @@ def build_timepoints_payload(src_timepoints, tgt_timepoints, tgt_uo_id: int) -> 
         }
         item["UnitOperationId"] = tgt_uo_id
 
-        tgt_tp = tgt_by_name.get(normalize(src_tp.get("name")))
-        if not tgt_tp:
-            tgt_tp = tgt_by_order.get(normalize(src_tp.get("recordOrder")))
+        tgt_tp = matching_target_timepoint(src_tp, tgt_by_name, tgt_by_order)
         if tgt_tp and tgt_tp.get("id"):
             item["id"] = tgt_tp["id"]
 
@@ -1090,11 +1231,7 @@ def build_timepoints_payload(src_timepoints, tgt_timepoints, tgt_uo_id: int) -> 
 
     return sorted(
         payload,
-        key=lambda tp: (
-            tp.get("recordOrder") is None,
-            str(tp.get("recordOrder")),
-            str(tp.get("name") or ""),
-        ),
+        key=timepoint_sort_key,
     )
 
 def _timepoint_label(timepoint: dict) -> str:
@@ -1104,21 +1241,11 @@ def _timepoint_label(timepoint: dict) -> str:
     return f"TP-{timepoint.get('id')} - {timepoint.get('name')}"
 
 def build_sample_timepoints_payload(src_timepoints, tgt_uo_timepoints, tgt_uo_id: int) -> list:
-    tgt_active = [
-        tp for tp in coerce_list(tgt_uo_timepoints)
-        if isinstance(tp, dict) and not tp.get("deletedAt")
-    ]
-    tgt_by_name = unique_lookup(tgt_active, lambda tp: normalize(tp.get("name")))
-    tgt_by_order = unique_lookup(tgt_active, lambda tp: normalize(tp.get("recordOrder")))
+    tgt_by_name, tgt_by_order = target_timepoint_lookups(tgt_uo_timepoints)
 
     payload = []
-    for src_tp in coerce_list(src_timepoints):
-        if not isinstance(src_tp, dict) or src_tp.get("deletedAt"):
-            continue
-
-        tgt_tp = tgt_by_name.get(normalize(src_tp.get("name")))
-        if not tgt_tp:
-            tgt_tp = tgt_by_order.get(normalize(src_tp.get("recordOrder")))
+    for src_tp in active_timepoints(src_timepoints):
+        tgt_tp = matching_target_timepoint(src_tp, tgt_by_name, tgt_by_order)
         if not tgt_tp or not tgt_tp.get("id"):
             logger.warning(
                 "Skipping Sample Timepoint '%s'; no matching target Timepoint on UnitOperation %s",
@@ -1138,37 +1265,28 @@ def build_sample_timepoints_payload(src_timepoints, tgt_uo_timepoints, tgt_uo_id
 
     return sorted(
         payload,
-        key=lambda tp: (
-            tp.get("recordOrder") is None,
-            str(tp.get("recordOrder")),
-            str(tp.get("name") or ""),
-        ),
+        key=timepoint_sort_key,
     )
 
 def normalize_sample_timepoints_for_compare(timepoints) -> list:
-    cleaned = []
-    for tp in coerce_list(timepoints):
-        if not isinstance(tp, dict) or tp.get("deletedAt"):
-            continue
-        cleaned.append({
+    cleaned = [
+        {
             "id": normalize(tp.get("id")),
             "name": normalize(tp.get("name")),
             "recordOrder": normalize(tp.get("recordOrder")),
-        })
+        }
+        for tp in active_timepoints(timepoints)
+    ]
 
     return sorted(
         cleaned,
-        key=lambda tp: (
-            tp.get("recordOrder") is None,
-            str(tp.get("recordOrder")),
-            str(tp.get("name") or ""),
-            str(tp.get("id") or ""),
-        ),
+        key=lambda tp: timepoint_sort_key(tp, include_id=True),
     )
+
+# --------------------- SUPPLIER HELPERS ---------------------
 
 def is_archived(record: dict) -> bool:
     return isinstance(record, dict) and record.get("currentState") == "Archived"
-# --------------------- SUPPLIER HELPERS ---------------------
 
 def get_target_supplier_by_name(client: QbdApiClient, name):
     data = client.list_records("Supplier")
@@ -1254,7 +1372,9 @@ def resolve_target_supplier_id(
 
     by_id[cache_key] = tgt_id
     return tgt_id
+
 # --------------------- ID MAP PERSISTENCE ---------------------
+
 ID_MAP_FILE = "process_id_map.json"
 
 def load_id_map() -> dict:
@@ -1272,7 +1392,9 @@ def load_id_map() -> dict:
 def save_id_map(id_map: dict):
     with open(ID_MAP_FILE, "w", encoding="utf-8") as f:
         json.dump(id_map, f, indent=2)
+
 # --------------------- CONTROL METHODS & RISK LINKS ---------------------
+
 def map_and_diff_control_methods(
     src_cms: list,
     tgt_cms: list,
@@ -1436,13 +1558,13 @@ def sanitize_risk_link_links(links_value, applies_to_maps: dict) -> str:
 
 
 def sync_risk_links(
-        records,
-        record_type,
-        put_fn,
-        link_fields,
-        src_client: QbdApiClient,
-        tgt_client: QbdApiClient,
-        applies_to_maps=None,
+    records,
+    record_type,
+    put_fn,
+    link_fields,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    applies_to_maps=None,
 ):
     """
     Sync relationship links for IQAs, IPAs, MaterialAttributes, ProcessParameters, and Samples.
@@ -1543,7 +1665,9 @@ def sync_risk_links(
         else:
             logger.info("%s '%s' risk links unchanged - skipping", record_type, tgt_record["name"])
 
+
 # --------------------- DRUG FLOWS & IQA LINKS ---------------------
+
 def sync_drug_flows(
     records: dict,
     record_type: str,
@@ -1779,7 +1903,9 @@ def sync_iqa_drug_links(
                 "IQA '%s' links to DrugSubstance/DrugProduct unchanged - skipping",
                 tgt_iqa.get("name"),
             )
+
 # --------------------- COPY HELPERS ---------------------
+
 def copy_unit_operations(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
@@ -1821,8 +1947,7 @@ def copy_unit_operations(
     src_uos.sort(key=lambda uo: uo.get("order") or 0)
 
     dup_uo_names = find_duplicate_keys(src_uos, lambda r: r.get("name"))
-    if dup_uo_names:
-        logger.info("Duplicate UnitOperation names in source; disabling name-based fallback for: %s", ", ".join(sorted(dup_uo_names)))
+    log_duplicate_name_fallback("UnitOperation", dup_uo_names)
 
     tgt_instances = list_process_records(tgt_client, "UnitOperation", tgt_project_id, tgt_process_id)
     tgt_by_name = name_record_lookup([uo for uo in tgt_instances if uo.get("ProcessId") == tgt_process_id])
@@ -1872,7 +1997,6 @@ def copy_unit_operations(
 
         changed_fields = []
         if tgt_uo:
-            # Strip attachments from target before diff to match payload sanitation
             try:
                 tgt_uo_for_diff = json.loads(json.dumps(tgt_uo))
             except Exception:
@@ -1885,7 +2009,6 @@ def copy_unit_operations(
                 tgt_timepoints = normalize_timepoints_for_compare(tgt_uo_for_diff.get("Timepoints"))
                 if src_timepoints != tgt_timepoints:
                     changed_fields.append("Timepoints")
-            # Ignore order-only changes
             if changed_fields == ["order"]:
                 changed_fields = []
 
@@ -2019,7 +2142,6 @@ def copy_steps(
     if dup_step_keys:
         logger.info("Duplicate Step names in source for some UnitOperations; disabling name-based fallback for those pairs")
 
-    # Group source steps by UnitOperation
     steps_by_uo = {}
     for step in src_steps:
         uo_id = step.get("UnitOperationId")
@@ -2031,6 +2153,11 @@ def copy_steps(
     for s in tgt_instances:
         tgt_uo_id = s.get("UnitOperationId")
         tgt_by_uo_name.setdefault(tgt_uo_id, {})[s["name"]] = s
+    tgt_lookup = {
+        (uo_id, name): step
+        for uo_id, steps_by_name in tgt_by_uo_name.items()
+        for name, step in steps_by_name.items()
+    }
 
     mapping = {}
 
@@ -2040,7 +2167,6 @@ def copy_steps(
             logger.warning("No target UnitOperation for source UO %s; skipping steps", src_uo_id)
             continue
 
-        # Order steps using PreviousStepId
         ordered_steps = []
         remaining = {s["id"]: s for s in step_list}
         while remaining:
@@ -2054,15 +2180,18 @@ def copy_steps(
             src_step_id = step["id"]
             src_name = step["name"]
 
-            tgt_step_id = prev_mapping.get(str(src_step_id))
-            tgt_step = tgt_client.get_record("Step", tgt_step_id) if tgt_step_id else None
-            tgt_step = validate_target_scope(tgt_step, tgt_project_id, tgt_process_id, "Step")
-
-            if not tgt_step_id and (src_uo_id, src_name) not in dup_step_keys:
-                tgt_step_obj = tgt_by_uo_name.get(tgt_uo_id, {}).get(src_name)
-                if tgt_step_obj:
-                    tgt_step_id = tgt_step_obj["id"]
-                    tgt_step = tgt_client.get_record("Step", tgt_step_id)
+            fallback_key = None if (src_uo_id, src_name) in dup_step_keys else (tgt_uo_id, src_name)
+            tgt_step_id, tgt_step = resolve_target_by_lookup(
+                src_id=src_step_id,
+                prev_mapping=prev_mapping,
+                fallback_key=fallback_key,
+                tgt_lookup=tgt_lookup,
+                record_type="Step",
+                record_label="Step",
+                tgt_client=tgt_client,
+                tgt_project_id=tgt_project_id,
+                tgt_process_id=tgt_process_id,
+            )
 
             if not tgt_step_id and (src_uo_id, src_name) in dup_step_keys:
                 logger.info("Step '%s' has duplicate name in source UO %s; skipping name-based fallback", src_name, src_uo_id)
@@ -2070,8 +2199,15 @@ def copy_steps(
             if tgt_step:
                 tgt_step = ensure_full_record("Step", tgt_step, tgt_client)
 
-            full_src = src_client.get_record("Step", src_step_id)
-            if is_archived(full_src):
+            full_src = active_source_full_record(
+                src_client,
+                "Step",
+                step,
+                src_project_id,
+                src_process_id,
+                "source Step",
+            )
+            if not full_src:
                 continue
             payload = build_step_payload(full_src, tgt_project_id, tgt_process_id, tgt_uo_id)
 
@@ -2101,7 +2237,7 @@ def sync_step_order(
     writer: SyncWriter,
     uo_mapping: dict,
     step_mapping: dict,
-):  
+):
     """
     Sync stepOrder on target UnitOperations to match source ordering.
     """
@@ -2182,8 +2318,7 @@ def copy_process_components(
         return {}
 
     dup_pc_names = find_duplicate_keys(src_list, lambda r: r.get("name"))
-    if dup_pc_names:
-        logger.info("Duplicate ProcessComponent names in source; disabling name-based fallback for: %s", ", ".join(sorted(dup_pc_names)))
+    log_duplicate_name_fallback("ProcessComponent", dup_pc_names)
 
     tgt_list = list_process_records(tgt_client, "ProcessComponent", tgt_project_id, tgt_process_id)
     tgt_by_name = name_record_lookup(tgt_list)
@@ -2191,14 +2326,8 @@ def copy_process_components(
     mapping = {}
 
     for src_pc in src_list:
-        if is_archived(src_pc):
-            continue
         src_id = src_pc["id"]
         src_name = src_pc["name"]
-
-        src_pc_scoped = validate_target_scope(src_pc, src_project_id, src_process_id, "source ProcessComponent")
-        if not src_pc_scoped:
-            continue
 
         tgt_pc_id, tgt_full = resolve_target_by_name(
             src_id=src_id,
@@ -2214,29 +2343,19 @@ def copy_process_components(
             fallback_when_mapped_invalid=True,
         )
 
-        full_src = get_scoped_record(
+        full_src = active_source_full_record(
             src_client,
             "ProcessComponent",
-            src_id,
+            src_pc,
             src_project_id,
             src_process_id,
             "source ProcessComponent",
         )
         if not full_src:
             continue
-        if is_archived(full_src):
-            continue
 
-        uos = [
-            {"id": map_lookup(uo_mapping, uo.get("UnitOperationId") or uo.get("id"))}
-            for uo in full_src.get("UnitOperations", [])
-            if map_lookup(uo_mapping, uo.get("UnitOperationId") or uo.get("id"))
-        ]
-        steps = [
-            {"id": map_lookup(step_mapping, step.get("StepId") or step.get("id"))}
-            for step in full_src.get("Steps", [])
-            if map_lookup(step_mapping, step.get("StepId") or step.get("id"))
-        ]
+        uos = mapped_id_relationships(full_src.get("UnitOperations", []), uo_mapping, "UnitOperationId", "id")
+        steps = mapped_id_relationships(full_src.get("Steps", []), step_mapping, "StepId", "id")
 
         payload = build_process_component_payload(
             full_src,
@@ -2246,7 +2365,6 @@ def copy_process_components(
             steps,
         )
 
-        
         if tgt_full:
             if not payload.get("name"):
                 payload["name"] = tgt_full.get("name")
@@ -2264,19 +2382,11 @@ def copy_process_components(
                 skip={"UnitOperations", "Steps"},
             )
 
-            append_relationship_id_diff(
+            append_relationship_diffs(
                 changed_fields,
-                "UnitOperations",
-                payload.get("UnitOperations", []),
-                tgt_full.get("UnitOperations", []),
-                record_label="ProcessComponent",
-                record_name=src_name,
-            )
-            append_relationship_id_diff(
-                changed_fields,
-                "Steps",
-                payload.get("Steps", []),
-                tgt_full.get("Steps", []),
+                payload,
+                tgt_full,
+                ("UnitOperations", "Steps"),
                 record_label="ProcessComponent",
                 record_name=src_name,
             )
@@ -2321,11 +2431,8 @@ def copy_materials(
         logger.info("No Materials found for source process %s", src_process_id)
         return {}
 
-
-    name_counts = Counter(m.get("name") for m in src_materials if m.get("name"))
-    dup_material_names = {name for name, count in name_counts.items() if count > 1}
-    if dup_material_names:
-        logger.info("Duplicate Material names in source; disabling name-based fallback for: %s", ", ".join(sorted(dup_material_names)))
+    dup_material_names = find_duplicate_keys(src_materials, lambda r: r.get("name"))
+    log_duplicate_name_fallback("Material", dup_material_names)
 
     tgt_materials = list_process_records(tgt_client, "Material", tgt_project_id, tgt_process_id)
     tgt_by_name = name_record_lookup(tgt_materials)
@@ -2334,18 +2441,22 @@ def copy_materials(
     seen_tgt_ids = set()
 
     for src_mat in src_materials:
-        if is_archived(src_mat):
-            continue
         src_id = src_mat["id"]
         src_name = src_mat["name"]
 
-        src_mat_scoped = validate_target_scope(src_mat, src_project_id, src_process_id, "source Material")
-        if not src_mat_scoped:
-            continue
-
-        tgt_mat_id = map_lookup(prev_mapping, src_id)
-        tgt_full = tgt_client.get_record("Material", tgt_mat_id) if tgt_mat_id else None
-        tgt_full = validate_target_scope(tgt_full, tgt_project_id, tgt_process_id, "Material")
+        tgt_mat_id, tgt_full = resolve_target_by_name(
+            src_id=src_id,
+            src_name=src_name,
+            prev_mapping=prev_mapping,
+            tgt_by_name=tgt_by_name,
+            duplicate_names=dup_material_names,
+            record_type="Material",
+            record_label="Material",
+            tgt_client=tgt_client,
+            tgt_project_id=tgt_project_id,
+            tgt_process_id=tgt_process_id,
+            fallback_when_mapped_invalid=True,
+        )
 
         if tgt_mat_id in seen_tgt_ids:
             logger.warning("Material '%s' maps to target id %s more than once; skipping duplicate update", src_name, tgt_mat_id)
@@ -2354,49 +2465,23 @@ def copy_materials(
         if tgt_mat_id:
             seen_tgt_ids.add(tgt_mat_id)
 
-        tgt_mat_id_before = tgt_mat_id
-
-        if not tgt_full and src_name in tgt_by_name and src_name not in dup_material_names:
-            tgt_mat_id = tgt_by_name[src_name]["id"]
-            tgt_full = tgt_client.get_record("Material", tgt_mat_id)
-
-        if not tgt_full and src_name in dup_material_names:
-            logger.info("Material '%s' has duplicate name in source; skipping name-based fallback", src_name)
-
-        if tgt_mat_id and tgt_mat_id != tgt_mat_id_before:
-            if tgt_mat_id in seen_tgt_ids:
-                logger.warning("Material '%s' maps to target id %s more than once; skipping duplicate update", src_name, tgt_mat_id)
-                mapping[src_id] = tgt_mat_id
-                continue
-            seen_tgt_ids.add(tgt_mat_id)
-
-        full_src = get_scoped_record(src_client, "Material", src_id, src_project_id, src_process_id, "source Material")
+        full_src = active_source_full_record(
+            src_client,
+            "Material",
+            src_mat,
+            src_project_id,
+            src_process_id,
+            "source Material",
+        )
         if not full_src:
             continue
-        if is_archived(full_src):
-            continue
 
-        material_flows = []
-        for flow in full_src.get("MaterialFlows", []):
-            tgt_uo_id = map_lookup(uo_mapping, flow.get("UnitOperationId"))
-            tgt_step_id = map_lookup(step_mapping, flow.get("StepId"))
-
-            if not tgt_uo_id and not tgt_step_id:
-                continue
-
-            flow_type = flow.get("flow", "Input")
-            if flow_type not in {"Input", "Intermediate", "Output"}:
-                flow_type = "Input"
-
-            material_flows.append({
-                "ProcessId": tgt_process_id,
-                "UnitOperationId": tgt_uo_id,
-                "StepId": tgt_step_id,
-                "flow": flow_type
-            })
-
-        uos = [{"id": mf["UnitOperationId"], "label": f"UO-{mf['UnitOperationId']}"} for mf in material_flows if mf["UnitOperationId"]]
-        steps = [{"id": mf["StepId"], "label": f"STP-{mf['StepId']}"} for mf in material_flows if mf["StepId"]]
+        material_flows, uos, steps = build_material_flow_relationships(
+            full_src.get("MaterialFlows", []),
+            uo_mapping,
+            step_mapping,
+            tgt_process_id,
+        )
 
         payload = build_material_payload(
             full_src,
@@ -2407,7 +2492,6 @@ def copy_materials(
             material_flows,
         )
 
-        
         if tgt_full:
             if not payload.get("name"):
                 payload["name"] = tgt_full.get("name")
@@ -2424,19 +2508,11 @@ def copy_materials(
             tgt_full = add_tgt_acr_for_diff(tgt_full)
             changed_fields = changed_fields_for(payload, tgt_full, ALLOWED_MATERIAL_FIELDS)
 
-            append_relationship_id_diff(
+            append_relationship_diffs(
                 changed_fields,
-                "UnitOperations",
-                uos,
-                tgt_full.get("UnitOperations", []),
-                record_label="Material",
-                record_name=src_name,
-            )
-            append_relationship_id_diff(
-                changed_fields,
-                "Steps",
-                steps,
-                tgt_full.get("Steps", []),
+                payload,
+                tgt_full,
+                ("UnitOperations", "Steps"),
                 record_label="Material",
                 record_name=src_name,
             )
@@ -2490,8 +2566,7 @@ def copy_material_attributes(
 
 
     dup_attr_names = find_duplicate_keys(src_attributes, lambda r: r.get("name"))
-    if dup_attr_names:
-        logger.info("Duplicate Material Attribute names in source; disabling name-based fallback for: %s", ", ".join(sorted(dup_attr_names)))
+    log_duplicate_name_fallback("Material Attribute", dup_attr_names)
 
     tgt_attributes = list_process_records(tgt_client, "MaterialAttribute", tgt_project_id, tgt_process_id)
     tgt_by_name = name_record_lookup(tgt_attributes)
@@ -2501,14 +2576,8 @@ def copy_material_attributes(
     mapping = {}
 
     for src_attr in src_attributes:
-        if is_archived(src_attr):
-            continue
         src_id = src_attr["id"]
         src_name = src_attr["name"]
-
-        src_attr_scoped = validate_target_scope(src_attr, src_project_id, src_process_id, "source MaterialAttribute")
-        if not src_attr_scoped:
-            continue
 
         tgt_attr_id, tgt_full = resolve_target_by_name(
             src_id=src_id,
@@ -2524,17 +2593,15 @@ def copy_material_attributes(
             fallback_when_mapped_invalid=True,
         )
 
-        full_src = get_scoped_record(
+        full_src = active_source_full_record(
             src_client,
             "MaterialAttribute",
-            src_id,
+            src_attr,
             src_project_id,
             src_process_id,
             "source MaterialAttribute",
         )
         if not full_src:
-            continue
-        if is_archived(full_src):
             continue
 
         uo_id = map_lookup(uo_mapping, full_src.get("UnitOperationId"))
@@ -2642,13 +2709,7 @@ def copy_process_parameters(
     mapping = {}
 
     for src_pp in src_params:
-        if is_archived(src_pp):
-            continue
         src_id = src_pp["id"]
-
-        src_pp_scoped = validate_target_scope(src_pp, src_project_id, src_process_id, "source ProcessParameter")
-        if not src_pp_scoped:
-            continue
 
         tgt_uo_id = map_lookup(uo_mapping, src_pp.get("UnitOperationId"))
         tgt_step_id = map_lookup(step_mapping, src_pp.get("StepId")) if src_pp.get("StepId") else None
@@ -2667,17 +2728,15 @@ def copy_process_parameters(
             tgt_process_id=tgt_process_id,
         )
 
-        full_src = get_scoped_record(
+        full_src = active_source_full_record(
             src_client,
             "ProcessParameter",
-            src_id,
+            src_pp,
             src_project_id,
             src_process_id,
             "source ProcessParameter",
         )
         if not full_src:
-            continue
-        if is_archived(full_src):
             continue
 
         payload = build_process_parameter_payload(
@@ -2742,8 +2801,7 @@ def copy_iqas(
 
 
     dup_iqa_names = find_duplicate_keys(src_iqas, lambda r: r.get("name"))
-    if dup_iqa_names:
-        logger.info("Duplicate IQA names in source; disabling name-based fallback for: %s", ", ".join(sorted(dup_iqa_names)))
+    log_duplicate_name_fallback("IQA", dup_iqa_names)
 
     tgt_iqas = list_process_records(tgt_client, "IQA", tgt_project_id, tgt_process_id)
     tgt_by_name = name_record_lookup(tgt_iqas)
@@ -2753,8 +2811,6 @@ def copy_iqas(
     mapping = {}
 
     for src_stub in src_iqas:
-        if is_archived(src_stub):
-            continue
         src_id = src_stub["id"]
         src_name = src_stub["name"]
 
@@ -2772,14 +2828,8 @@ def copy_iqas(
             fallback_when_mapped_invalid=True,
         )
 
-        src_stub_scoped = validate_target_scope(src_stub, src_project_id, src_process_id, "source IQA")
-        if not src_stub_scoped:
-            continue
-
-        full_src = get_scoped_record(src_client, "IQA", src_id, src_project_id, src_process_id, "source IQA")
+        full_src = active_source_full_record(src_client, "IQA", src_stub, src_project_id, src_process_id, "source IQA")
         if not full_src:
-            continue
-        if is_archived(full_src):
             continue
 
         tgt_uo_id = map_lookup(uo_mapping, full_src.get("UnitOperationId"))
@@ -2861,13 +2911,7 @@ def copy_ipas(
     mapping = {}
 
     for src_ipa in src_ipas:
-        if is_archived(src_ipa):
-            continue
         src_id = src_ipa["id"]
-
-        src_ipa_scoped = validate_target_scope(src_ipa, src_project_id, src_process_id, "source IPA")
-        if not src_ipa_scoped:
-            continue
 
         tgt_uo_id = map_lookup(uo_mapping, src_ipa.get("UnitOperationId"))
         tgt_step_id = map_lookup(step_mapping, src_ipa.get("StepId")) if src_ipa.get("StepId") else None
@@ -2884,10 +2928,8 @@ def copy_ipas(
             tgt_process_id=tgt_process_id,
         )
 
-        full_src = get_scoped_record(src_client, "IPA", src_id, src_project_id, src_process_id, "source IPA")
+        full_src = active_source_full_record(src_client, "IPA", src_ipa, src_project_id, src_process_id, "source IPA")
         if not full_src:
-            continue
-        if is_archived(full_src):
             continue
 
         tgt_cms_payload, cm_changed = map_and_diff_control_methods(
@@ -2978,13 +3020,7 @@ def copy_samples(
         return tgt_uo_cache[tgt_uo_id].get("Timepoints", [])
 
     for src_sample in src_samples:
-        if is_archived(src_sample):
-            continue
         src_id = src_sample["id"]
-
-        src_sample_scoped = validate_target_scope(src_sample, src_project_id, src_process_id, "source Sample")
-        if not src_sample_scoped:
-            continue
 
         tgt_uo_id = map_lookup(uo_mapping, src_sample.get("UnitOperationId")) if src_sample.get("UnitOperationId") else None
         tgt_step_id = map_lookup(step_mapping, src_sample.get("StepId")) if src_sample.get("StepId") else None
@@ -3010,10 +3046,15 @@ def copy_samples(
             tgt_process_id=tgt_process_id,
         )
 
-        full_src = get_scoped_record(src_client, "Sample", src_id, src_project_id, src_process_id, "source Sample")
+        full_src = active_source_full_record(
+            src_client,
+            "Sample",
+            src_sample,
+            src_project_id,
+            src_process_id,
+            "source Sample",
+        )
         if not full_src:
-            continue
-        if is_archived(full_src):
             continue
 
         tgt_uo_id = map_lookup(uo_mapping, full_src.get("UnitOperationId")) if full_src.get("UnitOperationId") else None
@@ -3083,6 +3124,18 @@ def list_or_none(value):
             return None
     return value if isinstance(value, list) else None
 
+def required_list_fields(record: dict, field_names: tuple[str, ...]) -> tuple[dict | None, str | None]:
+    values = {}
+    for field_name in field_names:
+        parsed = list_or_none(record.get(field_name))
+        if parsed is None:
+            return None, "missing " + "/".join(field_names)
+        values[field_name] = parsed
+    return values, None
+
+def merged_field(src_full: dict, tgt_full: dict, field_name: str):
+    return tgt_full.get(field_name) or src_full.get(field_name)
+
 def build_process_component_supplier_update(
     src_full: dict,
     tgt_full: dict,
@@ -3090,13 +3143,12 @@ def build_process_component_supplier_update(
     tgt_project_id: int,
     tgt_process_id: int,
 ) -> tuple[dict | None, str | None, str | None]:
-    steps = list_or_none(tgt_full.get("Steps"))
-    uos = list_or_none(tgt_full.get("UnitOperations"))
-    if steps is None or uos is None:
-        return None, tgt_full.get("name"), "missing Steps/UnitOperations"
+    lists, skip_reason = required_list_fields(tgt_full, ("Steps", "UnitOperations"))
+    if skip_reason:
+        return None, tgt_full.get("name"), skip_reason
 
-    name_val = tgt_full.get("name") or src_full.get("name")
-    type_val = tgt_full.get("type") or src_full.get("type")
+    name_val = merged_field(src_full, tgt_full, "name")
+    type_val = merged_field(src_full, tgt_full, "type")
     if not name_val or not type_val:
         return None, tgt_full.get("name"), "missing name/type"
 
@@ -3109,8 +3161,8 @@ def build_process_component_supplier_update(
             tgt_process_id,
             tgt_supplier_id,
             tgt_full.get("LastVersionId"),
-            steps,
-            uos,
+            lists["Steps"],
+            lists["UnitOperations"],
         ),
         name_val,
         None,
@@ -3123,15 +3175,13 @@ def build_material_supplier_update(
     tgt_project_id: int,
     tgt_process_id: int,
 ) -> tuple[dict | None, str | None, str | None]:
-    steps = list_or_none(tgt_full.get("Steps"))
-    uos = list_or_none(tgt_full.get("UnitOperations"))
-    flows = list_or_none(tgt_full.get("MaterialFlows"))
-    if steps is None or uos is None or flows is None:
-        return None, tgt_full.get("name"), "missing Steps/UnitOperations/MaterialFlows"
+    lists, skip_reason = required_list_fields(tgt_full, ("Steps", "UnitOperations", "MaterialFlows"))
+    if skip_reason:
+        return None, tgt_full.get("name"), skip_reason
 
-    name_val = tgt_full.get("name") or src_full.get("name")
-    category_val = tgt_full.get("category") or src_full.get("category")
-    use_val = tgt_full.get("use") or src_full.get("use")
+    name_val = merged_field(src_full, tgt_full, "name")
+    category_val = merged_field(src_full, tgt_full, "category")
+    use_val = merged_field(src_full, tgt_full, "use")
     if not name_val or category_val is None or use_val is None:
         return None, tgt_full.get("name"), "missing name/category/use"
 
@@ -3144,9 +3194,9 @@ def build_material_supplier_update(
             tgt_process_id,
             tgt_supplier_id,
             tgt_full.get("LastVersionId"),
-            steps,
-            uos,
-            flows,
+            lists["Steps"],
+            lists["UnitOperations"],
+            lists["MaterialFlows"],
         ),
         name_val,
         None,
@@ -3294,7 +3344,9 @@ def sync_supplier_ids(
         supplier_cache=supplier_cache,
         build_update_payload=build_material_supplier_update,
     )
-# --------------------- MAIN COPY LOGIC ---------------------
+
+# --------------------- MAIN COPY FLOW ---------------------
+
 def copy_process_record(config: SyncConfig, proc_entry: dict, writer: SyncWriter) -> tuple[dict, int | None]:
     src_project_id = config.src_project_id
     src_process_id = config.src_process_id
@@ -3653,7 +3705,9 @@ def copy_process(config: SyncConfig):
         sync_supplier_mappings(config, writer, mappings, tgt_process_id)
     finally:
         save_id_map(id_map)
-# --------------------- MAIN ---------------------
+
+# --------------------- ENTRYPOINT ---------------------
+
 def main():
     try:
         config = load_config()
