@@ -39,8 +39,8 @@ Each directory in this repository focuses on a specific aspect of the API:
   Explorer API to download multiple records **(Python)**
 - [`/process_explorer/process-graph`](/src/examples/process_explorer/process-graph) - Use the Process
   Explorer API to download all records and then displays them as a graph **(Node.js)**
-- [`/Syncing Utilities`](</src/examples/Syncing Utilities>) - Use the API to migrate projects & processes from one environment to another **(Python)**
-- [`/Risk Linking Utility`](</src/examples/Risk Linking Utility>) - Create risk links on records according to your RMP **(Python)**
+- [`/syncing_utilities`](/src/examples/syncing_utilities) - Use the API to migrate projects & processes from one environment to another **(Python)**
+- [`/risk_link_utility`](/src/examples/risk_link_utility) - Create risk links on records according to your RMP **(Python)**
 
 ## Usage
 
