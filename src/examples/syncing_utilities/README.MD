@@ -1,10 +1,31 @@
-# QbDVision Copy/Sync Utilities
 
-Utilities for copying or syncing QbDVision project-level data and process-level data from a source environment into a target environment.
+ ██████╗ ██████╗ ██████╗ ██╗   ██╗██╗███████╗██╗ ██████╗ ███╗   ██╗
+██╔═══██╗██╔══██╗██╔══██╗██║   ██║██║██╔════╝██║██╔═══██╗████╗  ██║
+██║   ██║██████╔╝██║  ██║██║   ██║██║███████╗██║██║   ██║██╔██╗ ██║
+██║▄▄ ██║██╔══██╗██║  ██║╚██╗ ██╔╝██║╚════██║██║██║   ██║██║╚██╗██║
+╚██████╔╝██████╔╝██████╔╝ ╚████╔╝ ██║███████║██║╚██████╔╝██║ ╚████║
+ ╚══▀▀═╝ ╚═════╝ ╚═════╝   ╚═══╝  ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
-These utilities are provided "as is" - and no support from QbDVision will be provided.
+         Copy / Sync Utilities  ·  QbDVision API Examples
 
-Run the project sync first. A process belongs to a project, so the target project and project-level records must exist before syncing a process.
+> Copy or sync QbDVision project and process data between environments — 
+> sandbox to production, demo to client, or anywhere in between.
+
+Copy or sync QbDVision project and process data between environments > sandbox to production, sandbox to QA, or anywhere in between.
+
+These are community-contributed utilities. QbDVision does not provide official support for them (provided "as is"), but they've been battle-tested and work well. We can also migrate your project for you through our service offerings. Contact us for more details.  
+
+# What This Does
+Got a perfectly configured QbDVision project in one environment and need it in another? Want to try to keep two environments in sync for some crazy reason?  These scripts handle the heavy lifting:
+Source Environment          Target Environment
+─────────────────           ──────────────────
+  📁 Project          ──►     📁 Project (created or updated)
+    └─ 🔬 Process     ──►       └─ 🔬 Process (created or updated)
+         └─ UOs, Steps,              └─ All child records
+            Materials, etc.               remapped & linked
+
+Run order matters: always sync the project first, then the process.
+
 
 ## Setup
 
