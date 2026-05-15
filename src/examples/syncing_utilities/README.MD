@@ -155,6 +155,7 @@ Synced entities:
 - Process Components
 - Materials
 - Material Attributes
+- Batch Record (Excludes Batch Attributes)
 - Process Parameters
 - IQAs
 - IPAs

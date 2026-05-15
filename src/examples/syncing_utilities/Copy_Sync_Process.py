@@ -1,6 +1,6 @@
 """
 Process copy tool.
-Copies a single Process and its Unit Operations, Steps, Process Params, Materials, Material Attributes, Samples, IPAs, IQAs, and Process Components
+Copies a single Process and its Unit Operations, Steps, Process Params, Materials, Material Attributes, Samples, Batches, IPAs, IQAs, and Process Components
 Also handles DS / DP flows
 from a source project into an existing target project.
 
@@ -83,6 +83,11 @@ ALLOWED_PROCESS_FIELDS = [
     "name", "description", "site", "gmp",
     "scale", "integrations", "referencesLinks",
 ]
+ALLOWED_BATCH_FIELDS = [
+    "ProjectId", "ProcessId", "customID", "type", "description", "site", "scale",
+    "startDate", "manufactureDate", "releaseDate", "expirationDate", "links",
+    "batchType", "purpose",
+]
 ALLOWED_UNIT_OPERATION_FIELDS = [
     "name", "description", "risk", "input",
     "output", "links", "order"
@@ -156,6 +161,7 @@ ACR_FIELDS = [
 ]
 REQUIRED_FIELDS_BY_TYPE = {
     "Process": ALLOWED_PROCESS_FIELDS,
+    "Batch": ALLOWED_BATCH_FIELDS,
     "UnitOperation": ALLOWED_UNIT_OPERATION_FIELDS,
     "Step": ALLOWED_STEP_FIELDS,
     "Material": ALLOWED_MATERIAL_FIELDS,
@@ -404,6 +410,12 @@ def build_target_lookup(
         return {r["name"]: r for r in instances if r.get("name")}
     else:
         return {r["name"]: r["id"] for r in instances if r.get("name")}
+
+def batch_label(record: dict) -> str:
+    return str(record.get("customID"))
+
+def record_process_id(record: dict):
+    return record.get("ProcessId")
 # --------------------- ACCEPTANCE CRITERIA ---------------------
 def acceptance_criteria_ranges_from_record(record: dict) -> list | None:
     for source in (
@@ -552,6 +564,16 @@ def build_material_flow_relationships(
 # --------------------- PAYLOAD BUILDERS ---------------------
 def build_process_payload(src_process: dict, tgt_project_id: int) -> dict:
     return sanitize_payload(src_process, ALLOWED_PROCESS_FIELDS, {"ProjectId": tgt_project_id})
+
+def build_batch_payload(full_src: dict, tgt_project_id: int, tgt_process_id: int) -> dict:
+    return sanitize_payload(
+        full_src,
+        ALLOWED_BATCH_FIELDS,
+        {
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+        },
+    )
 
 def build_unit_operation_order_payload(tgt_process: dict, tgt_order: list) -> dict:
     payload = sanitize_payload(
@@ -2728,6 +2750,90 @@ def copy_samples(
         )
 
     return mapping
+
+def copy_batches(
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_project_id: int,
+    src_process_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    prev_mapping: dict = None,
+) -> dict:
+    """
+    Copy Batches from source to target process.
+    Uses persisted source Batch ID -> target Batch ID mappings only.
+    Batch attributes are not synced.
+    """
+    prev_mapping = prev_mapping or {}
+
+    src_batches = list_process_records(src_client, "Batch", src_project_id, src_process_id)
+    scoped_src_batches = []
+    for src_batch in src_batches:
+        batch_process_id = record_process_id(src_batch)
+        if batch_process_id is not None and batch_process_id != src_process_id:
+            logger.info(
+                "Skipping Batch '%s' (%s); source ProcessId %s does not match targeted ProcessId %s",
+                batch_label(src_batch),
+                src_batch.get("id"),
+                batch_process_id,
+                src_process_id,
+            )
+            continue
+        scoped_src_batches.append(src_batch)
+    src_batches = scoped_src_batches
+
+    if not src_batches:
+        logger.info("No Batches found for source process %s", src_process_id)
+        return {}
+
+    mapping = {}
+
+    for src_batch in src_batches:
+        src_id = src_batch["id"]
+        tgt_batch_id = map_lookup(prev_mapping, src_id)
+        tgt_stub = tgt_client.get_record("Batch", tgt_batch_id) if tgt_batch_id else None
+        tgt_stub = validate_target_scope(tgt_stub, tgt_project_id, tgt_process_id, "Batch")
+        if tgt_batch_id and not tgt_stub:
+            tgt_batch_id = None
+
+        full_src = active_source_full_record(
+            src_client,
+            "Batch",
+            src_batch,
+            src_project_id,
+            src_process_id,
+            "source Batch",
+        )
+        if not full_src:
+            continue
+
+        payload = build_batch_payload(full_src, tgt_project_id, tgt_process_id)
+
+        changed_fields = []
+        if tgt_stub:
+            tgt_stub = ensure_full_record("Batch", tgt_stub, tgt_client)
+            try:
+                tgt_for_diff = json.loads(json.dumps(tgt_stub))
+            except Exception:
+                tgt_for_diff = dict(tgt_stub)
+            tgt_for_diff = strip_attachment_links(tgt_for_diff)
+            changed_fields = changed_fields_for(payload, tgt_for_diff, ALLOWED_BATCH_FIELDS)
+
+        mapping[src_id] = save_copy_payload(
+            record_type="Batch",
+            record_label="Batch",
+            writer=writer,
+            payload=payload,
+            src_name=batch_label(full_src),
+            tgt_record=tgt_stub,
+            tgt_id=tgt_batch_id,
+            changed_fields=changed_fields,
+            source_id=src_id,
+        )
+
+    return mapping
 # --------------------- SUPPLIER SYNC ---------------------
 def list_or_none(value):
     if isinstance(value, str):
@@ -3116,6 +3222,14 @@ def copy_core_entities(
     )
     proc_entry["samples"] = {str(k): v for k, v in sample_mapping.items()}
 
+    batch_mapping = copy_batches(
+        src_client, tgt_client, writer,
+        src_project_id, src_process_id,
+        tgt_project_id, tgt_process_id,
+        prev_mapping=proc_entry.get("batches", {}),
+    )
+    proc_entry["batches"] = {str(k): v for k, v in batch_mapping.items()}
+
     return {
         "UnitOperation": uo_mapping,
         "Step": step_mapping,
@@ -3126,6 +3240,7 @@ def copy_core_entities(
         "IQA": iqa_mapping,
         "IPA": ipa_mapping,
         "Sample": sample_mapping,
+        "Batch": batch_mapping,
     }
 
 def sync_relationship_links(config: SyncConfig, writer: SyncWriter, mappings: dict):
