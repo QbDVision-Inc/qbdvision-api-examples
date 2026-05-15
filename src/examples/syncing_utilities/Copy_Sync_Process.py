@@ -48,7 +48,10 @@ load_dotenv()
 # --------------------- LOGGING ---------------------
 LOG_DIR = "logs"
 
-def setup_logging(src_process_id: int, tgt_process_id: int | None = None) -> str:
+def setup_logging(
+    src_process_id: int,
+    tgt_process_id: int | None = None
+) -> str:
     return setup_file_logging(
         log_dir=LOG_DIR,
         filename_prefix="copy_process",
@@ -196,7 +199,12 @@ def load_config() -> SyncConfig:
         ),
     )
 # --------------------- RECORD HELPERS ---------------------
-def validate_target_scope(record: dict | None, project_id: int, process_id: int, label: str) -> dict | None:
+def validate_target_scope(
+    record: dict | None,
+    project_id: int,
+    process_id: int,
+    label: str
+) -> dict | None:
     if not record or not isinstance(record, dict):
         return None
 
@@ -213,7 +221,11 @@ def validate_target_scope(record: dict | None, project_id: int, process_id: int,
 
     return record
 
-def ensure_full_record(record_type: str, record: dict | None, client: QbdApiClient) -> dict | None:
+def ensure_full_record(
+    record_type: str,
+    record: dict | None,
+    client: QbdApiClient
+) -> dict | None:
     if not record or not isinstance(record, dict):
         return record
 
@@ -296,7 +308,10 @@ def resolve_target_by_lookup(
     tgt_record = tgt_lookup.get(fallback_key)
     return (tgt_record.get("id"), tgt_record) if tgt_record else (None, None)
 
-def find_duplicate_keys(records, key_fn):
+def find_duplicate_keys(
+    records,
+    key_fn
+):
     counts = Counter()
     for r in records or []:
         key = key_fn(r)
@@ -313,7 +328,11 @@ def list_process_records(
 ) -> list:
     return client.list_records(record_type, project_id, processId=process_id).get("instances", [])
 
-def list_project_records(client: QbdApiClient, record_type: str, project_id: int) -> list:
+def list_project_records(
+    client: QbdApiClient,
+    record_type: str,
+    project_id: int
+) -> list:
     return client.list_records(record_type, project_id).get("instances", [])
 
 def get_scoped_record(
@@ -353,7 +372,10 @@ def active_source_full_record(
         return None
     return full_source
 
-def log_duplicate_name_fallback(record_label: str, duplicate_names: set) -> None:
+def log_duplicate_name_fallback(
+    record_label: str,
+    duplicate_names: set
+) -> None:
     if duplicate_names:
         logger.info(
             "Duplicate %s names in source; disabling name-based fallback for: %s",
@@ -361,10 +383,14 @@ def log_duplicate_name_fallback(record_label: str, duplicate_names: set) -> None
             ", ".join(sorted(duplicate_names)),
         )
 
-def name_record_lookup(records: list) -> dict:
+def name_record_lookup(
+    records: list
+) -> dict:
     return {record["name"]: record for record in records if record.get("name")}
 
-def name_id_lookup(records: list) -> dict:
+def name_id_lookup(
+    records: list
+) -> dict:
     return {record["name"]: record["id"] for record in records if record.get("name") and record.get("id")}
 
 def build_name_based_id_mapping(
@@ -382,7 +408,9 @@ def build_name_based_id_mapping(
         if src_record.get("name") in tgt_by_name
     }
 
-def convert_map_to_record_keys(map_data: dict) -> List[str]:
+def convert_map_to_record_keys(
+    map_data: dict
+) -> List[str]:
     if not map_data:
         return []
     return [
@@ -405,7 +433,9 @@ def build_target_lookup(
     else:
         return {r["name"]: r["id"] for r in instances if r.get("name")}
 # --------------------- ACCEPTANCE CRITERIA ---------------------
-def acceptance_criteria_ranges_from_record(record: dict) -> list | None:
+def acceptance_criteria_ranges_from_record(
+    record: dict
+) -> list | None:
     for source in (
         record.get("Requirement"),
         record,
@@ -417,10 +447,15 @@ def acceptance_criteria_ranges_from_record(record: dict) -> list | None:
 
     return None
 
-def normalize_acceptance_criteria_ranges_list(ranges: list) -> list:
+def normalize_acceptance_criteria_ranges_list(
+    ranges: list
+) -> list:
     return normalize_acr_ranges(ranges, ACR_FIELDS)
 
-def add_acr_to_payload(full_src: dict, payload: dict) -> dict | None:
+def add_acr_to_payload(
+    full_src: dict,
+    payload: dict
+) -> dict | None:
     if not isinstance(full_src, dict):
         return None
 
@@ -433,7 +468,9 @@ def add_acr_to_payload(full_src: dict, payload: dict) -> dict | None:
     payload["AcceptanceCriteriaRanges"] = src_ranges
     return {"AcceptanceCriteriaRanges": src_ranges}
 
-def add_tgt_acr_for_diff(tgt_full: dict) -> dict:
+def add_tgt_acr_for_diff(
+    tgt_full: dict
+) -> dict:
     if not isinstance(tgt_full, dict):
         return tgt_full
 
@@ -447,10 +484,15 @@ def add_tgt_acr_for_diff(tgt_full: dict) -> dict:
 
     return tgt_full
 # --------------------- NORMALIZATION & DIFF ---------------------
-def id_set(records: list | None) -> set:
+def id_set(
+    records: list | None
+) -> set:
     return {record.get("id") for record in records or []}
 
-def tuple_set(records: list | None, fields: tuple[str, ...]) -> set:
+def tuple_set(
+    records: list | None,
+    fields: tuple[str, ...]
+) -> set:
     return {tuple(record.get(field) for field in fields) for record in records or []}
 
 def append_relationship_id_diff(
@@ -477,7 +519,12 @@ def append_relationship_id_diff(
         sorted(tgt_ids),
     )
 # --------------------- RELATIONSHIP HELPERS ---------------------
-def mapped_id_relationships(records: list, mapping: dict, *source_id_fields: str, label_prefix: str | None = None) -> list:
+def mapped_id_relationships(
+    records: list,
+    mapping: dict,
+    *source_id_fields: str,
+    label_prefix: str | None = None
+) -> list:
     relationships = []
     for record in records:
         mapped_id = None
@@ -550,10 +597,16 @@ def build_material_flow_relationships(
     ]
     return mapped_flows, uos, steps
 # --------------------- PAYLOAD BUILDERS ---------------------
-def build_process_payload(src_process: dict, tgt_project_id: int) -> dict:
+def build_process_payload(
+    src_process: dict,
+    tgt_project_id: int
+) -> dict:
     return sanitize_payload(src_process, ALLOWED_PROCESS_FIELDS, {"ProjectId": tgt_project_id})
 
-def build_unit_operation_order_payload(tgt_process: dict, tgt_order: list) -> dict:
+def build_unit_operation_order_payload(
+    tgt_process: dict,
+    tgt_order: list
+) -> dict:
     payload = sanitize_payload(
         tgt_process,
         ALLOWED_PROCESS_FIELDS,
@@ -594,7 +647,12 @@ def build_unit_operation_timepoints_update_payload(
         },
     )
 
-def build_step_payload(full_src: dict, tgt_project_id: int, tgt_process_id: int, tgt_uo_id: int) -> dict:
+def build_step_payload(
+    full_src: dict,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    tgt_uo_id: int
+) -> dict:
     return sanitize_payload(
         full_src,
         ALLOWED_STEP_FIELDS,
@@ -605,7 +663,11 @@ def build_step_payload(full_src: dict, tgt_project_id: int, tgt_process_id: int,
         },
     )
 
-def build_step_order_payload(tgt_uo: dict, tgt_uo_id: int, new_order: list) -> dict:
+def build_step_order_payload(
+    tgt_uo: dict,
+    tgt_uo_id: int,
+    new_order: list
+) -> dict:
     return sanitize_payload(
         tgt_uo,
         ALLOWED_UNIT_OPERATION_FIELDS,
@@ -811,7 +873,10 @@ def build_material_supplier_payload(
         "MaterialFlows": flows,
     }
 
-def attach_requirement_payload(payload: dict, requirement_payload: dict | None) -> None:
+def attach_requirement_payload(
+    payload: dict,
+    requirement_payload: dict | None
+) -> None:
     if requirement_payload:
         payload.pop("AcceptanceCriteriaRanges", None)
         payload["Requirement"] = requirement_payload
@@ -856,7 +921,9 @@ def save_copy_payload(
         logger.info("Created %s '%s': %s -> %s", record_label, src_name, source_id, new_id)
     return new_id
 # --------------------- TIMEPOINT HELPERS ---------------------
-def coerce_list(value) -> list:
+def coerce_list(
+    value
+) -> list:
     if isinstance(value, str):
         try:
             value = json.loads(value)
@@ -864,13 +931,19 @@ def coerce_list(value) -> list:
             return []
     return value if isinstance(value, list) else []
 
-def active_timepoints(timepoints) -> list:
+def active_timepoints(
+    timepoints
+) -> list:
     return [
         tp for tp in coerce_list(timepoints)
         if isinstance(tp, dict) and not tp.get("deletedAt")
     ]
 
-def timepoint_sort_key(timepoint: dict, *, include_id: bool = False) -> tuple:
+def timepoint_sort_key(
+    timepoint: dict,
+    *,
+    include_id: bool = False
+) -> tuple:
     key = (
         timepoint.get("recordOrder") is None,
         str(timepoint.get("recordOrder")),
@@ -880,20 +953,28 @@ def timepoint_sort_key(timepoint: dict, *, include_id: bool = False) -> tuple:
         return key + (str(timepoint.get("id") or ""),)
     return key
 
-def target_timepoint_lookups(timepoints) -> tuple[dict, dict]:
+def target_timepoint_lookups(
+    timepoints
+) -> tuple[dict, dict]:
     active = active_timepoints(timepoints)
     return (
         unique_lookup(active, lambda tp: normalize(tp.get("name"))),
         unique_lookup(active, lambda tp: normalize(tp.get("recordOrder"))),
     )
 
-def matching_target_timepoint(src_timepoint: dict, tgt_by_name: dict, tgt_by_order: dict) -> dict | None:
+def matching_target_timepoint(
+    src_timepoint: dict,
+    tgt_by_name: dict,
+    tgt_by_order: dict
+) -> dict | None:
     return (
         tgt_by_name.get(normalize(src_timepoint.get("name")))
         or tgt_by_order.get(normalize(src_timepoint.get("recordOrder")))
     )
 
-def normalize_timepoints_for_compare(timepoints) -> list:
+def normalize_timepoints_for_compare(
+    timepoints
+) -> list:
     cleaned = [
         {field: normalize(tp.get(field)) for field in ALLOWED_TIMEPOINT_FIELDS}
         for tp in active_timepoints(timepoints)
@@ -903,7 +984,10 @@ def normalize_timepoints_for_compare(timepoints) -> list:
         key=timepoint_sort_key,
     )
 
-def unique_lookup(records: list, key_fn) -> dict:
+def unique_lookup(
+    records: list,
+    key_fn
+) -> dict:
     counts = Counter()
     by_key = {}
     for record in records:
@@ -914,7 +998,11 @@ def unique_lookup(records: list, key_fn) -> dict:
         by_key[key] = record
     return {key: record for key, record in by_key.items() if counts[key] == 1}
 
-def build_timepoints_payload(src_timepoints, tgt_timepoints, tgt_uo_id: int) -> list:
+def build_timepoints_payload(
+    src_timepoints,
+    tgt_timepoints,
+    tgt_uo_id: int
+) -> list:
     tgt_by_name, tgt_by_order = target_timepoint_lookups(tgt_timepoints)
 
     payload = []
@@ -937,13 +1025,19 @@ def build_timepoints_payload(src_timepoints, tgt_timepoints, tgt_uo_id: int) -> 
         key=timepoint_sort_key,
     )
 
-def _timepoint_label(timepoint: dict) -> str:
+def _timepoint_label(
+    timepoint: dict
+) -> str:
     label = timepoint.get("label")
     if label:
         return label
     return f"TP-{timepoint.get('id')} - {timepoint.get('name')}"
 
-def build_sample_timepoints_payload(src_timepoints, tgt_uo_timepoints, tgt_uo_id: int) -> list:
+def build_sample_timepoints_payload(
+    src_timepoints,
+    tgt_uo_timepoints,
+    tgt_uo_id: int
+) -> list:
     tgt_by_name, tgt_by_order = target_timepoint_lookups(tgt_uo_timepoints)
 
     payload = []
@@ -971,7 +1065,9 @@ def build_sample_timepoints_payload(src_timepoints, tgt_uo_timepoints, tgt_uo_id
         key=timepoint_sort_key,
     )
 
-def normalize_sample_timepoints_for_compare(timepoints) -> list:
+def normalize_sample_timepoints_for_compare(
+    timepoints
+) -> list:
     cleaned = [
         {
             "id": normalize(tp.get("id")),
@@ -1008,7 +1104,9 @@ ID_MAP_FILE = "process_id_map.json"
 def load_id_map() -> dict:
     return load_id_map_file(ID_MAP_FILE, "processes", preserve_extra=True)
 
-def save_id_map(id_map: dict):
+def save_id_map(
+    id_map: dict
+):
     save_id_map_file(ID_MAP_FILE, id_map)
 # --------------------- CONTROL METHODS & RISK LINKS ---------------------
 def map_and_diff_control_methods(
@@ -1059,10 +1157,14 @@ def changed_fields_with_control_methods(
         changed_fields.append("ControlMethods")
     return changed_fields
 
-def canonical_type_code(code: str) -> str:
+def canonical_type_code(
+    code: str
+) -> str:
     return "".join(ch for ch in str(code or "").upper() if ch.isalnum())
 
-def normalize_applies_to_maps(applies_to_maps: dict | None) -> dict:
+def normalize_applies_to_maps(
+    applies_to_maps: dict | None
+) -> dict:
     aliases = {
         "MA": "MATERIALATTRIBUTE",
         "MATERIALATTRIBUTE": "MATERIALATTRIBUTE",
@@ -1092,7 +1194,10 @@ def normalize_applies_to_maps(applies_to_maps: dict | None) -> dict:
         normalized[canonical] = mapping
     return normalized
 
-def map_applies_to_ref(ref, applies_to_maps: dict) -> str | None:
+def map_applies_to_ref(
+    ref,
+    applies_to_maps: dict
+) -> str | None:
     if not isinstance(ref, str):
         return None
     ref = ref.strip()
@@ -1135,7 +1240,10 @@ def map_applies_to_ref(ref, applies_to_maps: dict) -> str | None:
 
     return f"{type_code}-{mapped_id}"
 
-def sanitize_risk_link_links(links_value, applies_to_maps: dict) -> str:
+def sanitize_risk_link_links(
+    links_value,
+    applies_to_maps: dict
+) -> str:
     links = links_value
     if isinstance(links, str):
         try:
@@ -2729,7 +2837,9 @@ def copy_samples(
 
     return mapping
 # --------------------- SUPPLIER SYNC ---------------------
-def list_or_none(value):
+def list_or_none(
+    value
+):
     if isinstance(value, str):
         try:
             value = json.loads(value)
@@ -2737,7 +2847,10 @@ def list_or_none(value):
             return None
     return value if isinstance(value, list) else None
 
-def required_list_fields(record: dict, field_names: tuple[str, ...]) -> tuple[dict | None, str | None]:
+def required_list_fields(
+    record: dict,
+    field_names: tuple[str, ...]
+) -> tuple[dict | None, str | None]:
     values = {}
     for field_name in field_names:
         parsed = list_or_none(record.get(field_name))
@@ -2746,7 +2859,11 @@ def required_list_fields(record: dict, field_names: tuple[str, ...]) -> tuple[di
         values[field_name] = parsed
     return values, None
 
-def merged_field(src_full: dict, tgt_full: dict, field_name: str):
+def merged_field(
+    src_full: dict,
+    tgt_full: dict,
+    field_name: str
+):
     return tgt_full.get(field_name) or src_full.get(field_name)
 
 def build_process_component_supplier_update(
@@ -2958,7 +3075,11 @@ def sync_supplier_ids(
         build_update_payload=build_material_supplier_update,
     )
 # --------------------- MAIN COPY FLOW ---------------------
-def copy_process_record(config: SyncConfig, proc_entry: dict, writer: SyncWriter) -> tuple[dict, int | None]:
+def copy_process_record(
+    config: SyncConfig,
+    proc_entry: dict,
+    writer: SyncWriter
+) -> tuple[dict, int | None]:
     src_project_id = config.src_project_id
     src_process_id = config.src_process_id
     tgt_project_id = config.tgt_project_id
@@ -3128,7 +3249,11 @@ def copy_core_entities(
         "Sample": sample_mapping,
     }
 
-def sync_relationship_links(config: SyncConfig, writer: SyncWriter, mappings: dict):
+def sync_relationship_links(
+    config: SyncConfig,
+    writer: SyncWriter,
+    mappings: dict
+):
     tgt_project_id = config.tgt_project_id
     src_client = config.src_client
     tgt_client = config.tgt_client
@@ -3226,7 +3351,12 @@ def sync_relationship_links(config: SyncConfig, writer: SyncWriter, mappings: di
         include_risk_fields=False,
     )
 
-def sync_drug_mappings(config: SyncConfig, writer: SyncWriter, mappings: dict, tgt_process_id: int):
+def sync_drug_mappings(
+    config: SyncConfig,
+    writer: SyncWriter,
+    mappings: dict,
+    tgt_process_id: int
+):
     src_project_id = config.src_project_id
     src_process_id = config.src_process_id
     tgt_project_id = config.tgt_project_id
@@ -3286,7 +3416,12 @@ def sync_drug_mappings(config: SyncConfig, writer: SyncWriter, mappings: dict, t
         src_process_id=src_process_id,
     )
 
-def sync_supplier_mappings(config: SyncConfig, writer: SyncWriter, mappings: dict, tgt_process_id: int):
+def sync_supplier_mappings(
+    config: SyncConfig,
+    writer: SyncWriter,
+    mappings: dict,
+    tgt_process_id: int
+):
     sync_supplier_ids(
         src_client=config.src_client,
         tgt_client=config.tgt_client,
@@ -3299,7 +3434,9 @@ def sync_supplier_mappings(config: SyncConfig, writer: SyncWriter, mappings: dic
         material_mapping=mappings["Material"],
     )
 
-def copy_process(config: SyncConfig):
+def copy_process(
+    config: SyncConfig
+):
     src_process_id = config.src_process_id
     writer = SyncWriter(config.tgt_client)
     id_map = load_id_map()

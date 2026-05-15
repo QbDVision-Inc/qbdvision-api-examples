@@ -13,7 +13,7 @@ Prerequisite: Python 3.11+
 
 Create a local virtual environment:
 
-```powershell
+```bash
 python -m venv venv
 ```
 
@@ -33,7 +33,7 @@ source venv/bin/activate
 
 Install dependencies:
 
-```powershell
+```bash
 pip install -r requirements.txt
 ```
 
@@ -75,7 +75,7 @@ If a required value is missing, or an ID value is not a whole number, the script
 
 Run the project sync first:
 
-```powershell
+```bash
 python Copy_Sync_Project.py
 ```
 
@@ -83,7 +83,7 @@ If the project sync creates a new RMP, approve the RMP in QbDVision and rerun `C
 
 Then run the process sync:
 
-```powershell
+```bash
 python Copy_Sync_Process.py
 ```
 

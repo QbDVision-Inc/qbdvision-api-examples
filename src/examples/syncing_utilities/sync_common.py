@@ -7,13 +7,18 @@ from typing import Any, Dict
 import requests
 
 
-def required_int(name: str, value: str | None) -> int:
+def required_int(
+    name: str,
+    value: str | None
+) -> int:
     try:
         return int(value)
     except (TypeError, ValueError):
         raise ValueError(f"{name} must be a whole number.")
 
-def required_env(name: str) -> str:
+def required_env(
+    name: str
+) -> str:
     value = os.getenv(name)
     if not value:
         raise ValueError(
@@ -45,7 +50,12 @@ def setup_file_logging(
     )
     return log_path
 
-def load_id_map_file(path: str, root_key: str, *, preserve_extra: bool = False) -> dict:
+def load_id_map_file(
+    path: str,
+    root_key: str,
+    *,
+    preserve_extra: bool = False
+) -> dict:
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -129,7 +139,9 @@ class SyncWriter:
     def save_fn(self, record_type: str, *, reason: str | None = None):
         return lambda payload: self.save_record(record_type, payload, reason=reason)
 
-def strip_attachment_links(payload: Dict[str, Any]) -> Dict[str, Any]:
+def strip_attachment_links(
+    payload: Dict[str, Any]
+) -> Dict[str, Any]:
     stack = [payload]
 
     while stack:
@@ -167,22 +179,33 @@ def strip_attachment_links(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     return payload
 
-def sanitize_payload(src: dict, allowed_fields: list, extra_fields: dict | None = None) -> dict:
+def sanitize_payload(
+    src: dict,
+    allowed_fields: list,
+    extra_fields: dict | None = None
+) -> dict:
     payload = {k: src[k] for k in allowed_fields if k in src}
     if extra_fields:
         payload.update(extra_fields)
     return strip_attachment_links(payload)
 
-def is_archived(record: dict) -> bool:
+def is_archived(
+    record: dict
+) -> bool:
     return isinstance(record, dict) and record.get("currentState") == "Archived"
 
-def normalize_id(val):
+def normalize_id(
+    val
+):
     try:
         return int(val)
     except Exception:
         return val
 
-def map_lookup(mapping: dict, key):
+def map_lookup(
+    mapping: dict,
+    key
+):
     if key is None:
         return None
     if key in mapping:
@@ -198,7 +221,9 @@ def map_lookup(mapping: dict, key):
         pass
     return None
 
-def parse_json_container(value):
+def parse_json_container(
+    value
+):
     if isinstance(value, str):
         try:
             return json.loads(value)
@@ -206,15 +231,21 @@ def parse_json_container(value):
             return None
     return value
 
-def parsed_list_or_none(value) -> list | None:
+def parsed_list_or_none(
+    value
+) -> list | None:
     parsed = parse_json_container(value)
     return parsed if isinstance(parsed, list) else None
 
-def parsed_dict_or_none(value) -> dict | None:
+def parsed_dict_or_none(
+    value
+) -> dict | None:
     parsed = parse_json_container(value)
     return parsed if isinstance(parsed, dict) else None
 
-def acceptance_criteria_ranges_from_container(container) -> list | None:
+def acceptance_criteria_ranges_from_container(
+    container
+) -> list | None:
     container = parse_json_container(container)
     if not container:
         return None
@@ -253,7 +284,9 @@ def normalize_acceptance_criteria_ranges_list(
 
     return sorted(cleaned, key=_key)
 
-def normalize_acr_value(val):
+def normalize_acr_value(
+    val
+):
     if val in ("", None):
         return None
     if isinstance(val, str):
@@ -266,11 +299,15 @@ def normalize_acr_value(val):
         return None
     return val
 
-def normalize_whitespace(text: str):
+def normalize_whitespace(
+    text: str
+):
     collapsed = " ".join(text.split())
     return collapsed if collapsed else None
 
-def normalize(val):
+def normalize(
+    val
+):
     if val is None:
         return None
 
@@ -294,7 +331,10 @@ def normalize(val):
 
     return val
 
-def param_changed(src, tgt):
+def param_changed(
+    src,
+    tgt
+):
     src_n = normalize(src)
     tgt_n = normalize(tgt)
 
@@ -309,7 +349,9 @@ def param_changed(src, tgt):
 
     return src_n != tgt_n
 
-def freeze_for_compare(val):
+def freeze_for_compare(
+    val
+):
     val = normalize(val)
 
     if isinstance(val, dict):
@@ -321,7 +363,13 @@ def freeze_for_compare(val):
 
     return val
 
-def changed_fields_for(payload: dict, target: dict, fields: list, *, skip: set | None = None) -> list:
+def changed_fields_for(
+    payload: dict,
+    target: dict,
+    fields: list,
+    *,
+    skip: set | None = None
+) -> list:
     skip = skip or set()
     return [
         field
@@ -329,14 +377,21 @@ def changed_fields_for(payload: dict, target: dict, fields: list, *, skip: set |
         if field not in skip and param_changed(payload.get(field), target.get(field))
     ]
 
-def frozen_changed_fields_for(payload: dict, target: dict, fields: list) -> list:
+def frozen_changed_fields_for(
+    payload: dict,
+    target: dict,
+    fields: list
+) -> list:
     return [
         field
         for field in fields
         if freeze_for_compare(payload.get(field)) != freeze_for_compare(target.get(field))
     ]
 
-def get_target_supplier_by_name(client: QbdApiClient, name):
+def get_target_supplier_by_name(
+    client: QbdApiClient,
+    name
+):
     data = client.list_records("Supplier")
     suppliers = data.get("instances") if isinstance(data, dict) else data
     if not isinstance(suppliers, list):
@@ -352,7 +407,10 @@ def get_target_supplier_by_name(client: QbdApiClient, name):
 
     return None
 
-def clean_supplier_payload(src_supplier: dict, allowed_fields: list) -> dict:
+def clean_supplier_payload(
+    src_supplier: dict,
+    allowed_fields: list
+) -> dict:
     return sanitize_payload(src_supplier, allowed_fields)
 
 def create_target_supplier(

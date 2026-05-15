@@ -220,7 +220,10 @@ RMP_NESTED_ID_FIELDS = [
     "RMPToRPNScales",
 ]
 # --------------------- LOGGING ---------------------
-def setup_logging(src_project_id: int, tgt_project_id: int | None = None) -> str:
+def setup_logging(
+    src_project_id: int,
+    tgt_project_id: int | None = None
+) -> str:
     return setup_file_logging(
         log_dir=LOG_DIR,
         filename_prefix="copy_project",
@@ -232,7 +235,9 @@ def setup_logging(src_project_id: int, tgt_project_id: int | None = None) -> str
 def load_id_map() -> dict:
     return load_id_map_file(ID_MAP_FILE, "projects")
 
-def save_id_map(id_map: dict):
+def save_id_map(
+    id_map: dict
+):
     save_id_map_file(ID_MAP_FILE, id_map)
 
 @dataclass(frozen=True)
@@ -256,7 +261,9 @@ def load_config() -> SyncConfig:
         ),
     )
 # --------------------- LINK & PAYLOAD HELPERS ---------------------
-def clean_rmp_payload(src_rmp: dict) -> dict:
+def clean_rmp_payload(
+    src_rmp: dict
+) -> dict:
     payload = {}
 
     for k, v in src_rmp.items():
@@ -290,7 +297,11 @@ def clean_rmp_payload(src_rmp: dict) -> dict:
 
     return payload
 
-def validate_target_scope(record: dict | None, project_id: int, label: str) -> dict | None:
+def validate_target_scope(
+    record: dict | None,
+    project_id: int,
+    label: str
+) -> dict | None:
     if not record or not isinstance(record, dict):
         return None
 
@@ -307,12 +318,16 @@ def validate_target_scope(record: dict | None, project_id: int, label: str) -> d
 
     return record
 
-def _normalize_risk_assessment_method(value: Any) -> str:
+def _normalize_risk_assessment_method(
+    value: Any
+) -> str:
     if value is None:
         return ""
     return re.sub(r"[^A-Za-z0-9]+", "", str(value)).lower()
 
-def _resolve_project_risk_model(remap_ctx: dict | None) -> str:
+def _resolve_project_risk_model(
+    remap_ctx: dict | None
+) -> str:
     ctx = remap_ctx or {}
     candidates = [
         ctx.get("target_project_risk_assessment_method"),
@@ -332,13 +347,20 @@ def _resolve_project_risk_model(remap_ctx: dict | None) -> str:
 
     return ""
 
-def is_risk_ranking_method(remap_ctx: dict | None) -> bool:
+def is_risk_ranking_method(
+    remap_ctx: dict | None
+) -> bool:
     return _resolve_project_risk_model(remap_ctx) == "riskranking"
 
-def is_classification_method(remap_ctx: dict | None) -> bool:
+def is_classification_method(
+    remap_ctx: dict | None
+) -> bool:
     return _resolve_project_risk_model(remap_ctx) == "classification"
 
-def resolve_non_riskranking_method(src_full: dict, remap_ctx: dict | None) -> str | None:
+def resolve_non_riskranking_method(
+    src_full: dict,
+    remap_ctx: dict | None
+) -> str | None:
     project_model = _resolve_project_risk_model(remap_ctx)
     if project_model == "classification":
         return "Classification"
@@ -385,7 +407,10 @@ def get_effective_entity_fields(
 
     return allowed_fields, diff_fields_cfg, sync_fields_cfg
 
-def _risk_info_value(src_full: dict, section_name: str) -> Any:
+def _risk_info_value(
+    src_full: dict,
+    section_name: str
+) -> Any:
     if not isinstance(src_full, dict):
         return None
     risk_info = src_full.get("riskInfo")
@@ -396,7 +421,10 @@ def _risk_info_value(src_full: dict, section_name: str) -> Any:
         return None
     return section.get("value")
 
-def apply_non_riskranking_risk_values(src_full: dict, payload: dict) -> dict:
+def apply_non_riskranking_risk_values(
+    src_full: dict,
+    payload: dict
+) -> dict:
     if not isinstance(payload, dict):
         return payload
 
@@ -432,15 +460,23 @@ def apply_non_riskranking_risk_values(src_full: dict, payload: dict) -> dict:
 
     return payload
 # --------------------- FETCH & DIFF HELPERS ---------------------
-def fetch_full_editable(client: QbdApiClient, entity_type: str, entity_id: int) -> dict:
+def fetch_full_editable(
+    client: QbdApiClient,
+    entity_type: str,
+    entity_id: int
+) -> dict:
     return client.get_record(entity_type, entity_id)
 
 _WHITESPACE_RE = re.compile(r"\s+")
 
-def _normalize_whitespace(value: str) -> str:
+def _normalize_whitespace(
+    value: str
+) -> str:
     return _WHITESPACE_RE.sub(" ", value).strip()
 
-def _normalize_value_for_compare(value: Any) -> Any:
+def _normalize_value_for_compare(
+    value: Any
+) -> Any:
     if value is None:
         return None
     if isinstance(value, str):
@@ -451,14 +487,21 @@ def _normalize_value_for_compare(value: Any) -> Any:
         return {k: _normalize_value_for_compare(v) for k, v in value.items()}
     return value
 
-def _values_equal_ignoring_whitespace(a: Any, b: Any) -> bool:
+def _values_equal_ignoring_whitespace(
+    a: Any,
+    b: Any
+) -> bool:
     if isinstance(a, str) and b is None:
         return _normalize_whitespace(a) == ""
     if isinstance(b, str) and a is None:
         return _normalize_whitespace(b) == ""
     return _normalize_value_for_compare(a) == _normalize_value_for_compare(b)
 
-def _preserve_whitespace_only_changes(src_payload: dict, tgt_payload: dict, fields: list) -> dict:
+def _preserve_whitespace_only_changes(
+    src_payload: dict,
+    tgt_payload: dict,
+    fields: list
+) -> dict:
     if not isinstance(tgt_payload, dict):
         return src_payload
     for field in fields:
@@ -496,7 +539,10 @@ def diff_fields(
 
     return diffs
 # --------------------- RMP HELPERS ---------------------
-def get_target_rmp_by_name(client: QbdApiClient, name):
+def get_target_rmp_by_name(
+    client: QbdApiClient,
+    name
+):
     data = client.list_records("RMP")
 
     for rmp in data.get("instances", []):
@@ -508,7 +554,10 @@ def get_target_rmp_by_name(client: QbdApiClient, name):
 
     return None
 
-def create_target_rmp(writer: SyncWriter, src_rmp: dict) -> int:
+def create_target_rmp(
+    writer: SyncWriter,
+    src_rmp: dict
+) -> int:
     cleaned_payload = clean_rmp_payload(src_rmp)
 
     if not cleaned_payload.get("name"):
@@ -534,7 +583,9 @@ def resolve_target_supplier_id(
         logger=logger,
     )
 # --------------------- ACCEPTANCE CRITERIA ---------------------
-def normalize_acceptance_criteria_ranges_list(ranges: list) -> list:
+def normalize_acceptance_criteria_ranges_list(
+    ranges: list
+) -> list:
     return normalize_acr_ranges(
         ranges,
         ACR_FIELDS,
@@ -542,7 +593,9 @@ def normalize_acceptance_criteria_ranges_list(ranges: list) -> list:
         include_missing=False,
     )
 
-def extract_acceptance_criteria_ranges_from_source(src_full: dict) -> list:
+def extract_acceptance_criteria_ranges_from_source(
+    src_full: dict
+) -> list:
     if not isinstance(src_full, dict):
         return []
 
@@ -564,7 +617,9 @@ def extract_acceptance_criteria_ranges_from_source(src_full: dict) -> list:
 
     return []
 
-def build_acceptance_criteria_ranges(src_full: dict) -> list:
+def build_acceptance_criteria_ranges(
+    src_full: dict
+) -> list:
     ranges = extract_acceptance_criteria_ranges_from_source(src_full)
     if not ranges:
         return []
@@ -704,7 +759,11 @@ def remap_fqa_links(
     payload[field_name] = remapped
     return payload
 
-def apply_remap(entity_type: str, payload: dict, ctx: dict) -> dict:
+def apply_remap(
+    entity_type: str,
+    payload: dict,
+    ctx: dict
+) -> dict:
     if entity_type in ("FPA", "FQA"):
         payload["TPPSections"] = remap_tpp_sections(
             payload.get("TPPSections", []),
@@ -761,7 +820,10 @@ for _entity_cfg in ENTITY_CONFIG.values():
         _entity_cfg["remap"] = apply_remap
 
 # --------------------- ENTITY HELPERS ---------------------
-def get_ga_name_map(client: QbdApiClient, project_id: int) -> Dict[int, str]:
+def get_ga_name_map(
+    client: QbdApiClient,
+    project_id: int
+) -> Dict[int, str]:
     data = client.list_records("GeneralAttribute", project_id)
     ga_list = data.get("instances", [])
     return {
@@ -770,7 +832,12 @@ def get_ga_name_map(client: QbdApiClient, project_id: int) -> Dict[int, str]:
         if isinstance(ga, dict) and ga.get("id") and ga.get("name")
     }
 
-def get_entities(client: QbdApiClient, project_id: int, entity_type: str, name_field: str = "name") -> Dict[str, int]:
+def get_entities(
+    client: QbdApiClient,
+    project_id: int,
+    entity_type: str,
+    name_field: str = "name"
+) -> Dict[str, int]:
     data = client.list_records(entity_type, project_id)
 
     entities_list = data.get("instances") if isinstance(data, dict) else data
@@ -798,7 +865,12 @@ def active_source_record(
         return None
     return src_full
 
-def apply_fpa_fqa_payload_rules(entity_type: str, src_full: dict, payload: dict, remap_ctx: dict | None) -> tuple[dict, dict | None]:
+def apply_fpa_fqa_payload_rules(
+    entity_type: str,
+    src_full: dict,
+    payload: dict,
+    remap_ctx: dict | None
+) -> tuple[dict, dict | None]:
     requirement_payload = None
     if entity_type not in ("FPA", "FQA"):
         return payload, requirement_payload
@@ -816,7 +888,12 @@ def apply_fpa_fqa_payload_rules(entity_type: str, src_full: dict, payload: dict,
             payload["riskAssessmentMethod"] = resolved_method
     return payload, requirement_payload
 
-def remap_entity_payload(entity_type: str, payload: dict, cfg: dict, remap_ctx: dict | None) -> dict:
+def remap_entity_payload(
+    entity_type: str,
+    payload: dict,
+    cfg: dict,
+    remap_ctx: dict | None
+) -> dict:
     remap_fn = cfg.get("remap")
     if remap_fn and remap_ctx:
         payload = remap_fn(entity_type, payload, remap_ctx)
@@ -904,7 +981,10 @@ def build_entity_payload(
 
     return payload, requirement_payload, diff_fields_cfg, sync_fields_cfg
 
-def relationship_ids(items, id_keys=("id",)) -> set:
+def relationship_ids(
+    items,
+    id_keys=("id",)
+) -> set:
     ids = set()
     for item in items or []:
         if not isinstance(item, dict):
@@ -916,7 +996,9 @@ def relationship_ids(items, id_keys=("id",)) -> set:
                 break
     return ids
 
-def general_attribute_risk_tuples(items) -> set:
+def general_attribute_risk_tuples(
+    items
+) -> set:
     tuples = set()
     for item in items or []:
         if not isinstance(item, dict):
@@ -928,7 +1010,13 @@ def general_attribute_risk_tuples(items) -> set:
             tuples.add((ga_id, item.get("impact"), item.get("uncertainty"), item.get("justification")))
     return tuples
 
-def append_id_relationship_diff(diffs: dict, field_name: str, src_items: list, tgt_items: list, id_keys=("id",)) -> None:
+def append_id_relationship_diff(
+    diffs: dict,
+    field_name: str,
+    src_items: list,
+    tgt_items: list,
+    id_keys=("id",)
+) -> None:
     src_ids = relationship_ids(src_items, id_keys)
     tgt_ids = relationship_ids(tgt_items, id_keys)
     if src_ids != tgt_ids:
@@ -937,7 +1025,12 @@ def append_id_relationship_diff(diffs: dict, field_name: str, src_items: list, t
             "to": sorted(src_ids),
         }
 
-def relationship_diffs(entity_type: str, sanitized_src: dict, tgt_full: dict, remap_ctx: dict | None) -> dict:
+def relationship_diffs(
+    entity_type: str,
+    sanitized_src: dict,
+    tgt_full: dict,
+    remap_ctx: dict | None
+) -> dict:
     diffs = {}
     if entity_type in ("FPA", "FQA"):
         ga_field = "FPAToGeneralAttributeRisks" if entity_type == "FPA" else "FQAToGeneralAttributeRisks"
@@ -979,7 +1072,10 @@ def relationship_diffs(entity_type: str, sanitized_src: dict, tgt_full: dict, re
         )
     return diffs
 
-def target_with_requirement_ranges(entity_type: str, target: dict) -> dict:
+def target_with_requirement_ranges(
+    entity_type: str,
+    target: dict
+) -> dict:
     if entity_type not in ("FPA", "FQA"):
         return target
     tgt_req = target.get("Requirement") if isinstance(target, dict) else None
@@ -1238,7 +1334,11 @@ def sync_or_create_entities(
 
     return mapping
 # --------------------- MAIN ---------------------
-def resolve_project_rmp(config: SyncConfig, writer: SyncWriter, sanitized_src_project: dict) -> int | None:
+def resolve_project_rmp(
+    config: SyncConfig,
+    writer: SyncWriter,
+    sanitized_src_project: dict
+) -> int | None:
     src_rmp_id = sanitized_src_project.get("RMPId")
     if not src_rmp_id:
         return None
@@ -1297,7 +1397,11 @@ def copy_project_record(
 
     return src_project, tgt_project_id, projects_map[project_key]
 
-def build_project_remap_context(config: SyncConfig, tgt_project_id: int, src_project: dict) -> dict:
+def build_project_remap_context(
+    config: SyncConfig,
+    tgt_project_id: int,
+    src_project: dict
+) -> dict:
     tgt_project = config.tgt_client.get_record("Project", tgt_project_id)
     return {
         "supplier_cache": {"by_id": {}, "by_name": {}},
@@ -1307,7 +1411,11 @@ def build_project_remap_context(config: SyncConfig, tgt_project_id: int, src_pro
         "target_project_product_risk_assessment_type": tgt_project.get("productRiskAssessmentType"),
     }
 
-def persist_mapping(project_state: dict, state_key: str, mapping: dict) -> dict:
+def persist_mapping(
+    project_state: dict,
+    state_key: str,
+    mapping: dict
+) -> dict:
     project_state[state_key] = {str(k): v for k, v in mapping.items()}
     return project_state[state_key]
 
