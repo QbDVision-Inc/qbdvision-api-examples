@@ -41,7 +41,7 @@ Each directory in this repository focuses on a specific aspect of the API:
   Explorer API to download all records and then displays them as a graph **(Node.js)**
 - [`/syncing_utilities`](/src/examples/syncing_utilities) - Use the API to migrate projects & processes from one environment to another **(Python)**
 - [`/risk_link_utility`](/src/examples/risk_link_utility) - Create risk links on records according to your RMP **(Python)**
-- [`/postman_collections`](/src/examples/postman_collections) - Postman collections with example QbDVision REST API requests **(JSON Files for Import into Postman)**
+- [`/postman_collections`](/src/examples/postman_collections) - Postman collections with example QbDVision REST API requests **(JSON Files for Import Into Postman)**
 
 ## Usage
 
