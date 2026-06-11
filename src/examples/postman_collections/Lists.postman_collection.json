@@ -492,16 +492,16 @@
           }
         },
         "url": {
-          "raw": "https://api.demo.qbdvision.com/demo/editables/RMP/list",
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/RMP/list",
           "protocol": "https",
           "host": [
             "api",
-            "demo",
+            "sandbox",
             "qbdvision",
             "com"
           ],
           "path": [
-            "demo",
+            "sandbox",
             "editables",
             "RMP",
             "list"
