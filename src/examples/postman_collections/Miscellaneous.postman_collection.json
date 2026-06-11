@@ -175,7 +175,7 @@
             "editables",
             "multiple",
             "list",
-            "${projectId}"
+            "{projectId}"
           ],
           "query": [
             {
