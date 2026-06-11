@@ -848,20 +848,20 @@
           }
         },
         "url": {
-          "raw": "https://api.demo.qbdvision.com/demo/editables/FPA/{id}",
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/{id}",
           "protocol": "https",
           "host": [
             "api",
-            "demo",
+            "sandbox",
             "qbdvision",
             "com"
           ],
           "path": [
-            "demo",
+            "sandbox",
             "editables",
             "FPA",
             "{id}"
-          ],
+          ]
           "query": [
             {
               "key": "approved",
