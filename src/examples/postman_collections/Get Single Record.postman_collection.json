@@ -122,7 +122,7 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/demo/editables/RMP/{id}",
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/RMP/{id}",
           "protocol": "https",
           "host": [
             "api",
@@ -131,11 +131,11 @@
             "com"
           ],
           "path": [
-            "demo",
+            "sandbox",
             "editables",
             "RMP",
             "{id}"
-          ],
+          ]
           "query": [
             {
               "key": "approved",
