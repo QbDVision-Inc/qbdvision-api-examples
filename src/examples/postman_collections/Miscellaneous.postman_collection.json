@@ -162,7 +162,7 @@
         "method": "PUT",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/multiple/list/${projectId}",
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/multiple/list/{projectId}",
           "protocol": "https",
           "host": [
             "api",
