@@ -52,7 +52,7 @@
             },
             {
               "key": "shouldCompress",
-              "value": "shouldCompress=false",
+              "value": "false",
               "description": "Returns uncompressed result",
               "type": "text",
               "disabled": true
