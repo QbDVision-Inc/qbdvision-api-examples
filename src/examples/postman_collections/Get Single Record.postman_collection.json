@@ -1229,20 +1229,20 @@
           }
         },
         "url": {
-          "raw": "https://api.demo.qbdvision.com/demo/editables/Document/{id}",
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Document/{id}",
           "protocol": "https",
           "host": [
             "api",
-            "demo",
+            "sandbox",
             "qbdvision",
             "com"
           ],
           "path": [
-            "demo",
+            "sandbox",
             "editables",
             "Document",
             "{id}"
-          ],
+          ]
           "query": [
             {
               "key": "approved",
