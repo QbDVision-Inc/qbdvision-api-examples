@@ -1,0 +1,5666 @@
+{
+  "info": {
+    "_postman_id": "e9b7f209-e76a-4f82-bd61-815e9db6b4a8",
+    "name": "Add Or Edit Record",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48544170"
+  },
+  "item": [
+    {
+      "name": "Add/Edit Supplier",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "Supplier",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Supplier",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Supplier",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Supplier",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Supplier",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Supplier",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Supplier",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Supplier",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Supplier",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Supplier",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Supplier",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Supplier",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"servicesOrProducts\": \"Testing Services\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Supplier",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Library Material",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "LibraryMaterial",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) LibraryMaterial",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"category\": \"Plasmid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "LibraryMaterial",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit LibraryMaterial",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"category\": \"Example Category\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "LibraryMaterial",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Library Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "LibraryMaterial",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Library Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "LibraryMaterial",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Library Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "LibraryMaterial",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) LibraryMaterial",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"category\": \"Plasmid\",\n    \"SupplierId\": 1,\n    \"materialQualified\": \"Pending\",\n    \"Specifications\": [\n        {\n            \"name\": \"Specification 1\",\n            \"measure\": \"Range\",\n            \"lowerLimit\": \"1\",\n            \"target\": \"2\",\n            \"upperLimit\": \"3\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "LibraryMaterial",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Drug Product",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "DrugProduct",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Drug Product",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Drug Product\",\r\n    \"ProjectId\":1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugProduct",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "Text",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Drug Product Copy",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Drug Product\",\r\n    \"description\": \"Test Description\",\r\n    \"ProjectId\":1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugProduct",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "Text",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Drug Product",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 1,\r\n    \"ProjectId\":1,\r\n    \"name\": \"Drug Product\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugProduct",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "Text",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Drug Product",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugProduct",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Drug Product",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugProduct",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Drug Product",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugProduct",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Drug Substance",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "DrugSubstance",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Drug Substance",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"ProjectId\":1,\r\n    \"name\": \"Drug Substance\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugSubstance",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "Text",
+          "header": [],
+          "cookie": [
+            {
+              "expires": "Invalid Date",
+              "domain": "",
+              "path": ""
+            }
+          ],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Drug Substance Copy",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"ProjectId\":1,\r\n    \"name\": \"Drug Substance\",\r\n    \"description\": \"Test Description\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugSubstance",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "Text",
+          "header": [],
+          "cookie": [
+            {
+              "expires": "Invalid Date",
+              "domain": "",
+              "path": ""
+            }
+          ],
+          "body": ""
+        },
+        {
+          "name": "Edit Drug Substance",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 1,\r\n    \"ProjectId\":1,\r\n    \"name\": \"Drug Substance\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugSubstance",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "Text",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Drug Substance",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugSubstance",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Drug Substance",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugSubstance",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Drug Substance",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "DrugSubstance",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Material",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "Material",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"category\": \"Tissue\",\n    \"use\": \"Process\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Material",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Material",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Material",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Material",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Material",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Material",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"category\": \"Tissue\",\n    \"use\": \"Process\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"SupplierId\": 5001,\n    \"materialQualified\": \"No\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Material",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit GA",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "GeneralAttribute",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) GeneralAttribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "GeneralAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit GeneralAttribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "GeneralAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve GA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "GeneralAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive GA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "GeneralAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore GA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "GeneralAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) GeneralAttribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "GeneralAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Material Attribute",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "MaterialAttribute",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) MaterialAttribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"type\": \"Chemical\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"measure\": \"Range\",\n    \"UnitOperationId\": 3001,\n    \"MaterialId\": 4001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "MaterialAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit MaterialAttribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"measure\": \"mg/mL\",\n    \"UnitOperationId\": 3001,\n    \"MaterialId\": 4001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "MaterialAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Material Attribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "MaterialAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Material Attribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "MaterialAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Material Attribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "MaterialAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) MaterialAttribute",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"type\": \"Chemical\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"measure\": \"Range\",\n    \"UnitOperationId\": 3001,\n    \"MaterialId\": 4001,\n    \"capabilityJustification\": \"Example\",\n    \"detectabilityJustification\": \"Example\",\n    \"controlStrategy\": \"[\\\"Not Required\\\"]\",\n    \"description\": \"Example\",\n    \"MaterialAttributeToFPAs\": [\n        {}\n    ],\n    \"MaterialAttributeToFQAs\":[\n        {}\n    ],\n    \"MaterialAttributeToIPAs\": [\n        {}\n    ],\n    \"MaterialAttributeToIQAs\": [\n        {}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "MaterialAttribute",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Unit Op",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": 3879,\r\n    \"name\": \"New Name\",\r\n    \"ProjectId\": 1001,\r\n    \"ProcessId\": 2001\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "UnitOperation",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) UnitOperation",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "UnitOperation",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit UnitOperation",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "UnitOperation",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Unit Op",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "UnitOperation",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Unit Op",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "UnitOperation",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Unit Op",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "UnitOperation",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) UnitOperation",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"description\": \"Example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "UnitOperation",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Create Control Method",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "ControlMethod",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) ControlMethod",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"type\": \"Biological\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ControlMethod",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit ControlMethod",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"type\": \"Example Type\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ControlMethod",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Control Method",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ControlMethod",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Control Method",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ControlMethod",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Control Method",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ControlMethod",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) ControlMethod",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"type\": \"Biological\",\n    \"description\": \"Example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ControlMethod",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Sample",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "Sample",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Sample",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"UnitOperationId\": 3001,\n    \"amount\": 10,\n    \"amountUnit\": \"kg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Sample",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Sample",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"UnitOperationId\": 3001,\n    \"amount\": 10,\n    \"amountUnit\": \"kg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Sample",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Sample",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Sample",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Sample",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Sample",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Sample",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Sample",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Sample",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"UnitOperationId\": 3001,\n    \"amount\": 10,\n    \"amountUnit\": \"kg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Sample",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Step",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "Step",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Step",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"UnitOperationId\": 1,\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Step",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Step",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Step",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Step",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Step",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Step",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Step",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Step",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Step",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Step",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"UnitOperationId\": 3001,\n    \"description\": \"Example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Step",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Process Param",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "ProcessParameter",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) ProcessParameter",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"UnitOperationId\": 3001,\n    \"MaterialId\": 4001,\n    \"measure\": \"Range\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessParameter",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit ProcessParameter",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"UnitOperationId\": 3001,\n    \"MaterialId\": 4001,\n    \"measure\": \"mg/mL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessParameter",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Process Param",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessParameter",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Process Param",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessParameter",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Process Param",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessParameter",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) ProcessParameter",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"UnitOperationId\": 3001,\n    \"MaterialId\": 4001,\n    \"measure\": \"mg/mL\",\n    \"capabilityJustification\": \"Example\",\n    \"detectabilityJustification\": \"Example\",\n    \"controlStrategy\": \"[\\\"Not Required\\\"]\",\n    \"description\": \"Example\",\n    \"ProcessParameterToFPAs\": [\n        {}\n    ],\n    \"ProcessParameterToFQAs\":[\n        {}\n    ],\n    \"ProcessParameterToIPAs\": [\n        {}\n    ],\n    \"ProcessParameterToIQAs\": [\n        {}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessParameter",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Process",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "Process",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Process",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Process",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Process",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Process",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Process",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Process",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Process",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Process",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Process",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Process",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Process",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"description\": \"Example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Process",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Process Component",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "ProcessComponent",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) ProcessComponent",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Equipment\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessComponent",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit ProcessComponent",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Example Type\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessComponent",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Process Component",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessComponent",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Process Component",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessComponent",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Process Component",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessComponent",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) ProcessComponent",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Equipment\",\n    \"function\": \"Example Function\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "ProcessComponent",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit TPP",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"ProjectId\": 209,\n    \"name\": \"name\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "TPPSection",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) TPPSection",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "TPPSection",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) TPPSection Copy",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "TPPSection",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit TPPSection",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "TPPSection",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve TPP",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "TPPSection",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive TPP",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "TPPSection",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore TPP",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "TPPSection",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit FQA",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "FQA",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) FQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"type\": \"Physical\",\n    \"scope\": \"[\\\"Drug Substance\\\"]\",\n    \"category\": \"[\\\"Device\\\"]\",\n    \"measure\": \"Range\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit FQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"type\": \"Example Type\",\n    \"scope\": \"Commercial\",\n    \"category\": \"Example Category\",\n    \"measure\": \"mg/mL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve FQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive FQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore FQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) FQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"type\": \"Physical\",\n    \"scope\": \"[\\\"Drug Substance\\\"]\",\n    \"category\": \"[\\\"Device\\\"]\",\n    \"measure\": \"Range\",\n    \"description\": \"Example\",\n    \"capabilityJustification\": \"Example\",\n    \"detectabilityJustification\": \"Example\",\n    \"controlStrategy\": \"[\\\"Not Required\\\"]\",\n    \"FQAToGeneralAttributeRisks\": [\n        {}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit IQA",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "IQA",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) IQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Microbiological\",\n    \"measure\": \"Range\",\n    \"UnitOperationId\": 3001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit IQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Example Type\",\n    \"UnitOperationId\": 3001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve IQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive IQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore IQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) IQA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Microbiological\",\n    \"UnitOperationId\": 3001,\n    \"measure\": \"Range\",\n    \"capabilityJustification\": \"Example\",\n    \"detectabilityJustification\": \"Example\",\n    \"controlStrategy\": \"[\\\"Not Required\\\"]\",\n    \"description\": \"Example\",\n    \"IQAToFPAs\": [\n        {}\n    ],\n    \"IQAToFQAs\":[\n        {}\n    ],\n    \"IQAToIPAs\": [\n        {}\n    ],\n    \"IQAToIQAs\": [\n        {}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IQA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit IPA",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "IPA",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) IPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Chemical\",\n    \"measure\": \"Range\",\n    \"UnitOperationId\": 3001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit IPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Example Type\",\n    \"UnitOperationId\": 3001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve IPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive IPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore IPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) IPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001,\n    \"type\": \"Chemical\",\n    \"UnitOperationId\": 3001,\n    \"measure\": \"Range\",\n    \"capabilityJustification\": \"Example\",\n    \"detectabilityJustification\": \"Example\",\n    \"controlStrategy\": \"[\\\"Not Required\\\"]\",\n    \"description\": \"Example\",\n    \"IPAToFPAs\": [\n        {}\n    ],\n    \"IPAToFQAs\":[\n        {}\n    ],\n    \"IPAToIPAs\": [\n        {}\n    ],\n    \"IPAToIQAs\": [\n        {}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "IPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit FPA",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "FPA",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) FPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"type\": \"Biological\",\n    \"scope\": \"[\\\"Drug Substance\\\"]\",\n    \"measure\": \"Range\",\n    \"category\": \"[\\\"Device\\\"]\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit FPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"type\": \"Example Type\",\n    \"scope\": \"Commercial\",\n    \"category\": \"Example Category\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve FPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive FPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore FPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) FPA",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"type\": \"Biological\",\n    \"scope\": \"[\\\"Drug Substance\\\"]\",\n    \"category\": \"[\\\"Device\\\"]\",\n    \"measure\": \"Range\",\n    \"description\": \"Example\",\n    \"capabilityJustification\": \"Example\",\n    \"detectabilityJustification\": \"Example\",\n    \"controlStrategy\": \"[\\\"Not Required\\\"]\",\n    \"FPAToGeneralAttributeRisks\": [\n        {}\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "FPA",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Project",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"New Test Proj\",\r\n    \"customProjectId\": \"NewTestProj1\",\r\n    \"type\": \"Drug Product\",\r\n    \"category\":\"Peptide\",\r\n    \"RMPId\": 2\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "Project",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Project",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customProjectId\": \"PRJ-1001\",\n    \"name\": \"Project Name\",\n    \"type\": \"Raw Material\",\n    \"category\": \"Peptide\",\n    \"RMPId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Project",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Project",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"customProjectId\": \"PRJ-1001\",\n    \"type\": \"Example Type\",\n    \"category\": \"Example Category\",\n    \"RMPId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Project",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Project",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Project",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Project",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Project",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Project",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Project",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Project",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customProjectId\": \"PRJ-1001\",\n    \"name\": \"Project Name\",\n    \"type\": \"Raw Material\",\n    \"category\": \"Peptide\",\n    \"classification\": \"Product\",\n    \"RMPId\": 2,\n    \"purposeAndScope\": \"Example\",\n    \"qualityByDesignPhase\": \"Phase 1\",\n    \"cmcPhase\": \"Phase 1\",\n    \"projectSponsorId\": 1,\n    \"projectManagerId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Project",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Batch",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "Batch",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Batch",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customID\": \"BATCH-001\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Batch",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Batch",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"customID\": \"BATCH-001\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Batch",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Batch",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Batch",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Batch",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Batch",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Batch",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Batch",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Batch",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customID\": \"BATCH-001\",\n    \"ProjectId\": 1001,\n    \"ProcessId\": 2001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "Batch",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit User",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/User/addOrEdit",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "User",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create User (minimum required fields)",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"John\",\r\n    \"lastName\": \"Smith\",\r\n    \"email\": \"JohnSmith123@outlook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/User/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "User",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": null
+        },
+        {
+          "name": "Edit User",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 1625,\r\n    \"firstName\": \"John\",\r\n    \"lastName\": \"Smith\",\r\n    \"email\": \"JohnSmith123@outlook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/User/addOrEdit",
+              "protocol": "https",
+              "host": [
+                "api",
+                "sandbox",
+                "qbdvision",
+                "com"
+              ],
+              "path": [
+                "sandbox",
+                "editables",
+                "User",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "",
+          "header": [],
+          "cookie": [
+            {
+              "expires": "Invalid Date",
+              "domain": "",
+              "path": ""
+            }
+          ],
+          "body": ""
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "qbdvision-api-key",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

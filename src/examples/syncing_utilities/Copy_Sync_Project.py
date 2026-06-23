@@ -46,7 +46,7 @@ logger = logging.getLogger("qbd_copy_project_only")
 # --------------------- ALLOWED FIELDS ---------------------
 ID_MAP_FILE = "project_id_map.json"
 ALLOWED_PROJECT_FIELDS = [
-    "name", "customProjectId", "type", "category", "links",
+    "name", "customProjectId", "type", "category", "classification", "links",
     "purposeAndScope", "objectives", "purposeLinks", "qualityByDesignPhase",
     "cmcPhase", "validationPhase", "dosageForm", "routeOfAdministration",
     "regulatoryPath", "regulatoryPhase", "referenceListedDrug",

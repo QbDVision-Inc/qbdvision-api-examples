@@ -1,0 +1,240 @@
+{
+  "info": {
+    "_postman_id": "f77ef70d-7eaa-4593-bbcc-80eb5bd6ba23",
+    "name": "Miscellaneous",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48544170"
+  },
+  "item": [
+    {
+      "name": "Process Explorer",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/processExplorer/{projectId}",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "processExplorer",
+            "{projectId}"
+          ],
+          "query": [
+            {
+              "key": "processId",
+              "value": "{processId}",
+              "description": "Scope query to a specific process ",
+              "disabled": true
+            },
+            {
+              "key": "shouldCompress",
+              "value": "false",
+              "description": "Returns uncompressed result",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "approvedOnly",
+              "value": "true",
+              "description": "Return the latest approved version of records. Records without any approved version will not be returned.",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "outputFormat",
+              "value": "JSON",
+              "description": "Response is formatted in JSON. This is default.",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "tagging",
+              "value": "true",
+              "description": "When using the \"standard=ISA=95\", enables support for tags in the integration mapping system",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Health Check",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/checkSystem",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "checkSystem"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ISA-88 Import",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<Recipe>\r\n    <GeneralRecipe>\r\n        <Header>\r\n            <ProductID>A-mAb Case Study (DS/DP)</ProductID>\r\n            <ProductName>A-mAb Case Study (DS/DP)</ProductName>\r\n        </Header>\r\n        <RecipeElement>\r\n            <ID>Default Process</ID>\r\n            <RecipeElementType>procedure</RecipeElementType>\r\n            <RecipeElement>\r\n                <ID>N-21 (Thaw)</ID>\r\n                <RecipeElementType>unit_procedure</RecipeElementType>\r\n                <Parameter>\r\n                    <ID>Medium Equilibration Time</ID>\r\n                    <Description>N/A </Description>\r\n                    <ParameterType>ProcessParameter</ParameterType>\r\n                    <Value>\r\n                        <ValueString>1.0 </ValueString>\r\n                        <UnitOfMeasure>Hours </UnitOfMeasure>\r\n                        <Limit>\r\n                            <LimitType>Recipe</LimitType>\r\n                            <LoLimit>0.5</LoLimit>\r\n                            <HiLimit>72.0</HiLimit>\r\n                        </Limit>\r\n                    </Value>\r\n                </Parameter>\r\n                <EquipmentElement>\r\n                    <ID>1M Sodium Carbonate</ID> <!-- Unique identifier for this process element.\r\n                    This will map to the name of the Material/Process Component in QbDVision.\r\n                    (Required by QbDVision) -->\r\n                    <Description>Titrant</Description> <!-- Description of the Material / Process\r\n                    Component-->\r\n                    <EquipmentElementType OtherValue=\"PRC\">Other</EquipmentElementType> <!-- Type of\r\n                    element Material/ Process Component, MT for material and PRC for process\r\n                    component (Required by QbDVision)-->\r\n                    <!-- Property objects to hold the properties of the Material/Process component,\r\n                    Some of these objects are enums and have to hold a correct value from this enum\r\n                    to be imported-->\r\n                    <Property>\r\n                        <ID>Use</ID> <!--This\r\n                        field will map to the name of the property that needs to be added/modified\r\n                        (Required by QbDVision)-->\r\n                        <Description></Description>\r\n                        <Value>\r\n                            <ValueString>DS/DP</ValueString> <!-- This is the value of the property\r\n                            (Required by QbDVision) -->\r\n                            <UnitOfMeasure></UnitOfMeasure> <!-- This is going to be ignored by\r\n                            QbDVision for Materials/Proces Components-->\r\n                        </Value>\r\n                    </Property>\r\n                    <Property>\r\n                        <ID>GMP</ID>\r\n                        <Description></Description>\r\n                        <Value>\r\n                            <ValueString>false</ValueString>\r\n                            <UnitOfMeasure></UnitOfMeasure>\r\n                        </Value>\r\n                    </Property>\r\n                </EquipmentElement>\r\n                <RecipeElement>\r\n                    <ID>Equilibrate Media</ID>\r\n                    <RecipeElementType>operation</RecipeElementType>\r\n                    <Parameter>\r\n                        <ID>Medium Equilibration Time2</ID>\r\n                        <Description>N/A </Description>\r\n                        <ParameterType>ProcessParameter</ParameterType>\r\n                        <Value>\r\n                            <ValueString>1.0 </ValueString>\r\n                            <UnitOfMeasure>Hours </UnitOfMeasure>\r\n                            <Limit>\r\n                                <LimitType>Recipe</LimitType>\r\n                                <LoLimit>0.5</LoLimit>\r\n                                <HiLimit>72.0</HiLimit>\r\n                            </Limit>\r\n                        </Value>\r\n                    </Parameter>\r\n                    <EquipmentElement>\r\n                        <ID>1M Sodium Carbonate2</ID> <!-- Unique identifier for this process\r\n                        element. This will map to the name of the Material/Process Component in\r\n                        QbDVision. (Required by QbDVision) -->\r\n                        <Description>Titrant</Description> <!-- Description of the Material / Process\r\n                        Component-->\r\n                        <EquipmentElementType OtherValue=\"PRC\">Other</EquipmentElementType> <!-- Type\r\n                        of element Material/ Process Component, MT for material and PRC for process\r\n                        component (Required by QbDVision)-->\r\n                        <!-- Property objects to hold the properties of the Material/Process\r\n                        component, Some of these objects are enums and have to hold a correct value\r\n                        from this enum to be imported-->\r\n                        <Property>\r\n                            <ID>Use</ID> <!--This\r\n                            field will map to the name of the property that needs to be\r\n                            added/modified (Required by QbDVision)-->\r\n                            <Description></Description>\r\n                            <Value>\r\n                                <ValueString>DS/DP</ValueString> <!-- This is the value of the\r\n                                property (Required by QbDVision) -->\r\n                                <UnitOfMeasure></UnitOfMeasure> <!-- This is going to be ignored by\r\n                                QbDVision for Materials/Proces Components-->\r\n                            </Value>\r\n                        </Property>\r\n                        <Property>\r\n                            <ID>GMP</ID>\r\n                            <Description></Description>\r\n                            <Value>\r\n                                <ValueString>false</ValueString>\r\n                                <UnitOfMeasure></UnitOfMeasure>\r\n                            </Value>\r\n                        </Property>\r\n                    </EquipmentElement>\r\n                </RecipeElement>\r\n            </RecipeElement>\r\n        </RecipeElement>\r\n    </GeneralRecipe>\r\n</Recipe>",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/import/ISA/import",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "import",
+            "ISA",
+            "import"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Multiple Records",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/multiple/list/{projectId}",
+          "protocol": "https",
+          "host": [
+            "api",
+            "sandbox",
+            "qbdvision",
+            "com"
+          ],
+          "path": [
+            "sandbox",
+            "editables",
+            "multiple",
+            "list",
+            "{projectId}"
+          ],
+          "query": [
+            {
+              "key": "returnLatestApprovedOrDraftVersionsOnly",
+              "value": "true",
+              "description": "Returns latest approved version. If no approved version exists, returns current draft.",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "includeHistory",
+              "value": "true",
+              "description": "Includes all the versions for the retrieved record.",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "qbdvision-api-key",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
