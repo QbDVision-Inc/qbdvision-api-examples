@@ -2,7 +2,7 @@
 
 Utilities for copying or syncing QbDVision project-level data and process-level data from a source environment into a target environment.
 
-Syncs the most recently approved version of records. If no approved version exists, uses the current draft.
+Syncs the most recent version of records regardless of approval status
 
 These utilities are provided "as is" - and no support from QbDVision will be provided.
 
