@@ -12,6 +12,7 @@ unit ops, steps, and flows and to avoid copying source-environment IDs.
 import json
 import logging
 import re
+import uuid
 from dataclasses import dataclass
 from typing import List
 from collections import Counter
@@ -93,7 +94,7 @@ ALLOWED_STEP_FIELDS = [
     "name", "description", "links", "tags"
 ]
 ALLOWED_STEP_WORK_INSTRUCTION_FIELDS = [
-    "uuid", "description", "recordOrder"
+    "description", "recordOrder"
 ]
 ALLOWED_PROCESS_PARAMETER_FIELDS = [
     "name", "type", "description", "potentialFailureModes", "scaleDependent",
@@ -1090,35 +1091,79 @@ def remap_html_record_ids(html_value, record_id_maps: dict) -> str:
 
     return HTML_TAG_RE.sub(_remap_tag, html_value)
 
-def target_work_instruction_lookups(work_instructions) -> tuple[dict, dict]:
+def work_instruction_fallback_key(item: dict) -> tuple:
+    return (
+        normalize(item.get("recordOrder")),
+        strip_html_record_ids(item.get("description")),
+    )
+
+def target_work_instruction_lookups(
+    work_instructions,
+) -> tuple[dict, dict, dict]:
     active = active_step_work_instructions(work_instructions) or []
     return (
+        {
+            normalize_id(item["id"]): item
+            for item in active
+            if item.get("id")
+        },
         unique_lookup(active, lambda item: normalize(item.get("uuid"))),
-        unique_lookup(active, lambda item: normalize(item.get("recordOrder"))),
+        unique_lookup(active, work_instruction_fallback_key),
     )
 
 def matching_target_work_instruction(
     source_item: dict,
+    mapped_target_id,
+    target_by_id: dict,
     target_by_uuid: dict,
-    target_by_order: dict,
+    target_by_fallback: dict,
 ) -> dict | None:
+    if mapped_target_id:
+        target_item = target_by_id.get(normalize_id(mapped_target_id))
+        if target_item:
+            return target_item
+
+    # Legacy adoption path for instructions copied before target-ID mappings
+    # were persisted. Source UUIDs are never written to new target records.
     source_uuid = normalize(source_item.get("uuid"))
     if source_uuid is not None and source_uuid in target_by_uuid:
         return target_by_uuid[source_uuid]
-    return target_by_order.get(normalize(source_item.get("recordOrder")))
+    return target_by_fallback.get(work_instruction_fallback_key(source_item))
+
+def generate_target_work_instruction_uuid(used_uuids: set) -> str:
+    while True:
+        candidate = str(uuid.uuid4())
+        if candidate not in used_uuids:
+            used_uuids.add(candidate)
+            return candidate
 
 def build_step_work_instructions_payload(
     source_work_instructions,
     target_work_instructions,
     target_step_id: int,
     record_id_maps: dict,
-) -> list:
-    target_by_uuid, target_by_order = target_work_instruction_lookups(
+    source_to_target_ids: dict,
+) -> tuple[list, dict]:
+    target_by_id, target_by_uuid, target_by_fallback = target_work_instruction_lookups(
         target_work_instructions
     )
+    used_target_ids = set()
+    used_target_uuids = {
+        str(item.get("uuid"))
+        for item in target_work_instructions
+        if item.get("uuid")
+    }
     payload = []
+    target_uuid_by_source_id = {}
 
     for source_item in active_step_work_instructions(source_work_instructions) or []:
+        source_instruction_id = source_item.get("id")
+        if not source_instruction_id:
+            raise ValueError(
+                f"Step {source_item.get('StepId')} Work Instruction is missing id"
+            )
+        source_key = str(source_instruction_id)
+
         item = {
             field: source_item.get(field)
             for field in ALLOWED_STEP_WORK_INSTRUCTION_FIELDS
@@ -1131,28 +1176,90 @@ def build_step_work_instructions_payload(
             )
         item["StepId"] = target_step_id
 
+        mapped_target_id = map_lookup(
+            source_to_target_ids,
+            source_instruction_id,
+        )
         target_item = matching_target_work_instruction(
             source_item,
+            mapped_target_id,
+            target_by_id,
             target_by_uuid,
-            target_by_order,
+            target_by_fallback,
         )
+        if target_item and target_item.get("id") in used_target_ids:
+            target_item = None
+
         if target_item and target_item.get("id"):
-            item["id"] = target_item["id"]
+            target_id = target_item["id"]
+            used_target_ids.add(target_id)
+            source_to_target_ids[source_key] = target_id
+            item["id"] = target_id
+        else:
+            source_to_target_ids.pop(source_key, None)
+
+        target_uuid = target_item.get("uuid") if target_item else None
+        source_uuid = source_item.get("uuid")
+        if not target_uuid or normalize(target_uuid) == normalize(source_uuid):
+            target_uuid = generate_target_work_instruction_uuid(
+                used_target_uuids
+            )
+        else:
+            used_target_uuids.add(str(target_uuid))
+
+        item["uuid"] = target_uuid
+        target_uuid_by_source_id[source_key] = target_uuid
 
         payload.append(item)
 
-    return sorted(payload, key=work_instruction_sort_key)
+    return (
+        sorted(payload, key=work_instruction_sort_key),
+        target_uuid_by_source_id,
+    )
 
 def normalize_step_work_instructions_for_compare(work_instructions) -> list:
     active = active_step_work_instructions(work_instructions) or []
     normalized = [
         {
+            "uuid": normalize(item.get("uuid")),
             "description": strip_html_record_ids(item.get("description")),
             "recordOrder": normalize(item.get("recordOrder")),
         }
         for item in active
     ]
     return sorted(normalized, key=work_instruction_sort_key)
+
+def update_step_work_instruction_id_mapping(
+    source_to_target_ids: dict,
+    target_uuid_by_source_id: dict,
+    target_work_instructions,
+) -> None:
+    target_by_uuid = unique_lookup(
+        active_step_work_instructions(target_work_instructions) or [],
+        lambda item: normalize(item.get("uuid")),
+    )
+    for source_id, target_uuid in target_uuid_by_source_id.items():
+        target_item = target_by_uuid.get(normalize(target_uuid))
+        if target_item and target_item.get("id"):
+            source_to_target_ids[source_id] = target_item["id"]
+        else:
+            logger.warning(
+                "Could not capture target Work Instruction id for source Work Instruction %s",
+                source_id,
+            )
+
+def prune_step_work_instruction_id_mapping(
+    source_to_target_ids: dict,
+    source_work_instructions,
+) -> None:
+    active_source_ids = {
+        str(item["id"])
+        for item in source_work_instructions
+        if item.get("id")
+    }
+    for source_id in list(source_to_target_ids):
+        if str(source_id) not in active_source_ids:
+            source_to_target_ids.pop(source_id, None)
 
 def sync_step_work_instructions(
     *,
@@ -1161,6 +1268,7 @@ def sync_step_work_instructions(
     tgt_client: QbdApiClient,
     writer: SyncWriter,
     record_id_maps: dict,
+    work_instruction_mappings: dict,
 ) -> dict:
     stats = {"updated": 0, "unchanged": 0, "skipped": 0}
 
@@ -1185,6 +1293,15 @@ def sync_step_work_instructions(
             stats["skipped"] += 1
             continue
 
+        step_mapping_key = str(source_step_id)
+        source_to_target_ids = work_instruction_mappings.setdefault(
+            step_mapping_key,
+            {},
+        )
+        if not isinstance(source_to_target_ids, dict):
+            source_to_target_ids = {}
+            work_instruction_mappings[step_mapping_key] = source_to_target_ids
+
         target_step = tgt_client.get_record("Step", target_step_id)
         if not target_step or is_archived(target_step):
             logger.warning(
@@ -1205,11 +1322,15 @@ def sync_step_work_instructions(
             stats["skipped"] += 1
             continue
 
-        desired_work_instructions = build_step_work_instructions_payload(
+        (
+            desired_work_instructions,
+            target_uuid_by_source_id,
+        ) = build_step_work_instructions_payload(
             source_work_instructions,
             target_work_instructions,
             target_step_id,
             record_id_maps,
+            source_to_target_ids,
         )
         if normalize_step_work_instructions_for_compare(
             desired_work_instructions
@@ -1217,6 +1338,10 @@ def sync_step_work_instructions(
             logger.info(
                 "Step '%s' work instructions unchanged - skipping",
                 target_step.get("name"),
+            )
+            prune_step_work_instruction_id_mapping(
+                source_to_target_ids,
+                source_work_instructions,
             )
             stats["unchanged"] += 1
             continue
@@ -1253,6 +1378,25 @@ def sync_step_work_instructions(
             payload,
             reason="sync Step work instructions",
         )
+        refreshed_target_step = tgt_client.get_record("Step", target_step_id)
+        refreshed_work_instructions = active_step_work_instructions(
+            refreshed_target_step.get("StepToWorkInstructions", [])
+        )
+        if refreshed_work_instructions is None:
+            logger.warning(
+                "Could not refresh StepToWorkInstructions for target Step %s",
+                target_step_id,
+            )
+        else:
+            update_step_work_instruction_id_mapping(
+                source_to_target_ids,
+                target_uuid_by_source_id,
+                refreshed_work_instructions,
+            )
+            prune_step_work_instruction_id_mapping(
+                source_to_target_ids,
+                source_work_instructions,
+            )
         stats["updated"] += 1
 
     return stats
@@ -3954,6 +4098,7 @@ def sync_step_work_instruction_mappings(
     writer: SyncWriter,
     mappings: dict,
     tgt_process_id: int,
+    proc_entry: dict,
 ):
     record_id_maps = dict(mappings)
     record_id_maps["Project"] = {
@@ -3962,6 +4107,13 @@ def sync_step_work_instruction_mappings(
     record_id_maps["Process"] = {
         config.src_process_id: tgt_process_id,
     }
+    work_instruction_mappings = proc_entry.setdefault(
+        "stepWorkInstructions",
+        {},
+    )
+    if not isinstance(work_instruction_mappings, dict):
+        work_instruction_mappings = {}
+        proc_entry["stepWorkInstructions"] = work_instruction_mappings
 
     sync_step_work_instructions(
         records=mappings["Step"],
@@ -3969,6 +4121,7 @@ def sync_step_work_instruction_mappings(
         tgt_client=config.tgt_client,
         writer=writer,
         record_id_maps=record_id_maps,
+        work_instruction_mappings=work_instruction_mappings,
     )
 
 def copy_process(config: SyncConfig):
@@ -3988,7 +4141,13 @@ def copy_process(config: SyncConfig):
         sync_drug_mappings(config, writer, mappings, tgt_process_id)
         sync_supplier_mappings(config, writer, mappings, tgt_process_id)
         sync_process_site_mappings(config, writer, tgt_process_id)
-        sync_step_work_instruction_mappings(config, writer, mappings, tgt_process_id)
+        sync_step_work_instruction_mappings(
+            config,
+            writer,
+            mappings,
+            tgt_process_id,
+            proc_entry,
+        )
     finally:
         save_id_map(id_map)
 # --------------------- MAIN ---------------------
