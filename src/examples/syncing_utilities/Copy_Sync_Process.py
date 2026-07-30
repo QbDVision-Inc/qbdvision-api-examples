@@ -13,7 +13,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass
-from typing import Dict, Any, List
+from typing import List
 from collections import Counter
 
 import requests
