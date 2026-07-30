@@ -171,6 +171,7 @@ Key behaviors:
 - Relies on project-level entities already existing in the target.
 - Syncs risk links after records are created.
 - Syncs supplier IDs for Materials and Process Components at the end.
+- Remaps sites references on process records by site name and creates missing sites.
 
 ## Generated Files
 

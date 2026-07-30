@@ -4,15 +4,16 @@ Copies a single Process and its Unit Operations, Steps, Process Params, Material
 Also handles DS / DP flows
 from a source project into an existing target project.
 
-Does NOT sync the supplier list between environments. SupplierId for Materials and Process Components is remapped
-by supplier name (create if missing). These are synced at the very end, after records are created - to preserve
-unit ops, steps, and flows.
+Does NOT sync the supplier or site lists between environments. SupplierId for Processes, Unit Operations, Materials, and Process Components
+and Sites for Processes are remapped by name (create if missing). These are synced at the very end, after records are created - to preserve
+unit ops, steps, and flows and to avoid copying source-environment IDs.
 
 Smart Content fields are not synced
 """
 
 import json
 import logging
+import re
 from dataclasses import dataclass
 from typing import Dict, Any, List
 from collections import Counter
@@ -68,7 +69,7 @@ ALLOWED_MATERIAL_FIELDS = [
     "chemicalStructure", "molecularWeight",
     "chemicalNameIUPAC", "otherNames", "innUsan", "casRegistryNumber",
     "compendialStandard", "certificateOfAnalysis",
-    "propertiesLinks", "referencesLinks"
+    "propertiesLinks", "referencesLinks", "tags"
 ]
 ALLOWED_MATERIAL_ATTRIBUTE_FIELDS = [
     "name", "ProcessId", "UnitOperationId", "ProcessComponentId", "StepId", "MaterialId",
@@ -77,7 +78,7 @@ ALLOWED_MATERIAL_ATTRIBUTE_FIELDS = [
     "measurementUnits", "targetJustification", "ControlMethods", "samplingPlan", "acceptanceCriteriaLinks", "AcceptanceCriteriaRanges",
     "capabilityRisk", "estimatedSampleSize", "capabilityJustification", "detectabilityRisk",
     "detectabilityJustification", "controlStrategy", "ccp", "controlStrategyJustification",
-    "riskControlLinks", "referencesLinks", "impact", "riskAssessmentMethod"
+    "riskControlLinks", "referencesLinks", "impact", "riskAssessmentMethod", "tags"
 ]
 ALLOWED_PROCESS_FIELDS = [
     "name", "description", "site", "gmp",
@@ -85,13 +86,13 @@ ALLOWED_PROCESS_FIELDS = [
 ]
 ALLOWED_UNIT_OPERATION_FIELDS = [
     "name", "description", "risk", "input",
-    "output", "links", "order"
+    "output", "links", "order", "tags"
 ]
 ALLOWED_TIMEPOINT_FIELDS = [
     "name", "recordOrder"
 ]
 ALLOWED_STEP_FIELDS = [
-    "name", "description", "links"
+    "name", "description", "links", "tags"
 ]
 ALLOWED_PROCESS_PARAMETER_FIELDS = [
     "name", "type", "description", "potentialFailureModes", "scaleDependent",
@@ -100,7 +101,7 @@ ALLOWED_PROCESS_PARAMETER_FIELDS = [
     "measurementUnits", "targetJustification", "samplingPlan", "lowerOperatingLimit",
     "upperOperatingLimit", "acceptanceCriteriaLinks", "AcceptanceCriteriaRanges",
     "capabilityRisk", "capabilityJustification", "estimatedSampleSize", "detectabilityRisk", "detectabilityJustification",
-    "ccp", "controlStrategy", "controlStrategyJustification", "riskControlLinks", "referencesLinks", "impact", "riskAssessmentMethod"
+    "ccp", "controlStrategy", "controlStrategyJustification", "riskControlLinks", "referencesLinks", "impact", "riskAssessmentMethod", "tags"
 ]
 ALLOWED_PROCESS_COMPONENT_FIELDS = [
     "name", "type", "function", "description", "certificateOfAnalysis", "links",
@@ -109,14 +110,14 @@ ALLOWED_PROCESS_COMPONENT_FIELDS = [
     "qualificationStatus", "calibration", "unitId", "unitQualificationLinks",
     "drugProductContact", "contactRisk", "contactRiskJustification",
     "cleaningValidation", "sterilizationValidation", "componentRiskLinks",
-    "referencesLinks"
+    "referencesLinks", "tags"
 ]
 ALLOWED_IQA_FIELDS = [
     "name", "type", "description", "recommendedActions", "riskLinks", "dataSpace", "measure",
     "group", "label", "lowerLimit", "target", "upperLimit", "measurementUnits", "targetJustification", "samplingPlan", "acceptanceCriteriaLinks",
     "AcceptanceCriteriaRanges", "estimatedSampleSize", "capabilityRisk", "capabilityJustification",
     "detectabilityJustification", "detectabilityRisk", "controlStrategy", "controlStrategyJustification", "ccp",
-    "riskControlLinks", "referencesLinks", "ControlMethods", "impact", "riskAssessmentMethod"
+    "riskControlLinks", "referencesLinks", "ControlMethods", "impact", "riskAssessmentMethod", "tags"
 ]
 ALLOWED_IPA_FIELDS = [
     "name", "type", "description", "recommendedActions", "dataSpace", "measure",
@@ -124,7 +125,7 @@ ALLOWED_IPA_FIELDS = [
     "measurementUnits", "targetJustification", "samplingPlan", "acceptanceCriteriaLinks", "AcceptanceCriteriaRanges",
     "estimatedSampleSize", "capabilityRisk", "capabilityJustification", "detectabilityJustification",
     "detectabilityRisk", "controlStrategy", "controlStrategyJustification", "ccp",
-    "riskControlLinks", "referencesLinks", "ControlMethods", "impact", "riskAssessmentMethod"
+    "riskControlLinks", "referencesLinks", "ControlMethods", "impact", "riskAssessmentMethod", "tags"
 ]
 ALLOWED_SAMPLE_FIELDS = [
     "name", "type", "description", "ProcessId", "StepId", "MaterialId", "UnitOperationId", "MatrixMaterialId",
@@ -132,7 +133,7 @@ ALLOWED_SAMPLE_FIELDS = [
     "storageCondition", "conditionUnit", "storageDuration", "durationUnit",
     "destination", "testingSite", "sampleLabel", "sampleCode", "documentCode",
     "internalName", "externalName", "sampleSpecificationsLinks",
-    "sampleLogisticsLinks", "sampleNamesLinks", "referencesLinks"
+    "sampleLogisticsLinks", "sampleNamesLinks", "referencesLinks", "tags"
 ]
 ALLOWED_SUPPLIER_FIELDS = [
     "name", "address", "phone", "website", "servicesOrProducts",
@@ -149,6 +150,9 @@ ALLOWED_SUPPLIER_FIELDS = [
     "qualityContactName", "qualityContactPhone", "qualityContactEmail",
     "qualityContactTitle", "otherContactName", "otherContactPhone",
     "otherContactEmail", "otherContactTitle",
+]
+ALLOWED_SITE_FIELDS = [
+    "name", "description", "links",
 ]
 ACR_FIELDS = [
     "group", "label", "isDefault", "lowerLimit", "target",
@@ -521,10 +525,16 @@ def build_material_flow_relationships(
 ) -> tuple[list, list, list]:
     mapped_flows = []
     for flow in material_flows:
-        tgt_uo_id = map_lookup(uo_mapping, flow.get("UnitOperationId"))
-        tgt_step_id = map_lookup(step_mapping, flow.get("StepId"))
+        src_uo_id = flow.get("UnitOperationId")
+        src_step_id = flow.get("StepId")
+        tgt_uo_id = map_lookup(uo_mapping, src_uo_id)
+        tgt_step_id = map_lookup(step_mapping, src_step_id)
 
-        if not tgt_uo_id and not tgt_step_id:
+        # MaterialFlows remain part of the Material payload. A flow may be
+        # scoped only by ProcessId, with no Unit Operation or Step, and must
+        # still be migrated. Only discard a relationship flow when it references
+        # a source relationship that cannot be mapped.
+        if (src_uo_id is not None or src_step_id is not None) and not tgt_uo_id and not tgt_step_id:
             continue
 
         flow_type = flow.get("flow", "Input")
@@ -550,6 +560,35 @@ def build_material_flow_relationships(
     ]
     return mapped_flows, uos, steps
 # --------------------- PAYLOAD BUILDERS ---------------------
+TAG_RECORD_ID_ATTR_RE = re.compile(r"\s+\bdata-record-id=(['\"])\d+\1", re.IGNORECASE)
+
+def parse_json_list(value) -> list:
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except Exception:
+            return []
+    if value is None:
+        return []
+    return value if isinstance(value, list) else []
+
+def sanitize_tags_for_copy(tags_value) -> str:
+    cleaned = []
+    for tag in parse_json_list(tags_value):
+        if not isinstance(tag, dict):
+            continue
+        out = dict(tag)
+        html_content = out.get("appliesToHtmlContent")
+        if isinstance(html_content, str):
+            out["appliesToHtmlContent"] = TAG_RECORD_ID_ATTR_RE.sub("", html_content)
+        cleaned.append(out)
+    return json.dumps(cleaned)
+
+def add_sanitized_tags(payload: dict, source: dict) -> dict:
+    if "tags" in source:
+        payload["tags"] = sanitize_tags_for_copy(source.get("tags"))
+    return payload
+
 def build_process_payload(src_process: dict, tgt_project_id: int) -> dict:
     return sanitize_payload(src_process, ALLOWED_PROCESS_FIELDS, {"ProjectId": tgt_project_id})
 
@@ -572,7 +611,7 @@ def build_unit_operation_payload(
     extra = {"ProjectId": tgt_project_id, "ProcessId": tgt_process_id}
     if timepoints is not None:
         extra["Timepoints"] = timepoints
-    return sanitize_payload(src_uo, ALLOWED_UNIT_OPERATION_FIELDS, extra)
+    return add_sanitized_tags(sanitize_payload(src_uo, ALLOWED_UNIT_OPERATION_FIELDS, extra), src_uo)
 
 def build_unit_operation_timepoints_update_payload(
     src_uo: dict,
@@ -582,27 +621,33 @@ def build_unit_operation_timepoints_update_payload(
     tgt_process_id: int,
     timepoints: list,
 ) -> dict:
-    return sanitize_payload(
+    return add_sanitized_tags(
+        sanitize_payload(
+            src_uo,
+            ALLOWED_UNIT_OPERATION_FIELDS,
+            {
+                "id": tgt_uo_id,
+                "LastVersionId": last_version_id,
+                "ProjectId": tgt_project_id,
+                "ProcessId": tgt_process_id,
+                "Timepoints": timepoints,
+            },
+        ),
         src_uo,
-        ALLOWED_UNIT_OPERATION_FIELDS,
-        {
-            "id": tgt_uo_id,
-            "LastVersionId": last_version_id,
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "Timepoints": timepoints,
-        },
     )
 
 def build_step_payload(full_src: dict, tgt_project_id: int, tgt_process_id: int, tgt_uo_id: int) -> dict:
-    return sanitize_payload(
+    return add_sanitized_tags(
+        sanitize_payload(
+            full_src,
+            ALLOWED_STEP_FIELDS,
+            {
+                "ProjectId": tgt_project_id,
+                "ProcessId": tgt_process_id,
+                "UnitOperationId": tgt_uo_id,
+            },
+        ),
         full_src,
-        ALLOWED_STEP_FIELDS,
-        {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperationId": tgt_uo_id,
-        },
     )
 
 def build_step_order_payload(tgt_uo: dict, tgt_uo_id: int, new_order: list) -> dict:
@@ -624,15 +669,18 @@ def build_process_component_payload(
     uos: list,
     steps: list,
 ) -> dict:
-    return sanitize_payload(
+    return add_sanitized_tags(
+        sanitize_payload(
+            full_src,
+            ALLOWED_PROCESS_COMPONENT_FIELDS,
+            {
+                "ProjectId": tgt_project_id,
+                "ProcessId": tgt_process_id,
+                "UnitOperations": uos,
+                "Steps": steps,
+            },
+        ),
         full_src,
-        ALLOWED_PROCESS_COMPONENT_FIELDS,
-        {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperations": uos,
-            "Steps": steps,
-        },
     )
 
 def build_material_payload(
@@ -643,16 +691,19 @@ def build_material_payload(
     steps: list,
     material_flows: list,
 ) -> dict:
-    return sanitize_payload(
+    return add_sanitized_tags(
+        sanitize_payload(
+            full_src,
+            ALLOWED_MATERIAL_FIELDS,
+            {
+                "ProjectId": tgt_project_id,
+                "ProcessId": tgt_process_id,
+                "UnitOperations": uos,
+                "Steps": steps,
+                "MaterialFlows": material_flows,
+            },
+        ),
         full_src,
-        ALLOWED_MATERIAL_FIELDS,
-        {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperations": uos,
-            "Steps": steps,
-            "MaterialFlows": material_flows,
-        },
     )
 
 def build_material_attribute_payload(
@@ -665,18 +716,21 @@ def build_material_attribute_payload(
     mat_id: int | None,
     control_methods: list,
 ) -> dict:
-    return sanitize_payload(
+    return add_sanitized_tags(
+        sanitize_payload(
+            full_src,
+            ALLOWED_MATERIAL_ATTRIBUTE_FIELDS,
+            {
+                "ProjectId": tgt_project_id,
+                "ProcessId": tgt_process_id,
+                "UnitOperationId": uo_id,
+                "StepId": step_id,
+                "ProcessComponentId": pc_id,
+                "MaterialId": mat_id,
+                "ControlMethods": control_methods,
+            },
+        ),
         full_src,
-        ALLOWED_MATERIAL_ATTRIBUTE_FIELDS,
-        {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperationId": uo_id,
-            "StepId": step_id,
-            "ProcessComponentId": pc_id,
-            "MaterialId": mat_id,
-            "ControlMethods": control_methods,
-        },
     )
 
 def build_process_parameter_payload(
@@ -699,7 +753,7 @@ def build_process_parameter_payload(
         extra["ProcessComponentId"] = tgt_pc_id
     if tgt_mat_id:
         extra["MaterialId"] = tgt_mat_id
-    return sanitize_payload(full_src, ALLOWED_PROCESS_PARAMETER_FIELDS, extra)
+    return add_sanitized_tags(sanitize_payload(full_src, ALLOWED_PROCESS_PARAMETER_FIELDS, extra), full_src)
 
 def build_iqa_payload(
     full_src: dict,
@@ -709,16 +763,19 @@ def build_iqa_payload(
     tgt_step_id: int | None,
     control_methods: list,
 ) -> dict:
-    return sanitize_payload(
+    return add_sanitized_tags(
+        sanitize_payload(
+            full_src,
+            ALLOWED_IQA_FIELDS,
+            {
+                "ProjectId": tgt_project_id,
+                "ProcessId": tgt_process_id,
+                "UnitOperationId": tgt_uo_id,
+                "StepId": tgt_step_id,
+                "ControlMethods": control_methods,
+            },
+        ),
         full_src,
-        ALLOWED_IQA_FIELDS,
-        {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperationId": tgt_uo_id,
-            "StepId": tgt_step_id,
-            "ControlMethods": control_methods,
-        },
     )
 
 def build_ipa_payload(
@@ -729,16 +786,19 @@ def build_ipa_payload(
     tgt_step_id: int | None,
     control_methods: list,
 ) -> dict:
-    return sanitize_payload(
+    return add_sanitized_tags(
+        sanitize_payload(
+            full_src,
+            ALLOWED_IPA_FIELDS,
+            {
+                "ProjectId": tgt_project_id,
+                "ProcessId": tgt_process_id,
+                "UnitOperationId": tgt_uo_id,
+                "StepId": tgt_step_id,
+                "ControlMethods": control_methods,
+            },
+        ),
         full_src,
-        ALLOWED_IPA_FIELDS,
-        {
-            "ProjectId": tgt_project_id,
-            "ProcessId": tgt_process_id,
-            "UnitOperationId": tgt_uo_id,
-            "StepId": tgt_step_id,
-            "ControlMethods": control_methods,
-        },
     )
 
 def build_sample_payload(
@@ -761,7 +821,7 @@ def build_sample_payload(
     }
     if timepoints is not None:
         extra["Timepoints"] = timepoints
-    return sanitize_payload(full_src, ALLOWED_SAMPLE_FIELDS, extra)
+    return add_sanitized_tags(sanitize_payload(full_src, ALLOWED_SAMPLE_FIELDS, extra), full_src)
 
 def build_process_component_supplier_payload(
     tgt_id: int,
@@ -785,6 +845,24 @@ def build_process_component_supplier_payload(
         "Steps": steps,
         "UnitOperations": uos,
     }
+
+def build_process_supplier_payload(
+    tgt_full: dict,
+    name: str,
+    tgt_project_id: int,
+    tgt_supplier_id: int,
+) -> dict:
+    return sanitize_payload(
+        tgt_full,
+        ALLOWED_PROCESS_FIELDS + ["unitOperationOrder", "Sites"],
+        {
+            "id": tgt_full["id"],
+            "name": name,
+            "ProjectId": tgt_project_id,
+            "SupplierId": tgt_supplier_id,
+            "LastVersionId": tgt_full.get("LastVersionId"),
+        },
+    )
 
 def build_material_supplier_payload(
     tgt_id: int,
@@ -810,6 +888,26 @@ def build_material_supplier_payload(
         "UnitOperations": uos,
         "MaterialFlows": flows,
     }
+
+def build_unit_operation_supplier_payload(
+    tgt_full: dict,
+    name: str,
+    tgt_project_id: int,
+    tgt_process_id: int,
+    tgt_supplier_id: int,
+) -> dict:
+    return sanitize_payload(
+        tgt_full,
+        ALLOWED_UNIT_OPERATION_FIELDS,
+        {
+            "id": tgt_full["id"],
+            "name": name,
+            "ProjectId": tgt_project_id,
+            "ProcessId": tgt_process_id,
+            "SupplierId": tgt_supplier_id,
+            "LastVersionId": tgt_full.get("LastVersionId"),
+        },
+    )
 
 def attach_requirement_payload(payload: dict, requirement_payload: dict | None) -> None:
     if requirement_payload:
@@ -985,7 +1083,7 @@ def normalize_sample_timepoints_for_compare(timepoints) -> list:
         cleaned,
         key=lambda tp: timepoint_sort_key(tp, include_id=True),
     )
-# --------------------- SUPPLIER HELPERS ---------------------
+# --------------------- SUPPLIER & SITE HELPERS ---------------------
 def resolve_target_supplier_id(
     src_client: QbdApiClient,
     tgt_client: QbdApiClient,
@@ -1002,6 +1100,86 @@ def resolve_target_supplier_id(
         ALLOWED_SUPPLIER_FIELDS,
         logger=logger,
     )
+
+def get_target_site_by_name(client: QbdApiClient, name: str) -> int | None:
+    data = client.list_records("Site")
+    sites = data.get("instances") if isinstance(data, dict) else data
+    if not isinstance(sites, list):
+        return None
+
+    for site in sites:
+        if (
+            isinstance(site, dict)
+            and site.get("name") == name
+            and not is_archived(site)
+        ):
+            return site.get("id")
+    return None
+
+def create_target_site(writer: SyncWriter, src_site: dict) -> int:
+    payload = sanitize_payload(src_site, ALLOWED_SITE_FIELDS)
+    if not payload.get("name"):
+        raise ValueError("Site payload missing name")
+
+    site = writer.save_record("Site", payload, reason="create Site")
+    return site["id"]
+
+def resolve_target_site_id(
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_site_id: int,
+    site_cache: dict | None = None,
+) -> int | None:
+    if not src_site_id:
+        return None
+
+    if site_cache is None:
+        site_cache = {}
+    by_id = site_cache.setdefault("by_id", {})
+    by_name = site_cache.setdefault("by_name", {})
+    cache_key = str(src_site_id)
+    if cache_key in by_id:
+        return by_id[cache_key]
+
+    src_site = src_client.get_record("Site", src_site_id)
+    if is_archived(src_site):
+        logger.info(
+            "Skipping archived Site '%s' (%s)",
+            src_site.get("name"),
+            src_site_id,
+        )
+        return None
+
+    name = src_site.get("name") if isinstance(src_site, dict) else None
+    if not name:
+        logger.warning("Site id %s missing name; skipping remap", src_site_id)
+        return None
+
+    if name in by_name:
+        tgt_id = by_name[name]
+    else:
+        tgt_id = get_target_site_by_name(tgt_client, name)
+        if tgt_id:
+            logger.info(
+                "Mapped existing Site '%s': %s -> %s",
+                name,
+                src_site_id,
+                tgt_id,
+            )
+        else:
+            logger.info("Site '%s' not found in target; creating it", name)
+            tgt_id = create_target_site(writer, src_site)
+            logger.info(
+                "Created new Site '%s': %s -> %s",
+                name,
+                src_site_id,
+                tgt_id,
+            )
+        by_name[name] = tgt_id
+
+    by_id[cache_key] = tgt_id
+    return tgt_id
 # --------------------- ID MAP PERSISTENCE ---------------------
 ID_MAP_FILE = "process_id_map.json"
 
@@ -2749,6 +2927,51 @@ def required_list_fields(record: dict, field_names: tuple[str, ...]) -> tuple[di
 def merged_field(src_full: dict, tgt_full: dict, field_name: str):
     return tgt_full.get(field_name) or src_full.get(field_name)
 
+def build_process_supplier_update(
+    src_full: dict,
+    tgt_full: dict,
+    tgt_supplier_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+) -> tuple[dict | None, str | None, str | None]:
+    name_val = merged_field(src_full, tgt_full, "name")
+    if not name_val:
+        return None, tgt_full.get("name"), "missing name"
+
+    return (
+        build_process_supplier_payload(
+            tgt_full,
+            name_val,
+            tgt_project_id,
+            tgt_supplier_id,
+        ),
+        name_val,
+        None,
+    )
+
+def build_unit_operation_supplier_update(
+    src_full: dict,
+    tgt_full: dict,
+    tgt_supplier_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+) -> tuple[dict | None, str | None, str | None]:
+    name_val = merged_field(src_full, tgt_full, "name")
+    if not name_val:
+        return None, tgt_full.get("name"), "missing name"
+
+    return (
+        build_unit_operation_supplier_payload(
+            tgt_full,
+            name_val,
+            tgt_project_id,
+            tgt_process_id,
+            tgt_supplier_id,
+        ),
+        name_val,
+        None,
+    )
+
 def build_process_component_supplier_update(
     src_full: dict,
     tgt_full: dict,
@@ -2927,10 +3150,37 @@ def sync_supplier_ids(
     src_process_id: int,
     tgt_project_id: int,
     tgt_process_id: int,
+    uo_mapping: dict,
     pc_mapping: dict,
     material_mapping: dict,
 ):
     supplier_cache = {"by_id": {}, "by_name": {}}
+    sync_supplier_id_records(
+        record_type="Process",
+        records={src_process_id: tgt_process_id},
+        src_client=src_client,
+        tgt_client=tgt_client,
+        writer=writer,
+        src_project_id=src_project_id,
+        src_process_id=src_process_id,
+        tgt_project_id=tgt_project_id,
+        tgt_process_id=tgt_process_id,
+        supplier_cache=supplier_cache,
+        build_update_payload=build_process_supplier_update,
+    )
+    sync_supplier_id_records(
+        record_type="UnitOperation",
+        records=uo_mapping,
+        src_client=src_client,
+        tgt_client=tgt_client,
+        writer=writer,
+        src_project_id=src_project_id,
+        src_process_id=src_process_id,
+        tgt_project_id=tgt_project_id,
+        tgt_process_id=tgt_process_id,
+        supplier_cache=supplier_cache,
+        build_update_payload=build_unit_operation_supplier_update,
+    )
     sync_supplier_id_records(
         record_type="ProcessComponent",
         records=pc_mapping,
@@ -2957,6 +3207,149 @@ def sync_supplier_ids(
         supplier_cache=supplier_cache,
         build_update_payload=build_material_supplier_update,
     )
+
+# --------------------- PROCESS SITE SYNC ---------------------
+def parse_process_sites(value) -> list | None:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except (TypeError, ValueError):
+            return None
+    return value if isinstance(value, list) else None
+
+def normalized_site_ids(sites) -> list:
+    parsed = parse_process_sites(sites)
+    if parsed is None:
+        return []
+
+    ids = []
+    for site in parsed:
+        site_id = normalize_id(site.get("id")) if isinstance(site, dict) else normalize_id(site)
+        if site_id and site_id not in ids:
+            ids.append(site_id)
+    return sorted(ids, key=str)
+
+def build_process_sites_payload(
+    tgt_full: dict,
+    tgt_project_id: int,
+    mapped_sites: list,
+) -> dict:
+    return sanitize_payload(
+        tgt_full,
+        ALLOWED_PROCESS_FIELDS + ["unitOperationOrder", "SupplierId"],
+        {
+            "id": tgt_full["id"],
+            "ProjectId": tgt_project_id,
+            "Sites": mapped_sites,
+            "LastVersionId": tgt_full.get("LastVersionId"),
+        },
+    )
+
+def sync_process_sites(
+    *,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    src_project_id: int,
+    src_process_id: int,
+    tgt_project_id: int,
+    tgt_process_id: int,
+) -> dict:
+    stats = {"updated": 0, "unchanged": 0, "skipped": 0}
+    src_process = src_client.get_record("Process", src_process_id)
+    src_process = validate_target_scope(
+        src_process,
+        src_project_id,
+        src_process_id,
+        "source Process",
+    )
+    if not src_process or is_archived(src_process):
+        stats["skipped"] += 1
+        logger.info("Skipping Process Sites sync; source Process is missing, out of scope, or archived")
+        return stats
+
+    source_sites = parse_process_sites(src_process.get("Sites"))
+    if source_sites is None:
+        stats["skipped"] += 1
+        logger.warning(
+            "Skipping Process '%s' (%s) Sites sync; source Sites is not a list",
+            src_process.get("name"),
+            src_process_id,
+        )
+        return stats
+
+    mapped_sites = []
+    mapped_ids = set()
+    site_cache = {"by_id": {}, "by_name": {}}
+    for source_site in source_sites:
+        if not isinstance(source_site, dict) or not source_site.get("id"):
+            stats["skipped"] += 1
+            logger.warning(
+                "Skipping Process '%s' (%s) Sites sync; source Site entry has no id: %r",
+                src_process.get("name"),
+                src_process_id,
+                source_site,
+            )
+            return stats
+
+        src_site_id = source_site["id"]
+        tgt_site_id = resolve_target_site_id(
+            src_client,
+            tgt_client,
+            writer,
+            src_site_id,
+            site_cache,
+        )
+        if not tgt_site_id:
+            stats["skipped"] += 1
+            logger.warning(
+                "Skipping Process '%s' (%s) Sites sync; unable to map source Site %s",
+                src_process.get("name"),
+                src_process_id,
+                src_site_id,
+            )
+            return stats
+        if tgt_site_id in mapped_ids:
+            continue
+
+        mapped_sites.append({"id": tgt_site_id})
+        mapped_ids.add(tgt_site_id)
+
+    tgt_process = tgt_client.get_record("Process", tgt_process_id)
+    tgt_process = validate_target_scope(
+        tgt_process,
+        tgt_project_id,
+        tgt_process_id,
+        "target Process",
+    )
+    if not tgt_process or is_archived(tgt_process):
+        stats["skipped"] += 1
+        logger.info("Skipping Process Sites sync; target Process is missing, out of scope, or archived")
+        return stats
+    tgt_process = ensure_full_record("Process", tgt_process, tgt_client)
+
+    if normalized_site_ids(tgt_process.get("Sites")) == normalized_site_ids(mapped_sites):
+        stats["unchanged"] += 1
+        logger.info(
+            "Process '%s' (%s) Sites unchanged (%s) - skipping",
+            tgt_process.get("name"),
+            tgt_process_id,
+            normalized_site_ids(mapped_sites),
+        )
+        return stats
+
+    payload = build_process_sites_payload(tgt_process, tgt_project_id, mapped_sites)
+    logger.info(
+        "Updating Process '%s' (%s) Sites -> %s",
+        tgt_process.get("name"),
+        tgt_process_id,
+        normalized_site_ids(mapped_sites),
+    )
+    writer.save_record("Process", payload, reason="sync Process Sites")
+    stats["updated"] += 1
+    return stats
 # --------------------- MAIN COPY FLOW ---------------------
 def copy_process_record(config: SyncConfig, proc_entry: dict, writer: SyncWriter) -> tuple[dict, int | None]:
     src_project_id = config.src_project_id
@@ -3295,8 +3688,20 @@ def sync_supplier_mappings(config: SyncConfig, writer: SyncWriter, mappings: dic
         src_process_id=config.src_process_id,
         tgt_project_id=config.tgt_project_id,
         tgt_process_id=tgt_process_id,
+        uo_mapping=mappings["UnitOperation"],
         pc_mapping=mappings["ProcessComponent"],
         material_mapping=mappings["Material"],
+    )
+
+def sync_process_site_mappings(config: SyncConfig, writer: SyncWriter, tgt_process_id: int):
+    sync_process_sites(
+        src_client=config.src_client,
+        tgt_client=config.tgt_client,
+        writer=writer,
+        src_project_id=config.src_project_id,
+        src_process_id=config.src_process_id,
+        tgt_project_id=config.tgt_project_id,
+        tgt_process_id=tgt_process_id,
     )
 
 def copy_process(config: SyncConfig):
@@ -3315,6 +3720,7 @@ def copy_process(config: SyncConfig):
         sync_relationship_links(config, writer, mappings)
         sync_drug_mappings(config, writer, mappings, tgt_process_id)
         sync_supplier_mappings(config, writer, mappings, tgt_process_id)
+        sync_process_site_mappings(config, writer, tgt_process_id)
     finally:
         save_id_map(id_map)
 # --------------------- MAIN ---------------------
