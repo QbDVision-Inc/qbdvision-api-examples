@@ -7,7 +7,7 @@ you can run this again and it will continue.
 We do NOT sync the supplier list between environments, so ControlMethod.SupplierId
 is remapped by supplier name (create if missing) much like the RMP.
 
-Smart Content and User fields are not synced
+User fields are not synced
 
 You may end up with more TPPs and GAs in the target if any of the defaults are archived in the source.
 This does not handle archiving records in the target.

@@ -172,6 +172,8 @@ Key behaviors:
 - Syncs risk links after records are created.
 - Syncs supplier IDs for Materials and Process Components at the end.
 - Remaps sites references on process records by site name and creates missing sites.
+- Syncs Step work instructions after all process records are created so embedded
+  record references can be remapped to target IDs.
 
 ## Generated Files
 

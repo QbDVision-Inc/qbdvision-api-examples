@@ -7,8 +7,6 @@ from a source project into an existing target project.
 Does NOT sync the supplier or site lists between environments. SupplierId for Processes, Unit Operations, Materials, and Process Components
 and Sites for Processes are remapped by name (create if missing). These are synced at the very end, after records are created - to preserve
 unit ops, steps, and flows and to avoid copying source-environment IDs.
-
-Smart Content fields are not synced
 """
 
 import json
@@ -93,6 +91,9 @@ ALLOWED_TIMEPOINT_FIELDS = [
 ]
 ALLOWED_STEP_FIELDS = [
     "name", "description", "links", "tags"
+]
+ALLOWED_STEP_WORK_INSTRUCTION_FIELDS = [
+    "uuid", "description", "recordOrder"
 ]
 ALLOWED_PROCESS_PARAMETER_FIELDS = [
     "name", "type", "description", "potentialFailureModes", "scaleDependent",
@@ -561,6 +562,17 @@ def build_material_flow_relationships(
     return mapped_flows, uos, steps
 # --------------------- PAYLOAD BUILDERS ---------------------
 TAG_RECORD_ID_ATTR_RE = re.compile(r"\s+\bdata-record-id=(['\"])\d+\1", re.IGNORECASE)
+HTML_TAG_RE = re.compile(r"<[^<>]+>")
+HTML_RECORD_ID_ATTR_RE = re.compile(
+    r"(?P<prefix>\s+\bdata-record-id\s*=\s*)"
+    r"(?P<quote>['\"])(?P<record_id>\d+)(?P=quote)",
+    re.IGNORECASE,
+)
+HTML_RECORD_MODEL_ATTR_RE = re.compile(
+    r"\bdata-record-model-name\s*=\s*"
+    r"(?P<quote>['\"])(?P<model_name>[^'\"]+)(?P=quote)",
+    re.IGNORECASE,
+)
 
 def parse_json_list(value) -> list:
     if isinstance(value, str):
@@ -1011,6 +1023,239 @@ def unique_lookup(records: list, key_fn) -> dict:
         counts[key] += 1
         by_key[key] = record
     return {key: record for key, record in by_key.items() if counts[key] == 1}
+
+def parse_step_work_instructions(value) -> list | None:
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            return None
+    if not isinstance(value, list):
+        return None
+    if any(not isinstance(item, dict) for item in value):
+        return None
+    return value
+
+def active_step_work_instructions(value) -> list | None:
+    parsed = parse_step_work_instructions(value)
+    if parsed is None:
+        return None
+    return [
+        item
+        for item in parsed
+        if not item.get("deletedAt") and item.get("currentState") != "Archived"
+    ]
+
+def work_instruction_sort_key(item: dict) -> tuple:
+    return (
+        item.get("recordOrder") is None,
+        str(item.get("recordOrder")),
+        str(item.get("uuid") or ""),
+        str(item.get("description") or ""),
+    )
+
+def strip_html_record_ids(html_value):
+    if not isinstance(html_value, str):
+        return html_value
+    return HTML_RECORD_ID_ATTR_RE.sub("", html_value)
+
+def remap_html_record_ids(html_value, record_id_maps: dict) -> str:
+    if not isinstance(html_value, str):
+        return html_value
+
+    normalized_maps = normalize_applies_to_maps(record_id_maps)
+
+    def _remap_tag(tag_match):
+        tag = tag_match.group(0)
+        record_id_match = HTML_RECORD_ID_ATTR_RE.search(tag)
+        if not record_id_match:
+            return tag
+
+        model_match = HTML_RECORD_MODEL_ATTR_RE.search(tag)
+        mapped_id = None
+        if model_match:
+            model_key = canonical_type_code(model_match.group("model_name"))
+            mapping = normalized_maps.get(model_key)
+            if mapping:
+                mapped_id = map_lookup(mapping, record_id_match.group("record_id"))
+
+        if mapped_id is None:
+            return HTML_RECORD_ID_ATTR_RE.sub("", tag, count=1)
+
+        def _replace_id(attr_match):
+            quote = attr_match.group("quote")
+            return f"{attr_match.group('prefix')}{quote}{mapped_id}{quote}"
+
+        return HTML_RECORD_ID_ATTR_RE.sub(_replace_id, tag, count=1)
+
+    return HTML_TAG_RE.sub(_remap_tag, html_value)
+
+def target_work_instruction_lookups(work_instructions) -> tuple[dict, dict]:
+    active = active_step_work_instructions(work_instructions) or []
+    return (
+        unique_lookup(active, lambda item: normalize(item.get("uuid"))),
+        unique_lookup(active, lambda item: normalize(item.get("recordOrder"))),
+    )
+
+def matching_target_work_instruction(
+    source_item: dict,
+    target_by_uuid: dict,
+    target_by_order: dict,
+) -> dict | None:
+    source_uuid = normalize(source_item.get("uuid"))
+    if source_uuid is not None and source_uuid in target_by_uuid:
+        return target_by_uuid[source_uuid]
+    return target_by_order.get(normalize(source_item.get("recordOrder")))
+
+def build_step_work_instructions_payload(
+    source_work_instructions,
+    target_work_instructions,
+    target_step_id: int,
+    record_id_maps: dict,
+) -> list:
+    target_by_uuid, target_by_order = target_work_instruction_lookups(
+        target_work_instructions
+    )
+    payload = []
+
+    for source_item in active_step_work_instructions(source_work_instructions) or []:
+        item = {
+            field: source_item.get(field)
+            for field in ALLOWED_STEP_WORK_INSTRUCTION_FIELDS
+            if field in source_item
+        }
+        if "description" in item:
+            item["description"] = remap_html_record_ids(
+                item["description"],
+                record_id_maps,
+            )
+        item["StepId"] = target_step_id
+
+        target_item = matching_target_work_instruction(
+            source_item,
+            target_by_uuid,
+            target_by_order,
+        )
+        if target_item and target_item.get("id"):
+            item["id"] = target_item["id"]
+
+        payload.append(item)
+
+    return sorted(payload, key=work_instruction_sort_key)
+
+def normalize_step_work_instructions_for_compare(work_instructions) -> list:
+    active = active_step_work_instructions(work_instructions) or []
+    normalized = [
+        {
+            "description": strip_html_record_ids(item.get("description")),
+            "recordOrder": normalize(item.get("recordOrder")),
+        }
+        for item in active
+    ]
+    return sorted(normalized, key=work_instruction_sort_key)
+
+def sync_step_work_instructions(
+    *,
+    records: dict,
+    src_client: QbdApiClient,
+    tgt_client: QbdApiClient,
+    writer: SyncWriter,
+    record_id_maps: dict,
+) -> dict:
+    stats = {"updated": 0, "unchanged": 0, "skipped": 0}
+
+    for source_step_id, target_step_id in records.items():
+        source_step = src_client.get_record("Step", source_step_id)
+        if is_archived(source_step):
+            stats["skipped"] += 1
+            continue
+
+        if "StepToWorkInstructions" not in source_step:
+            stats["skipped"] += 1
+            continue
+
+        source_work_instructions = active_step_work_instructions(
+            source_step.get("StepToWorkInstructions")
+        )
+        if source_work_instructions is None:
+            logger.warning(
+                "Skipping StepToWorkInstructions for source Step %s; expected a list",
+                source_step_id,
+            )
+            stats["skipped"] += 1
+            continue
+
+        target_step = tgt_client.get_record("Step", target_step_id)
+        if not target_step or is_archived(target_step):
+            logger.warning(
+                "Skipping StepToWorkInstructions for target Step %s; record is missing or archived",
+                target_step_id,
+            )
+            stats["skipped"] += 1
+            continue
+
+        target_work_instructions = active_step_work_instructions(
+            target_step.get("StepToWorkInstructions", [])
+        )
+        if target_work_instructions is None:
+            logger.warning(
+                "Skipping StepToWorkInstructions for target Step %s; expected a list",
+                target_step_id,
+            )
+            stats["skipped"] += 1
+            continue
+
+        desired_work_instructions = build_step_work_instructions_payload(
+            source_work_instructions,
+            target_work_instructions,
+            target_step_id,
+            record_id_maps,
+        )
+        if normalize_step_work_instructions_for_compare(
+            desired_work_instructions
+        ) == normalize_step_work_instructions_for_compare(target_work_instructions):
+            logger.info(
+                "Step '%s' work instructions unchanged - skipping",
+                target_step.get("name"),
+            )
+            stats["unchanged"] += 1
+            continue
+
+        last_version_id = target_step.get("LastVersionId")
+        if not last_version_id:
+            logger.warning(
+                "Skipping StepToWorkInstructions for target Step %s; LastVersionId is missing",
+                target_step_id,
+            )
+            stats["skipped"] += 1
+            continue
+
+        payload = sanitize_payload(
+            target_step,
+            ALLOWED_STEP_FIELDS,
+            {
+                "id": target_step_id,
+                "LastVersionId": last_version_id,
+                "ProjectId": target_step.get("ProjectId"),
+                "ProcessId": target_step.get("ProcessId"),
+                "UnitOperationId": target_step.get("UnitOperationId"),
+                "StepToWorkInstructions": desired_work_instructions,
+            },
+        )
+        logger.info(
+            "Updating StepToWorkInstructions for Step '%s' (%s): %s instruction(s)",
+            target_step.get("name"),
+            target_step_id,
+            len(desired_work_instructions),
+        )
+        writer.save_record(
+            "Step",
+            payload,
+            reason="sync Step work instructions",
+        )
+        stats["updated"] += 1
+
+    return stats
 
 def build_timepoints_payload(src_timepoints, tgt_timepoints, tgt_uo_id: int) -> list:
     tgt_by_name, tgt_by_order = target_timepoint_lookups(tgt_timepoints)
@@ -3704,6 +3949,28 @@ def sync_process_site_mappings(config: SyncConfig, writer: SyncWriter, tgt_proce
         tgt_process_id=tgt_process_id,
     )
 
+def sync_step_work_instruction_mappings(
+    config: SyncConfig,
+    writer: SyncWriter,
+    mappings: dict,
+    tgt_process_id: int,
+):
+    record_id_maps = dict(mappings)
+    record_id_maps["Project"] = {
+        config.src_project_id: config.tgt_project_id,
+    }
+    record_id_maps["Process"] = {
+        config.src_process_id: tgt_process_id,
+    }
+
+    sync_step_work_instructions(
+        records=mappings["Step"],
+        src_client=config.src_client,
+        tgt_client=config.tgt_client,
+        writer=writer,
+        record_id_maps=record_id_maps,
+    )
+
 def copy_process(config: SyncConfig):
     src_process_id = config.src_process_id
     writer = SyncWriter(config.tgt_client)
@@ -3721,6 +3988,7 @@ def copy_process(config: SyncConfig):
         sync_drug_mappings(config, writer, mappings, tgt_process_id)
         sync_supplier_mappings(config, writer, mappings, tgt_process_id)
         sync_process_site_mappings(config, writer, tgt_process_id)
+        sync_step_work_instruction_mappings(config, writer, mappings, tgt_process_id)
     finally:
         save_id_map(id_map)
 # --------------------- MAIN ---------------------
