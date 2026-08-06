@@ -459,6 +459,17 @@ def id_set(records: list | None) -> set:
 def tuple_set(records: list | None, fields: tuple[str, ...]) -> set:
     return {tuple(record.get(field) for field in fields) for record in records or []}
 
+def material_flow_set(records: list | None) -> set:
+    return {
+        (
+            record.get("UnitOperationId"),
+            record.get("StepId"),
+            record.get("flow"),
+            normalize(record.get("function")),
+        )
+        for record in records or []
+    }
+
 def append_relationship_id_diff(
     changed_fields: list,
     field_name: str,
@@ -548,6 +559,7 @@ def build_material_flow_relationships(
             "UnitOperationId": tgt_uo_id,
             "StepId": tgt_step_id,
             "flow": flow_type,
+            "function": flow.get("function"),
         })
 
     uos = [
@@ -2698,9 +2710,8 @@ def copy_materials(
                 record_label="Material",
                 record_name=src_name,
             )
-            if tuple_set(material_flows, ("UnitOperationId", "StepId", "flow")) != tuple_set(
-                tgt_full.get("MaterialFlows", []),
-                ("UnitOperationId", "StepId", "flow"),
+            if material_flow_set(material_flows) != material_flow_set(
+                tgt_full.get("MaterialFlows", [])
             ):
                 changed_fields.append("MaterialFlows")
 
