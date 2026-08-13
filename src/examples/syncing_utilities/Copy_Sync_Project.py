@@ -1,5 +1,10 @@
+ibrary
+/
+Copy_Sync_Project.py
+
+
 """
-Project copy tool with TPP, General Attributes, Control Methods, FQA, FPA, DS, and DP mapping.
+Project copy tool for standard and Analytical Procedure projects with TPP, General Attributes, Control Methods, FQA, FPA, DS, DP, and Performance Characteristic mapping.
 RMPs are not synced. Logic is: If RMP with same name exists in target, use it. If not, create it, then use it. 
 If RMP is created, the script will break and stop after creating the RMP. You must manually approve the RMP to use it, then
 you can run this again and it will continue.
@@ -45,6 +50,7 @@ LOG_PATH = None
 logger = logging.getLogger("qbd_copy_project_only")
 # --------------------- ALLOWED FIELDS ---------------------
 ID_MAP_FILE = "project_id_map.json"
+ANALYTICAL_PROJECT_TYPE = "Analytical Procedure"
 ALLOWED_PROJECT_FIELDS = [
     "name", "customProjectId", "type", "category", "classification", "links",
     "purposeAndScope", "objectives", "purposeLinks", "qualityByDesignPhase",
@@ -131,6 +137,14 @@ ALLOWED_DRUG_PRODUCT_FIELDS = [
     "casRegistryNumber", "compendialStandard", "certificateOfAnalysis",
     "propertiesLinks", "referencesLinks", "DrugProductToFQAs"
 ]
+ALLOWED_PERFORMANCE_CHARACTERISTIC_FIELDS = [
+    "name", "description", "dataSpace", "measure", "measurementUnits",
+    "lowerLimit", "target", "upperLimit", "targetJustification",
+    "acceptanceCriteriaLinks", "AcceptanceCriteriaRanges", "referencesLinks", "links",
+]
+ANALYTICAL_FQA_FIELDS = [
+    field for field in NON_RISKRANKING_FPA_FQA_FIELDS if field not in ("TPPSections", "GeneralAttributes")
+] + ["PerformanceCharacteristics"]
 ENTITY_CONFIG = {
     "Project": {
         "endpoint": "editables/Project",
@@ -193,6 +207,12 @@ ENTITY_CONFIG = {
             if f != "DrugProductToFQAs"
         ],
         "remap": "apply_remap"
+    },
+    "PerformanceCharacteristic": {
+        "endpoint": "editables/PerformanceCharacteristic",
+        "allowed_fields": ALLOWED_PERFORMANCE_CHARACTERISTIC_FIELDS,
+        "diff_fields": ALLOWED_PERFORMANCE_CHARACTERISTIC_FIELDS,
+        "remap": None,
     }
 }
 # --------------------- FIELDS TO REMOVE (RMP ONLY) ---------------------
@@ -244,17 +264,13 @@ class SyncConfig:
 def load_config() -> SyncConfig:
     return SyncConfig(
         src_project_id=required_int("SOURCE_PROJECT_ID", required_env("SOURCE_PROJECT_ID")),
-        src_client=QbdApiClient.from_host(
-            required_env("SOURCE_HOST"),
-            required_env("SOURCE_BASE_PATH"),
-            required_env("SOURCE_KEY"),
-        ),
-        tgt_client=QbdApiClient.from_host(
-            required_env("TARGET_HOST"),
-            required_env("TARGET_BASE_PATH"),
-            required_env("TARGET_KEY"),
-        ),
+        src_client=QbdApiClient.from_environment("SOURCE"),
+        tgt_client=QbdApiClient.from_environment("TARGET"),
     )
+
+class ProjectTypeMismatchError(RuntimeError):
+    """Raised when a saved project mapping points to a different project type."""
+
 # --------------------- LINK & PAYLOAD HELPERS ---------------------
 def clean_rmp_payload(src_rmp: dict) -> dict:
     payload = {}
@@ -311,6 +327,12 @@ def _normalize_risk_assessment_method(value: Any) -> str:
     if value is None:
         return ""
     return re.sub(r"[^A-Za-z0-9]+", "", str(value)).lower()
+
+def is_analytical_procedure_project(project: dict | None) -> bool:
+    return isinstance(project, dict) and project.get("type") == ANALYTICAL_PROJECT_TYPE
+
+def is_analytical_procedure_context(remap_ctx: dict | None) -> bool:
+    return bool(remap_ctx and remap_ctx.get("is_analytical_procedure"))
 
 def _resolve_project_risk_model(remap_ctx: dict | None) -> str:
     ctx = remap_ctx or {}
@@ -375,7 +397,14 @@ def get_effective_entity_fields(
     diff_fields_cfg = list(cfg["diff_fields"])
     sync_fields_cfg = list(cfg.get("sync_fields", allowed_fields))
 
-    if entity_type in ("FPA", "FQA") and not is_risk_ranking_method(remap_ctx):
+    if entity_type == "FQA" and is_analytical_procedure_context(remap_ctx):
+        allowed_fields = list(ANALYTICAL_FQA_FIELDS)
+        diff_fields_cfg = [
+            f for f in allowed_fields
+            if f not in ("ControlMethods", "PerformanceCharacteristics")
+        ]
+        sync_fields_cfg = list(allowed_fields)
+    elif entity_type in ("FPA", "FQA") and not is_risk_ranking_method(remap_ctx):
         allowed_fields = list(NON_RISKRANKING_FPA_FQA_FIELDS)
         diff_fields_cfg = [
             f for f in allowed_fields
@@ -611,6 +640,26 @@ def remap_general_attributes(
 
     return remapped
 
+def remap_performance_characteristics(
+    performance_characteristics: list,
+    pc_id_map: Dict[str, int],
+) -> list:
+    remapped = []
+
+    for pc in performance_characteristics or []:
+        src_id = str(pc.get("id"))
+        tgt_id = pc_id_map.get(src_id)
+        if not tgt_id:
+            logger.warning("No target PerformanceCharacteristic mapping for source PC %s", src_id)
+            continue
+
+        remapped.append({
+            "id": tgt_id,
+            "typeCode": "PC"
+        })
+
+    return remapped
+
 def remap_general_attribute_risks(
     risks: list,
     ga_id_map: Dict[str, int],
@@ -705,6 +754,17 @@ def remap_fqa_links(
     return payload
 
 def apply_remap(entity_type: str, payload: dict, ctx: dict) -> dict:
+    if entity_type == "FQA" and is_analytical_procedure_context(ctx):
+        payload["PerformanceCharacteristics"] = remap_performance_characteristics(
+            payload.get("PerformanceCharacteristics", []),
+            ctx["pc_id_map"],
+        )
+        payload["ControlMethods"] = remap_control_methods(
+            payload.get("ControlMethods", []),
+            ctx["cm_id_map"],
+        )
+        return payload
+
     if entity_type in ("FPA", "FQA"):
         payload["TPPSections"] = remap_tpp_sections(
             payload.get("TPPSections", []),
@@ -800,13 +860,18 @@ def active_source_record(
 
 def apply_fpa_fqa_payload_rules(entity_type: str, src_full: dict, payload: dict, remap_ctx: dict | None) -> tuple[dict, dict | None]:
     requirement_payload = None
-    if entity_type not in ("FPA", "FQA"):
+    if entity_type not in ("FPA", "FQA", "PerformanceCharacteristic"):
         return payload, requirement_payload
 
     src_ranges = build_acceptance_criteria_ranges(src_full)
     if src_ranges:
         payload["AcceptanceCriteriaRanges"] = src_ranges
         requirement_payload = {"AcceptanceCriteriaRanges": src_ranges}
+    if entity_type == "PerformanceCharacteristic":
+        return payload, requirement_payload
+    if entity_type == "FQA" and is_analytical_procedure_context(remap_ctx):
+	# placeholder - FQAs in analytical procedures still need a scope in an API request although they do not have a scope in the UI
+        payload["scope"] = ANALYTICAL_PROJECT_TYPE
     if not is_risk_ranking_method(remap_ctx):
         payload = apply_non_riskranking_risk_values(src_full, payload)
         resolved_method = resolve_non_riskranking_method(src_full, remap_ctx)
@@ -939,6 +1004,23 @@ def append_id_relationship_diff(diffs: dict, field_name: str, src_items: list, t
 
 def relationship_diffs(entity_type: str, sanitized_src: dict, tgt_full: dict, remap_ctx: dict | None) -> dict:
     diffs = {}
+    if entity_type == "FQA" and is_analytical_procedure_context(remap_ctx):
+        append_id_relationship_diff(
+            diffs,
+            "PerformanceCharacteristics",
+            sanitized_src.get("PerformanceCharacteristics", []),
+            tgt_full.get("PerformanceCharacteristics", []),
+            id_keys=("id", "PerformanceCharacteristicId"),
+        )
+        append_id_relationship_diff(
+            diffs,
+            "ControlMethods",
+            sanitized_src.get("ControlMethods", []),
+            tgt_full.get("ControlMethods", []),
+            id_keys=("id", "ControlMethodId"),
+        )
+        return diffs
+
     if entity_type in ("FPA", "FQA"):
         ga_field = "FPAToGeneralAttributeRisks" if entity_type == "FPA" else "FQAToGeneralAttributeRisks"
         append_id_relationship_diff(
@@ -980,7 +1062,7 @@ def relationship_diffs(entity_type: str, sanitized_src: dict, tgt_full: dict, re
     return diffs
 
 def target_with_requirement_ranges(entity_type: str, target: dict) -> dict:
-    if entity_type not in ("FPA", "FQA"):
+    if entity_type not in ("FPA", "FQA", "PerformanceCharacteristic"):
         return target
     tgt_req = target.get("Requirement") if isinstance(target, dict) else None
     if not isinstance(tgt_req, dict):
@@ -1257,6 +1339,23 @@ def resolve_project_rmp(config: SyncConfig, writer: SyncWriter, sanitized_src_pr
     sanitized_src_project["RMPId"] = tgt_rmp_id
     return tgt_rmp_id
 
+def validate_mapped_project_type(
+    source_project: dict,
+    target_project: dict,
+    source_project_id: int,
+    target_project_id: int,
+) -> None:
+    source_type = source_project.get("type")
+    target_type = target_project.get("type")
+    if source_type == target_type:
+        return
+
+    raise ProjectTypeMismatchError(
+        "Mapped target project type does not match the source: "
+        f"source {source_project_id} is {source_type!r}, but target "
+        f"{target_project_id} is {target_type!r}. No records were synchronized."
+    )
+
 def copy_project_record(
     config: SyncConfig,
     writer: SyncWriter,
@@ -1268,12 +1367,23 @@ def copy_project_record(
         logger.info("Source project %s is archived; skipping copy", src_project_id)
         return src_project, None, {}
 
+    project_key = str(src_project_id)
+    existing_project_state = projects_map.get(project_key)
+    if existing_project_state:
+        tgt_project_id = existing_project_state["targetProjectId"]
+        tgt_project = config.tgt_client.get_record("Project", tgt_project_id)
+        validate_mapped_project_type(
+            src_project,
+            tgt_project,
+            src_project_id,
+            tgt_project_id,
+        )
+
     sanitized_src_project = sanitize_payload(src_project, ALLOWED_PROJECT_FIELDS)
     sanitized_src_project = strip_attachment_links(sanitized_src_project)
     tgt_rmp_id = resolve_project_rmp(config, writer, sanitized_src_project)
 
-    project_key = str(src_project_id)
-    if project_key not in projects_map:
+    if not existing_project_state:
         logger.info("No existing mapping found. Creating new project.")
         new_project = writer.save_record("Project", sanitized_src_project, reason="create Project")
         tgt_project_id = new_project["id"]
@@ -1301,6 +1411,7 @@ def build_project_remap_context(config: SyncConfig, tgt_project_id: int, src_pro
     tgt_project = config.tgt_client.get_record("Project", tgt_project_id)
     return {
         "supplier_cache": {"by_id": {}, "by_name": {}},
+        "is_analytical_procedure": is_analytical_procedure_project(src_project),
         "project_risk_assessment_method": src_project.get("riskAssessmentMethod"),
         "project_product_risk_assessment_type": src_project.get("productRiskAssessmentType"),
         "target_project_risk_assessment_method": tgt_project.get("riskAssessmentMethod"),
@@ -1319,6 +1430,53 @@ def sync_project_entities(
     tgt_project_id: int,
 ) -> None:
     remap_ctx = build_project_remap_context(config, tgt_project_id, src_project)
+
+    if is_analytical_procedure_project(src_project):
+        logger.info(
+            "Detected %s source project; using analytical entity sync",
+            ANALYTICAL_PROJECT_TYPE,
+        )
+
+        cm_mapping = sync_or_create_entities(
+            "ControlMethod",
+            config.src_client,
+            config.tgt_client,
+            writer,
+            config.src_project_id,
+            tgt_project_id,
+            remap_ctx,
+            prev_mapping=project_state.get("controlMethods", {}),
+        )
+        remap_ctx["cm_id_map"] = persist_mapping(project_state, "controlMethods", cm_mapping)
+
+        performance_mapping = sync_or_create_entities(
+            "PerformanceCharacteristic",
+            config.src_client,
+            config.tgt_client,
+            writer,
+            config.src_project_id,
+            tgt_project_id,
+            remap_ctx,
+            prev_mapping=project_state.get("performanceCharacteristics", {}),
+        )
+        remap_ctx["pc_id_map"] = persist_mapping(
+            project_state,
+            "performanceCharacteristics",
+            performance_mapping,
+        )
+
+        fqa_mapping = sync_or_create_entities(
+            "FQA",
+            config.src_client,
+            config.tgt_client,
+            writer,
+            config.src_project_id,
+            tgt_project_id,
+            remap_ctx,
+            prev_mapping=project_state.get("fqas", {}),
+        )
+        persist_mapping(project_state, "fqas", fqa_mapping)
+        return
 
     tpp_mapping = sync_or_create_entities(
         "TPPSection",
@@ -1439,6 +1597,8 @@ def main():
         saved_id_map = True
         logger.info("Sync complete for source project %s", config.src_project_id)
 
+    except ProjectTypeMismatchError as e:
+        logger.error("Project type mismatch: %s", e)
     except requests.HTTPError as e:
         logger.error("HTTP error: %s", e)
         if e.response is not None:
@@ -1448,6 +1608,11 @@ def main():
     finally:
         if not saved_id_map:
             save_id_map(id_map)
+        logger.info(
+            "Target record summary: %s created, %s updated",
+            writer.records_created,
+            writer.records_updated,
+        )
 
 if __name__ == "__main__":
     main()
