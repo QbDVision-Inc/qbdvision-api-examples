@@ -125,7 +125,7 @@ ALLOWED_SUPPLIER_FIELDS = [
 ALLOWED_DRUG_SUBSTANCE_FIELDS = [
     "name", "ctdFiledName", "description", "internalPartNumber",
     "links", "drugSubstanceType", "form", "empiricalFormula", "density", "densityConditions", 
-    "chemicalStructure", "molecularWeight", "molecularFormula",
+    "chemicalStructure", "molecularWeight", "molecularFormula", "intermediate",
     "chemicalNameCAS", "chemicalNameIUPAC", "otherNames", "innUsan",
     "casRegistryNumber", "compendialStandard", "certificateOfAnalysis",
     "propertiesLinks", "referencesLinks", "DrugSubstanceToFQAs"
