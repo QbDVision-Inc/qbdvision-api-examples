@@ -18,14 +18,18 @@ These collections are configured for static API key authentication. The API key 
 
 ## Before Sending Requests
 
-The included requests are examples and are configured for the QbDVision sandbox by default. Update the request URLs and base paths so they point to your own QbDVision environment before using them.
-
-For example, replace sandbox URLs like:
+Every request URL is built from a collection variable named `baseUrl`, so you only need to change the host and base path in one place per collection:
 
 ```text
-https://api.sandbox.qbdvision.com/sandbox/...
+{{baseUrl}}/editables/Supplier/addOrEdit
 ```
 
-with the host and path for your target environment.
+`baseUrl` defaults to the QbDVision sandbox:
+
+```text
+https://api.sandbox.qbdvision.com/sandbox
+```
+
+To point a collection at your own environment, open the collection's **Variables** tab, set `baseUrl` to your host and base path with no trailing slash, and save. If you work across several environments, define `baseUrl` in a Postman environment instead and switch between them.
 
 The request bodies are examples only. They are meant to show the expected JSON shape for each request. Some field values, such as project IDs, record IDs, process IDs, user IDs, and other environment-specific references, must be changed to values that exist in your environment before the requests will work correctly.
