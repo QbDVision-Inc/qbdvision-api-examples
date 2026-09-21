@@ -30,16 +30,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Supplier/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Supplier",
             "{id}"
@@ -87,16 +82,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/users/1799",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/users/1799",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "users",
             "1799"
           ]
@@ -122,20 +112,15 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/RMP/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/RMP/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "RMP",
             "{id}"
-          ]
+          ],
           "query": [
             {
               "key": "approved",
@@ -179,16 +164,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/MaterialAttribute/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "MaterialAttribute",
             "{id}"
@@ -236,16 +216,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/LibraryMaterial/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "LibraryMaterial",
             "{id}"
@@ -293,16 +268,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/DrugSubstance/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "DrugSubstance",
             "{id}"
@@ -338,16 +308,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/3758",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/UnitOperation/3758",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "UnitOperation",
             "3758"
@@ -395,16 +360,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/DrugProduct/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "DrugProduct",
             "{id}"
@@ -451,16 +411,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Material/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Material",
             "{id}"
@@ -496,16 +451,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/13281",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ProcessParameter/13281",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ProcessParameter",
             "13281"
@@ -559,16 +509,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/IPA/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "IPA",
             "{id}"
@@ -615,16 +560,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/GeneralAttribute/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "GeneralAttribute",
             "{id}"
@@ -659,16 +599,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ControlMethod/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ControlMethod",
             "{id}"
@@ -722,16 +657,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/IQA/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "IQA",
             "{id}"
@@ -785,16 +715,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/TPPSection/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "TPPSection",
             "{id}"
@@ -848,20 +773,15 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/FPA/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "FPA",
             "{id}"
-          ]
+          ],
           "query": [
             {
               "key": "approved",
@@ -893,16 +813,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Sample/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Sample",
             "{id}"
@@ -938,16 +853,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Step/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Step",
             "{id}"
@@ -1001,16 +911,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/FQA/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "FQA",
             "{id}"
@@ -1052,16 +957,11 @@
           }
         ],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Project/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Project",
             "{id}"
@@ -1115,16 +1015,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Process/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Process",
             "{id}"
@@ -1166,16 +1061,11 @@
           }
         ],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ProcessComponent/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ProcessComponent",
             "{id}"
@@ -1229,20 +1119,15 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Document/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Document/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Document",
             "{id}"
-          ]
+          ],
           "query": [
             {
               "key": "approved",
@@ -1292,18 +1177,273 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/{id}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Batch/{id}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Batch",
+            "{id}"
+          ],
+          "query": [
+            {
+              "key": "approved",
+              "value": "true",
+              "description": "Optional. Blank/default returns approved if exists, otherwise draft. false returns last version regardless of approval/draft. true returns last approved version.",
+              "disabled": true
+            },
+            {
+              "key": "includeHistory",
+              "value": "true",
+              "description": "Optional. Includes a field array named ${model}Versions with all versions of the record.",
+              "disabled": true
+            },
+            {
+              "key": "versionId",
+              "value": "{versionId}",
+              "description": "Scopes request to return only a specific historical version of the record. A version's ID can be found in the ${model}Versions array from the includeHistory parameter.",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Library Equipment Category",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/{id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentCategory",
+            "{id}"
+          ],
+          "query": [
+            {
+              "key": "approved",
+              "value": "true",
+              "description": "Optional. Blank/default returns approved if exists, otherwise draft. false returns last version regardless of approval/draft. true returns last approved version.",
+              "disabled": true
+            },
+            {
+              "key": "includeHistory",
+              "value": "true",
+              "description": "Optional. Includes a field array named ${model}Versions with all versions of the record.",
+              "disabled": true
+            },
+            {
+              "key": "versionId",
+              "value": "{versionId}",
+              "description": "Scopes request to return only a specific historical version of the record. A version's ID can be found in the ${model}Versions array from the includeHistory parameter.",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Library Equipment Model",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/{id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentModel",
+            "{id}"
+          ],
+          "query": [
+            {
+              "key": "approved",
+              "value": "true",
+              "description": "Optional. Blank/default returns approved if exists, otherwise draft. false returns last version regardless of approval/draft. true returns last approved version.",
+              "disabled": true
+            },
+            {
+              "key": "includeHistory",
+              "value": "true",
+              "description": "Optional. Includes a field array named ${model}Versions with all versions of the record.",
+              "disabled": true
+            },
+            {
+              "key": "versionId",
+              "value": "{versionId}",
+              "description": "Scopes request to return only a specific historical version of the record. A version's ID can be found in the ${model}Versions array from the includeHistory parameter.",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Library Equipment Unit",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/{id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentUnit",
+            "{id}"
+          ],
+          "query": [
+            {
+              "key": "approved",
+              "value": "true",
+              "description": "Optional. Blank/default returns approved if exists, otherwise draft. false returns last version regardless of approval/draft. true returns last approved version.",
+              "disabled": true
+            },
+            {
+              "key": "includeHistory",
+              "value": "true",
+              "description": "Optional. Includes a field array named ${model}Versions with all versions of the record.",
+              "disabled": true
+            },
+            {
+              "key": "versionId",
+              "value": "{versionId}",
+              "description": "Scopes request to return only a specific historical version of the record. A version's ID can be found in the ${model}Versions array from the includeHistory parameter.",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Site",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/Site/{id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "Site",
+            "{id}"
+          ],
+          "query": [
+            {
+              "key": "approved",
+              "value": "true",
+              "description": "Optional. Blank/default returns approved if exists, otherwise draft. false returns last version regardless of approval/draft. true returns last approved version.",
+              "disabled": true
+            },
+            {
+              "key": "includeHistory",
+              "value": "true",
+              "description": "Optional. Includes a field array named ${model}Versions with all versions of the record.",
+              "disabled": true
+            },
+            {
+              "key": "versionId",
+              "value": "{versionId}",
+              "description": "Scopes request to return only a specific historical version of the record. A version's ID can be found in the ${model}Versions array from the includeHistory parameter.",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Equipment",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/Equipment/{id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "Equipment",
             "{id}"
           ],
           "query": [
@@ -1369,6 +1509,13 @@
           ""
         ]
       }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.sandbox.qbdvision.com/sandbox",
+      "type": "string"
     }
   ]
 }
