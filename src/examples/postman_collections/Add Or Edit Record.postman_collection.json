@@ -21,16 +21,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Supplier/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Supplier",
             "addOrEdit"
@@ -53,16 +48,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Supplier/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Supplier",
                 "addOrEdit"
@@ -89,16 +79,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Supplier/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Supplier",
                 "addOrEdit"
@@ -125,16 +110,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Supplier/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Supplier",
                 "addOrEdit"
@@ -161,16 +141,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Supplier/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Supplier",
                 "addOrEdit"
@@ -197,16 +172,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Supplier/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Supplier",
                 "addOrEdit"
@@ -233,16 +203,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Supplier/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Supplier",
                 "addOrEdit"
@@ -271,16 +236,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/LibraryMaterial/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "LibraryMaterial",
             "addOrEdit"
@@ -303,16 +263,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/LibraryMaterial/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "LibraryMaterial",
                 "addOrEdit"
@@ -339,16 +294,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/LibraryMaterial/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "LibraryMaterial",
                 "addOrEdit"
@@ -375,16 +325,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/LibraryMaterial/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "LibraryMaterial",
                 "addOrEdit"
@@ -411,16 +356,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/LibraryMaterial/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "LibraryMaterial",
                 "addOrEdit"
@@ -447,16 +387,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/LibraryMaterial/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "LibraryMaterial",
                 "addOrEdit"
@@ -483,16 +418,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/LibraryMaterial/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "LibraryMaterial",
                 "addOrEdit"
@@ -521,16 +451,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/DrugProduct/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "DrugProduct",
             "addOrEdit"
@@ -553,16 +478,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugProduct/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugProduct",
                 "addOrEdit"
@@ -589,16 +509,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugProduct/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugProduct",
                 "addOrEdit"
@@ -625,16 +540,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugProduct/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugProduct",
                 "addOrEdit"
@@ -661,16 +571,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugProduct/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugProduct",
                 "addOrEdit"
@@ -697,16 +602,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugProduct/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugProduct",
                 "addOrEdit"
@@ -733,16 +633,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugProduct/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugProduct",
                 "addOrEdit"
@@ -771,16 +666,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/DrugSubstance/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "DrugSubstance",
             "addOrEdit"
@@ -803,16 +693,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugSubstance/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugSubstance",
                 "addOrEdit"
@@ -845,16 +730,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugSubstance/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugSubstance",
                 "addOrEdit"
@@ -887,16 +767,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugSubstance/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugSubstance",
                 "addOrEdit"
@@ -923,16 +798,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugSubstance/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugSubstance",
                 "addOrEdit"
@@ -959,16 +829,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugSubstance/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugSubstance",
                 "addOrEdit"
@@ -995,16 +860,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/DrugSubstance/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "DrugSubstance",
                 "addOrEdit"
@@ -1033,16 +893,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Material/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Material",
             "addOrEdit"
@@ -1065,16 +920,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Material/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Material",
                 "addOrEdit"
@@ -1101,16 +951,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Material/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Material",
                 "addOrEdit"
@@ -1137,16 +982,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Material/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Material",
                 "addOrEdit"
@@ -1173,16 +1013,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Material/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Material",
                 "addOrEdit"
@@ -1209,16 +1044,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Material/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Material",
                 "addOrEdit"
@@ -1245,16 +1075,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Material/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Material",
                 "addOrEdit"
@@ -1283,16 +1108,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/GeneralAttribute/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "GeneralAttribute",
             "addOrEdit"
@@ -1315,16 +1135,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/GeneralAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "GeneralAttribute",
                 "addOrEdit"
@@ -1351,16 +1166,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/GeneralAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "GeneralAttribute",
                 "addOrEdit"
@@ -1387,16 +1197,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/GeneralAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "GeneralAttribute",
                 "addOrEdit"
@@ -1423,16 +1228,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/GeneralAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "GeneralAttribute",
                 "addOrEdit"
@@ -1459,16 +1259,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/GeneralAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "GeneralAttribute",
                 "addOrEdit"
@@ -1495,16 +1290,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/GeneralAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "GeneralAttribute",
                 "addOrEdit"
@@ -1533,16 +1323,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/MaterialAttribute/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "MaterialAttribute",
             "addOrEdit"
@@ -1565,16 +1350,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/MaterialAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "MaterialAttribute",
                 "addOrEdit"
@@ -1601,16 +1381,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/MaterialAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "MaterialAttribute",
                 "addOrEdit"
@@ -1637,16 +1412,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/MaterialAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "MaterialAttribute",
                 "addOrEdit"
@@ -1673,16 +1443,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/MaterialAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "MaterialAttribute",
                 "addOrEdit"
@@ -1709,16 +1474,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/MaterialAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "MaterialAttribute",
                 "addOrEdit"
@@ -1745,16 +1505,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/MaterialAttribute/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "MaterialAttribute",
                 "addOrEdit"
@@ -1789,16 +1544,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/UnitOperation/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "UnitOperation",
             "addOrEdit"
@@ -1827,16 +1577,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/UnitOperation/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "UnitOperation",
                 "addOrEdit"
@@ -1869,16 +1614,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/UnitOperation/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "UnitOperation",
                 "addOrEdit"
@@ -1905,16 +1645,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/UnitOperation/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "UnitOperation",
                 "addOrEdit"
@@ -1941,16 +1676,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/UnitOperation/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "UnitOperation",
                 "addOrEdit"
@@ -1977,16 +1707,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/UnitOperation/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "UnitOperation",
                 "addOrEdit"
@@ -2013,16 +1738,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/UnitOperation/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "UnitOperation",
                 "addOrEdit"
@@ -2051,16 +1771,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ControlMethod/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ControlMethod",
             "addOrEdit"
@@ -2083,16 +1798,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ControlMethod/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ControlMethod",
                 "addOrEdit"
@@ -2119,16 +1829,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ControlMethod/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ControlMethod",
                 "addOrEdit"
@@ -2155,16 +1860,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ControlMethod/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ControlMethod",
                 "addOrEdit"
@@ -2191,16 +1891,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ControlMethod/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ControlMethod",
                 "addOrEdit"
@@ -2227,16 +1922,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ControlMethod/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ControlMethod",
                 "addOrEdit"
@@ -2263,16 +1953,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ControlMethod/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ControlMethod",
                 "addOrEdit"
@@ -2307,16 +1992,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Sample/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Sample",
             "addOrEdit"
@@ -2345,16 +2025,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Sample/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Sample",
                 "addOrEdit"
@@ -2387,16 +2062,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Sample/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Sample",
                 "addOrEdit"
@@ -2423,16 +2093,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Sample/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Sample",
                 "addOrEdit"
@@ -2459,16 +2124,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Sample/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Sample",
                 "addOrEdit"
@@ -2495,16 +2155,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Sample/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Sample",
                 "addOrEdit"
@@ -2531,16 +2186,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Sample/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Sample",
                 "addOrEdit"
@@ -2575,16 +2225,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Step/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Step",
             "addOrEdit"
@@ -2613,16 +2258,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Step/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Step",
                 "addOrEdit"
@@ -2655,16 +2295,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Step/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Step",
                 "addOrEdit"
@@ -2691,16 +2326,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Step/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Step",
                 "addOrEdit"
@@ -2727,16 +2357,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Step/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Step",
                 "addOrEdit"
@@ -2763,16 +2388,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Step/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Step",
                 "addOrEdit"
@@ -2799,16 +2419,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Step/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Step",
                 "addOrEdit"
@@ -2843,16 +2458,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ProcessParameter/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ProcessParameter",
             "addOrEdit"
@@ -2881,16 +2491,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessParameter/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessParameter",
                 "addOrEdit"
@@ -2923,16 +2528,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessParameter/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessParameter",
                 "addOrEdit"
@@ -2959,16 +2559,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessParameter/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessParameter",
                 "addOrEdit"
@@ -2995,16 +2590,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessParameter/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessParameter",
                 "addOrEdit"
@@ -3031,16 +2621,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessParameter/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessParameter",
                 "addOrEdit"
@@ -3067,16 +2652,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessParameter/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessParameter",
                 "addOrEdit"
@@ -3111,16 +2691,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Process/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Process",
             "addOrEdit"
@@ -3149,16 +2724,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Process/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Process",
                 "addOrEdit"
@@ -3191,16 +2761,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Process/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Process",
                 "addOrEdit"
@@ -3227,16 +2792,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Process/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Process",
                 "addOrEdit"
@@ -3263,16 +2823,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Process/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Process",
                 "addOrEdit"
@@ -3299,16 +2854,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Process/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Process",
                 "addOrEdit"
@@ -3335,16 +2885,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Process/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Process",
                 "addOrEdit"
@@ -3379,16 +2924,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ProcessComponent/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ProcessComponent",
             "addOrEdit"
@@ -3417,16 +2957,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessComponent/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessComponent",
                 "addOrEdit"
@@ -3459,16 +2994,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessComponent/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessComponent",
                 "addOrEdit"
@@ -3495,16 +3025,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessComponent/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessComponent",
                 "addOrEdit"
@@ -3531,16 +3056,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessComponent/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessComponent",
                 "addOrEdit"
@@ -3567,16 +3087,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessComponent/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessComponent",
                 "addOrEdit"
@@ -3603,16 +3118,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/ProcessComponent/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "ProcessComponent",
                 "addOrEdit"
@@ -3647,16 +3157,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/TPPSection/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "TPPSection",
             "addOrEdit"
@@ -3685,16 +3190,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/TPPSection/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "TPPSection",
                 "addOrEdit"
@@ -3727,16 +3227,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/TPPSection/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "TPPSection",
                 "addOrEdit"
@@ -3769,16 +3264,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/TPPSection/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "TPPSection",
                 "addOrEdit"
@@ -3805,16 +3295,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/TPPSection/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "TPPSection",
                 "addOrEdit"
@@ -3841,16 +3326,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/TPPSection/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "TPPSection",
                 "addOrEdit"
@@ -3877,16 +3357,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/TPPSection/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "TPPSection",
                 "addOrEdit"
@@ -3921,16 +3396,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/FQA/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "FQA",
             "addOrEdit"
@@ -3959,16 +3429,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FQA",
                 "addOrEdit"
@@ -4001,16 +3466,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FQA",
                 "addOrEdit"
@@ -4037,16 +3497,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FQA",
                 "addOrEdit"
@@ -4073,16 +3528,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FQA",
                 "addOrEdit"
@@ -4109,16 +3559,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FQA",
                 "addOrEdit"
@@ -4145,16 +3590,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FQA",
                 "addOrEdit"
@@ -4189,16 +3629,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/IQA/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "IQA",
             "addOrEdit"
@@ -4227,16 +3662,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IQA",
                 "addOrEdit"
@@ -4269,16 +3699,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IQA",
                 "addOrEdit"
@@ -4305,16 +3730,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IQA",
                 "addOrEdit"
@@ -4341,16 +3761,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IQA",
                 "addOrEdit"
@@ -4377,16 +3792,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IQA",
                 "addOrEdit"
@@ -4413,16 +3823,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IQA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IQA",
                 "addOrEdit"
@@ -4457,16 +3862,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/IPA/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "IPA",
             "addOrEdit"
@@ -4495,16 +3895,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IPA",
                 "addOrEdit"
@@ -4537,16 +3932,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IPA",
                 "addOrEdit"
@@ -4573,16 +3963,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IPA",
                 "addOrEdit"
@@ -4609,16 +3994,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IPA",
                 "addOrEdit"
@@ -4645,16 +4025,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IPA",
                 "addOrEdit"
@@ -4681,16 +4056,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/IPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "IPA",
                 "addOrEdit"
@@ -4725,16 +4095,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/FPA/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "FPA",
             "addOrEdit"
@@ -4763,16 +4128,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FPA",
                 "addOrEdit"
@@ -4805,16 +4165,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FPA",
                 "addOrEdit"
@@ -4841,16 +4196,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FPA",
                 "addOrEdit"
@@ -4877,16 +4227,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FPA",
                 "addOrEdit"
@@ -4913,16 +4258,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FPA",
                 "addOrEdit"
@@ -4949,16 +4289,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/FPA/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "FPA",
                 "addOrEdit"
@@ -4993,16 +4328,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Project/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Project",
             "addOrEdit"
@@ -5031,16 +4361,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Project/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Project",
                 "addOrEdit"
@@ -5073,16 +4398,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Project/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Project",
                 "addOrEdit"
@@ -5109,16 +4429,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Project/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Project",
                 "addOrEdit"
@@ -5145,16 +4460,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Project/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Project",
                 "addOrEdit"
@@ -5181,16 +4491,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Project/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Project",
                 "addOrEdit"
@@ -5217,16 +4522,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Project/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Project",
                 "addOrEdit"
@@ -5261,16 +4561,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Batch/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Batch",
             "addOrEdit"
@@ -5299,16 +4594,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Batch/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Batch",
                 "addOrEdit"
@@ -5341,16 +4631,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Batch/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Batch",
                 "addOrEdit"
@@ -5377,16 +4662,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Batch/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Batch",
                 "addOrEdit"
@@ -5413,16 +4693,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Batch/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Batch",
                 "addOrEdit"
@@ -5449,16 +4724,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Batch/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Batch",
                 "addOrEdit"
@@ -5485,16 +4755,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/Batch/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "Batch",
                 "addOrEdit"
@@ -5514,16 +4779,11 @@
         "method": "PUT",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/User/addOrEdit",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/User/addOrEdit",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "User",
             "addOrEdit"
@@ -5552,16 +4812,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/User/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/User/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "User",
                 "addOrEdit"
@@ -5594,16 +4849,11 @@
               }
             },
             "url": {
-              "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/User/addOrEdit",
-              "protocol": "https",
+              "raw": "{{baseUrl}}/editables/User/addOrEdit",
               "host": [
-                "api",
-                "sandbox",
-                "qbdvision",
-                "com"
+                "{{baseUrl}}"
               ],
               "path": [
-                "sandbox",
                 "editables",
                 "User",
                 "addOrEdit"
@@ -5619,6 +4869,1020 @@
               "path": ""
             }
           ],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Library Equipment Category",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/addOrEdit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentCategory",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) LibraryEquipmentCategory",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentCategory",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit LibraryEquipmentCategory",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"description\": \"Example Description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentCategory",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Library Equipment Category",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentCategory",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Library Equipment Category",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentCategory",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Library Equipment Category",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentCategory",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) LibraryEquipmentCategory",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"Capabilities\": [\n        {\n            \"name\": \"Capability 1\",\n            \"measure\": \"Range\",\n            \"lowerLimit\": \"1\",\n            \"target\": \"2\",\n            \"upperLimit\": \"3\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentCategory",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Library Equipment Model",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/addOrEdit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentModel",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) LibraryEquipmentModel",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"LibraryEquipmentCategoryId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentModel",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit LibraryEquipmentModel",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"LibraryEquipmentCategoryId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentModel",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Library Equipment Model",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentModel",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Library Equipment Model",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentModel",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Library Equipment Model",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentModel",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) LibraryEquipmentModel",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"LibraryEquipmentCategoryId\": 1,\n    \"Capabilities\": [\n        {\n            \"name\": \"Capability 1\",\n            \"measure\": \"Range\",\n            \"lowerLimit\": \"1\",\n            \"target\": \"2\",\n            \"upperLimit\": \"3\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentModel",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Library Equipment Unit",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/addOrEdit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentUnit",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) LibraryEquipmentUnit",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"serialNumber\": \"SN-00001\",\n    \"LibraryEquipmentModelId\": 1,\n    \"SiteId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentUnit",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit LibraryEquipmentUnit",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"serialNumber\": \"SN-00001\",\n    \"LibraryEquipmentModelId\": 1,\n    \"SiteId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentUnit",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Library Equipment Unit",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentUnit",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Library Equipment Unit",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentUnit",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Library Equipment Unit",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentUnit",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) LibraryEquipmentUnit",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\",\n    \"serialNumber\": \"SN-00001\",\n    \"LibraryEquipmentModelId\": 1,\n    \"SiteId\": 1,\n    \"Capabilities\": [\n        {\n            \"name\": \"Capability 1\",\n            \"measure\": \"Range\",\n            \"lowerLimit\": \"1\",\n            \"target\": \"2\",\n            \"upperLimit\": \"3\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "LibraryEquipmentUnit",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Site",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/Site/addOrEdit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "Site",
+            "addOrEdit"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Create (Fields Required for Draft) Site",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Site/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Site",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Edit Site",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"description\": \"Example Description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Site/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Site",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Site",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Site/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Site",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Site",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Site/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Site",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Site",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Site/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Site",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Create (Fields Required for Proposal) Site",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Site/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Site",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "Add/Edit Equipment",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/Equipment/addOrEdit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "Equipment",
+            "addOrEdit"
+          ]
+        },
+        "description": "Equipment records cannot be created through this endpoint. A create request returns `Process Equipment can only be created by Library Services or internal system operations.` — an Equipment record comes into being by adding a library equipment unit to a process in the application, so only Edit and the Propose requests below apply here.\n\nAn edit must resend `EquipmentFlows` along with the matching `UnitOperations` (and `Steps`) entries. Omitting them detaches the record from its unit operation and the request is rejected to avoid corrupting dependent records."
+      },
+      "response": [
+        {
+          "name": "Edit Equipment",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"name\": \"Example Name\",\n    \"ProjectId\": 1001,\n    \"EquipmentFlows\": [\n        {\n            \"ProcessId\": 2001,\n            \"UnitOperationId\": 3001,\n            \"StepId\": null,\n            \"flow\": \"Input\",\n            \"function\": \"Example Function\"\n        }\n    ],\n    \"UnitOperations\": [\n        {\n            \"id\": 3001,\n            \"label\": \"UO-3001\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Equipment/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Equipment",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Approve Equipment",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Please review and approve this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"approve\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Equipment/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Equipment",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Archive Equipment",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting archive of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"archive\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Equipment/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Equipment",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "Propose Restore Equipment",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"approvalInfo\": {\n        \"approvers\": [\n            {\n                \"id\": 456\n            }\n        ],\n        \"comment\": \"Requesting restoration of this record.\",\n        \"approveByDate\": \"2026-06-30\",\n        \"action\": \"restore\"\n    },\n    \"id\": 123\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/editables/Equipment/addOrEdit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "editables",
+                "Equipment",
+                "addOrEdit"
+              ]
+            }
+          },
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
           "body": ""
         }
       ]
@@ -5661,6 +5925,13 @@
           ""
         ]
       }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.sandbox.qbdvision.com/sandbox",
+      "type": "string"
     }
   ]
 }
