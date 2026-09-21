@@ -12,16 +12,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessParameter/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ProcessParameter/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ProcessParameter",
             "list",
@@ -88,16 +83,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugSubstance/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/DrugSubstance/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "DrugSubstance",
             "list",
@@ -145,16 +135,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Step/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Step/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Step",
             "list",
@@ -215,16 +200,11 @@
           }
         ],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ProcessComponent/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ProcessComponent/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ProcessComponent",
             "list",
@@ -279,16 +259,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/UnitOperation/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/UnitOperation/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "UnitOperation",
             "list",
@@ -355,16 +330,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/GeneralAttribute/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/GeneralAttribute/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "GeneralAttribute",
             "list",
@@ -424,16 +394,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Supplier/list",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Supplier/list",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Supplier",
             "list"
@@ -492,16 +457,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/RMP/list",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/RMP/list",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "RMP",
             "list"
@@ -560,16 +520,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/LibraryMaterial/list",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/LibraryMaterial/list",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "LibraryMaterial",
             "list"
@@ -634,16 +589,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/TPPSection/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/TPPSection/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "TPPSection",
             "{projectId}"
@@ -708,16 +658,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FQA/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/FQA/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "FQA",
             "list",
@@ -765,16 +710,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Sample/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Sample/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Sample",
             "list",
@@ -835,16 +775,11 @@
           }
         ],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Process/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Process/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Process",
             "list",
@@ -904,16 +839,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/DrugProduct/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/DrugProduct/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "DrugProduct",
             "list",
@@ -973,16 +903,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/users/list",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/users/list",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "users",
             "list"
           ]
@@ -1008,16 +933,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Material/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Material/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Material",
             "list",
@@ -1084,16 +1004,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/MaterialAttribute/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/MaterialAttribute/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "MaterialAttribute",
             "list",
@@ -1148,16 +1063,11 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/ControlMethod/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/ControlMethod/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "ControlMethod",
             "list",
@@ -1211,16 +1121,11 @@
           }
         ],
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Project/list",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Project/list",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Project",
             "list"
@@ -1285,16 +1190,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IQA/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/IQA/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "IQA",
             "list",
@@ -1367,16 +1267,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/FPA/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/FPA/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "FPA",
             "list",
@@ -1442,16 +1337,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/IPA/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/IPA/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "IPA",
             "list",
@@ -1524,16 +1414,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Document/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Document/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Document",
             "list",
@@ -1607,16 +1492,11 @@
           }
         },
         "url": {
-          "raw": "https://api.sandbox.qbdvision.com/sandbox/editables/Batch/list/{projectId}",
-          "protocol": "https",
+          "raw": "{{baseUrl}}/editables/Batch/list/{projectId}",
           "host": [
-            "api",
-            "sandbox",
-            "qbdvision",
-            "com"
+            "{{baseUrl}}"
           ],
           "path": [
-            "sandbox",
             "editables",
             "Batch",
             "list",
@@ -1664,6 +1544,310 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Get Library Equipment Categories",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentCategory/list",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentCategory",
+            "list"
+          ],
+          "query": [
+            {
+              "key": "onlyApproved",
+              "value": "true",
+              "description": "Returns only objects that are approved and don't have a new draft.",
+              "disabled": true
+            },
+            {
+              "key": "showRemoved",
+              "value": "true",
+              "description": "Includes archived records.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllVersions",
+              "value": "true",
+              "description": "Includes allVersionsWithDetails with all versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllApprovedVersions",
+              "value": "true",
+              "description": "Includes approvedVersionsWithDetails with approved versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "sortBy",
+              "value": "{field,direction}",
+              "description": "Sort by field and direction. Field can be any record field, such as name or description. Direction: asc or desc.",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Library Equipment Models",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentModel/list",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentModel",
+            "list"
+          ],
+          "query": [
+            {
+              "key": "onlyApproved",
+              "value": "true",
+              "description": "Returns only objects that are approved and don't have a new draft.",
+              "disabled": true
+            },
+            {
+              "key": "showRemoved",
+              "value": "true",
+              "description": "Includes archived records.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllVersions",
+              "value": "true",
+              "description": "Includes allVersionsWithDetails with all versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllApprovedVersions",
+              "value": "true",
+              "description": "Includes approvedVersionsWithDetails with approved versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "sortBy",
+              "value": "{field,direction}",
+              "description": "Sort by field and direction. Field can be any record field, such as name or description. Direction: asc or desc.",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Library Equipment Units",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/LibraryEquipmentUnit/list",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "LibraryEquipmentUnit",
+            "list"
+          ],
+          "query": [
+            {
+              "key": "onlyApproved",
+              "value": "true",
+              "description": "Returns only objects that are approved and don't have a new draft.",
+              "disabled": true
+            },
+            {
+              "key": "showRemoved",
+              "value": "true",
+              "description": "Includes archived records.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllVersions",
+              "value": "true",
+              "description": "Includes allVersionsWithDetails with all versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllApprovedVersions",
+              "value": "true",
+              "description": "Includes approvedVersionsWithDetails with approved versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "sortBy",
+              "value": "{field,direction}",
+              "description": "Sort by field and direction. Field can be any record field, such as name or description. Direction: asc or desc.",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Sites",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/editables/Site/list",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "Site",
+            "list"
+          ],
+          "query": [
+            {
+              "key": "onlyApproved",
+              "value": "true",
+              "description": "Returns only objects that are approved and don't have a new draft.",
+              "disabled": true
+            },
+            {
+              "key": "showRemoved",
+              "value": "true",
+              "description": "Includes archived records.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllVersions",
+              "value": "true",
+              "description": "Includes allVersionsWithDetails with all versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllApprovedVersions",
+              "value": "true",
+              "description": "Includes approvedVersionsWithDetails with approved versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "sortBy",
+              "value": "{field,direction}",
+              "description": "Sort by field and direction. Field can be any record field, such as name or description. Direction: asc or desc.",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Equipment",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/editables/Equipment/list/{projectId}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "editables",
+            "Equipment",
+            "list",
+            "{projectId}"
+          ],
+          "query": [
+            {
+              "key": "onlyApproved",
+              "value": "true",
+              "description": "Returns only objects that are approved and don't have a new draft.",
+              "disabled": true
+            },
+            {
+              "key": "showRemoved",
+              "value": "true",
+              "description": "Includes archived records.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllVersions",
+              "value": "true",
+              "description": "Includes allVersionsWithDetails with all versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "includeAllApprovedVersions",
+              "value": "true",
+              "description": "Includes approvedVersionsWithDetails with approved versions and all fields.",
+              "disabled": true
+            },
+            {
+              "key": "sortBy",
+              "value": "{field,direction}",
+              "description": "Sort by field and direction. Field can be any record field, such as name or description. Direction: asc or desc.",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "auth": {
@@ -1703,6 +1887,13 @@
           ""
         ]
       }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.sandbox.qbdvision.com/sandbox",
+      "type": "string"
     }
   ]
 }
