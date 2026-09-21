@@ -171,6 +171,10 @@ Key behaviors:
 - Relies on project-level entities already existing in the target.
 - Syncs risk links after records are created.
 - Syncs supplier IDs for Materials and Process Components at the end.
+- Remaps sites references on process records by site name and creates missing sites.
+- Syncs Step work instructions after all process records are created so embedded
+  record references can be remapped to target IDs.
+- Persists their source-to-target work instruction ID mappings in `process_id_map.json`.
 
 ## Generated Files
 
